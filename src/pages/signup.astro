@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Toast from '../components/ui/Toast.astro';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (user) {
+  return Astro.redirect('/dashboard');
+}
+---
+
+<BaseLayout title="Create Account" description="Join CelebrateLoop for free and start creating beautiful digital greeting cards.">
+  <Navbar />
+  <Toast />
+
+  <main class="flex min-h-[calc(100dvh-4rem)] items-center justify-center px-4 py-16">
+    <div class="pointer-events-none absolute inset-0 overflow-hidden">
+      <div class="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-secondary/5 blur-3xl"></div>
+      <div class="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-accent/5 blur-3xl"></div>
+    </div>
+
+    <div class="relative w-full max-w-md">
+      <div class="mb-8 text-center">
+        <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-secondary/20 to-accent/20 text-3xl">
+          ✨
+        </div>
+        <h1 class="text-2xl font-bold text-surface-50">Create your account</h1>
+        <p class="mt-2 text-sm text-surface-400">Start creating beautiful celebrations for free</p>
+      </div>
+
+      <div class="glass rounded-2xl p-6 sm:p-8">
+        <form id="signup-form" class="flex flex-col gap-5">
+          <Input
+            label="Full Name"
+            name="full_name"
+            type="text"
+            placeholder="Your name"
+            required={true}
+          />
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            required={true}
+          />
+          <Input
+            label="Password"
+            name="password"
+            type="password"
+            placeholder="Min. 6 characters"
+            required={true}
+          />
+
+          <Button type="submit" variant="primary" size="lg" fullWidth={true} id="signup-submit-btn">
+            Create Account
+          </Button>
+        </form>
+      </div>
+
+      <p class="mt-6 text-center text-sm text-surface-400">
+        Already have an account?
+        <a href="/login" class="font-medium text-primary hover:text-primary-light transition-colors">
+          Sign in
+        </a>
+      </p>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  document.getElementById('signup-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const btn = document.getElementById('signup-submit-btn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Creating account...';
+
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.get('email'),
+          password: formData.get('password'),
+          full_name: formData.get('full_name'),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (data.session) {
+          try {
+            const { supabaseBrowser } = await import('../lib/supabase-browser');
+            await supabaseBrowser.auth.setSession({
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+            });
+          } catch {
+            // Ignore client sync errors
+          }
+        }
+        (window as any).showToast({ message: 'Account created! Redirecting...', type: 'success' });
+        setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
+      } else {
+        (window as any).showToast({ message: data.error || 'Signup failed', type: 'error' });
+      }
+    } catch {
+      (window as any).showToast({ message: 'Network error. Please try again.', type: 'error' });
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    }
+  });
+</script>

@@ -1,0 +1,650 @@
+---
+import BaseLayout from '../../components/layout/BaseLayout.astro';
+import type { Card, Wish, ThemeConfig } from '../../lib/types';
+import { CATEGORY_META } from '../../lib/types';
+import { getTrackById, getTrackUrl } from '../../lib/audio-tracks';
+import { resolveMediaUrl } from '../../lib/r2';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+const supabase = Astro.locals.supabase;
+
+// Fetch card by slug
+const { data: card, error: cardError } = await supabase
+  .from('cards')
+  .select('*')
+  .eq('slug', slug)
+  .eq('is_published', true)
+  .single();
+
+if (cardError || !card) {
+  return new Response(null, { status: 404, statusText: 'Card not found' });
+}
+
+// Fetch wishes
+const { data: wishes } = await supabase
+  .from('wishes')
+  .select('*')
+  .eq('card_id', card.id)
+  .order('created_at', { ascending: false });
+
+const typedCard = card as Card;
+const typedWishes = (wishes || []) as Wish[];
+const theme = typedCard.theme_config as ThemeConfig;
+const meta = CATEGORY_META[typedCard.category as keyof typeof CATEGORY_META];
+const audioTrack = theme.audioTrackId ? getTrackById(theme.audioTrackId) : null;
+const audioUrl = audioTrack ? getTrackUrl(audioTrack.filename) : (theme.externalAudioUrl || null);
+const trackId = theme.audioTrackId || (audioTrack ? audioTrack.id : 'warm-piano');
+const hasAudio = Boolean(theme.audioTrackId || theme.externalAudioUrl || audioTrack);
+
+const fontMap: Record<string, string> = {
+  sans: "'Inter', sans-serif",
+  serif: "'Georgia', serif",
+  handwritten: 'cursive',
+  display: "'Outfit', sans-serif",
+};
+const fontFamily = fontMap[theme.fontFamily] || fontMap.sans;
+
+// Pattern SVGs
+const patternMap: Record<string, string> = {
+  confetti: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23${theme.primaryColor.slice(1)}' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+  hearts: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23${theme.secondaryColor.slice(1)}' fill-opacity='0.06'%3E%3Cpath d='M20 10c2-4 7-5 10-2s3 8 0 12L20 30 10 20c-3-4-3-9 0-12s8-2 10 2z'/%3E%3C/g%3E%3C/svg%3E")`,
+  stars: `url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23${theme.primaryColor.slice(1)}' fill-opacity='0.06'%3E%3Cpath d='M25 5l3 9h9l-7 5 3 9-8-6-8 6 3-9-7-5h9z'/%3E%3C/g%3E%3C/svg%3E")`,
+  dots: `radial-gradient(circle, ${theme.primaryColor}08 1px, transparent 1px)`,
+  waves: `url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264.888-.14 1.652-1.249 2.747-2.98 3.227-4.908.48-1.929.384-3.96-.287-5.84C20.124 7.232 15.89 6.4 12.084 7.315 8.28 8.23 4.86 10.811 2.63 14.48L0 19.84V20h21.184z' fill='%23${theme.primaryColor.slice(1)}' fill-opacity='0.04'/%3E%3C/svg%3E")`,
+};
+const bgPattern = patternMap[theme.backgroundPattern] || 'none';
+const ogImage = typedCard.media_urls.length > 0
+  ? resolveMediaUrl(typedCard.media_urls[0])
+  : '/og-default.png';
+---
+
+<BaseLayout
+  title={`${meta?.label || 'Card'} for ${typedCard.recipient_name}`}
+  description={typedCard.message.slice(0, 155)}
+  ogImage={ogImage}
+>
+  <!-- Envelope Unboxing Overlay -->
+  <div
+    id="unbox-overlay"
+    class="fixed inset-0 z-50 flex items-center justify-center"
+    style={`background: linear-gradient(135deg, ${theme.primaryColor}30, ${theme.secondaryColor}20, ${theme.backgroundColor});`}
+  >
+    <div class="text-center">
+      {theme.unboxStyle === 'envelope' && (
+        <div id="envelope-container" class="relative cursor-pointer mx-auto" style="width: 280px; height: 200px;">
+          <!-- Envelope body -->
+          <div class="absolute inset-0 rounded-2xl shadow-elevated" style={`background: linear-gradient(135deg, ${theme.primaryColor}80, ${theme.secondaryColor}60);`}>
+            <div class="flex h-full items-center justify-center">
+              <span class="text-6xl">{meta?.emoji || '🎉'}</span>
+            </div>
+          </div>
+          <!-- Envelope flap -->
+          <div
+            id="envelope-flap"
+            class="absolute left-0 right-0 top-0 h-1/2 origin-top rounded-t-2xl"
+            style={`background: linear-gradient(180deg, ${theme.primaryColor}90, ${theme.primaryColor}70); clip-path: polygon(0 0, 50% 100%, 100% 0);`}
+          ></div>
+        </div>
+      )}
+
+      {theme.unboxStyle === 'giftbox' && (
+        <div id="giftbox-container" class="relative cursor-pointer mx-auto" style="width: 220px; height: 240px;">
+          <!-- Box body -->
+          <div class="absolute bottom-0 left-2.5 right-2.5 h-40 rounded-xl" style={`background: linear-gradient(135deg, ${theme.primaryColor}80, ${theme.secondaryColor}60);`}>
+            <!-- Vertical ribbon -->
+            <div class="absolute left-1/2 top-0 h-full w-6 -translate-x-1/2" style={`background: ${theme.secondaryColor}90;`}></div>
+            <div class="flex h-full items-center justify-center relative z-10">
+              <span class="text-5xl">{meta?.emoji || '🎉'}</span>
+            </div>
+          </div>
+          <!-- Lid -->
+          <div
+            id="gift-lid"
+            class="absolute left-0 right-0 top-15 h-12.5 rounded-xl origin-bottom"
+            style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
+          >
+            <!-- Horizontal ribbon -->
+            <div class="absolute left-1/2 top-0 h-full w-6 -translate-x-1/2" style={`background: ${theme.secondaryColor};`}></div>
+            <!-- Bow -->
+            <div class="absolute left-1/2 -top-5 -translate-x-1/2 text-3xl">🎀</div>
+          </div>
+        </div>
+      )}
+
+      {theme.unboxStyle === 'ribbon' && (
+        <div id="ribbon-container" class="relative cursor-pointer mx-auto" style="width: 260px; height: 260px;">
+          <div class="absolute inset-0 rounded-2xl shadow-elevated overflow-hidden" style={`background: linear-gradient(135deg, ${theme.primaryColor}80, ${theme.secondaryColor}60);`}>
+            <div class="flex h-full items-center justify-center">
+              <span class="text-6xl">{meta?.emoji || '🎉'}</span>
+            </div>
+          </div>
+          <!-- Ribbon cross -->
+          <div id="ribbon-v" class="absolute left-1/2 top-0 h-full w-8 -translate-x-1/2 origin-top" style={`background: ${theme.secondaryColor}90;`}></div>
+          <div id="ribbon-h" class="absolute left-0 top-1/2 h-8 w-full -translate-y-1/2 origin-left" style={`background: ${theme.secondaryColor}90;`}></div>
+          <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl z-10">🎀</div>
+        </div>
+      )}
+
+      <p class="mt-8 text-base font-medium text-surface-200 animate-pulse">
+        Tap to open
+      </p>
+    </div>
+  </div>
+
+  <!-- Data bridge for client script -->
+  <div
+    id="card-data"
+    data-card-id={typedCard.id}
+    data-audio-url={audioUrl || ''}
+    data-track-id={trackId}
+    data-has-audio={hasAudio ? 'true' : 'false'}
+    data-unbox-style={theme.unboxStyle}
+    class="hidden"
+  ></div>
+
+  <!-- Card Content (hidden until unboxed) -->
+  <main
+    id="card-content"
+    class="hidden min-h-dvh"
+    style={`background: linear-gradient(180deg, ${theme.backgroundColor}, ${theme.primaryColor}10); background-image: ${bgPattern}; background-size: ${theme.backgroundPattern === 'dots' ? '20px 20px' : 'auto'}; font-family: ${fontFamily};`}
+  >
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="pointer-events-none fixed inset-0 z-(--z-confetti)" style="width:100%;height:100%;"></canvas>
+
+    <!-- Audio Player (hidden, autoplay-compliant) -->
+    {hasAudio && (
+      <div id="audio-bar" class="fixed bottom-4 right-4 z-40">
+        <button
+          id="audio-toggle"
+          class="flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-110 cursor-pointer"
+          style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
+          aria-label="Toggle music"
+        >
+          <svg id="audio-icon-play" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+          </svg>
+          <svg id="audio-icon-mute" class="hidden h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+          </svg>
+        </button>
+        {audioUrl && (
+          <audio id="bg-audio" loop preload="none">
+            <source src={audioUrl} type="audio/ogg" />
+          </audio>
+        )}
+      </div>
+    )}
+
+    <div class="mx-auto max-w-2xl px-4 py-12 sm:py-16">
+      <!-- Greeting Header -->
+      <header class="text-center animate-fade-in-up" style="animation-delay: 200ms; opacity: 0; animation-fill-mode: forwards;">
+        <div class="mb-4 text-6xl sm:text-7xl">{meta?.emoji || '🎉'}</div>
+        <h1
+          class="font-display text-3xl font-bold sm:text-4xl"
+          style={`color: ${theme.primaryColor}; font-size: var(--text-hero);`}
+        >
+          Happy {meta?.label || 'Celebration'}!
+        </h1>
+        <p class="mt-2 text-xl text-surface-200 sm:text-2xl" style="font-family: inherit;">
+          Dear <span class="font-semibold" style={`color: ${theme.secondaryColor};`}>{typedCard.recipient_name}</span>
+        </p>
+      </header>
+
+      <!-- Message -->
+      <section class="mt-10 animate-fade-in-up" style="animation-delay: 400ms; opacity: 0; animation-fill-mode: forwards;">
+        <div
+          class="rounded-2xl p-6 sm:p-8"
+          style={`background: ${theme.primaryColor}10; border: 1px solid ${theme.primaryColor}20;`}
+        >
+          <p class="whitespace-pre-line text-base leading-relaxed text-surface-200 sm:text-lg">
+            {typedCard.message}
+          </p>
+          {typedCard.sender_name && (
+            <p class="mt-6 text-right text-sm italic text-surface-400">
+              With love, <span class="font-medium text-surface-300">{typedCard.sender_name}</span>
+            </p>
+          )}
+        </div>
+      </section>
+
+      <!-- Countdown Timer -->
+      {typedCard.event_date && (
+        <section class="mt-10 animate-fade-in-up" style="animation-delay: 600ms; opacity: 0; animation-fill-mode: forwards;">
+          <div class="text-center">
+            <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-surface-400">Countdown</h2>
+            <div id="countdown" class="flex justify-center gap-3 sm:gap-5" data-event-date={typedCard.event_date}>
+              {['Days', 'Hours', 'Min', 'Sec'].map((unit) => (
+                <div class="flex flex-col items-center">
+                  <div
+                    class="flex h-16 w-16 items-center justify-center rounded-xl text-2xl font-bold text-white sm:h-20 sm:w-20 sm:text-3xl"
+                    style={`background: linear-gradient(135deg, ${theme.primaryColor}40, ${theme.secondaryColor}30);`}
+                    data-countdown={unit.toLowerCase().replace('min', 'minutes').replace('sec', 'seconds')}
+                  >
+                    --
+                  </div>
+                  <span class="mt-1.5 text-xs text-surface-400">{unit}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <!-- Photo Gallery -->
+      {typedCard.media_urls.length > 0 && (
+        <section class="mt-10 animate-fade-in-up" style="animation-delay: 800ms; opacity: 0; animation-fill-mode: forwards;">
+          <h2 class="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">Memories</h2>
+          <div class:list={[
+            'grid gap-3',
+            typedCard.media_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2',
+          ]}>
+            {typedCard.media_urls.map((url, i) => (
+              <div
+                class="group overflow-hidden rounded-2xl bg-surface-800"
+                style={`border: 1px solid ${theme.primaryColor}20;`}
+              >
+                <img
+                  src={resolveMediaUrl(url)}
+                  alt={`Photo ${i + 1}`}
+                  loading="lazy"
+                  decoding="async"
+                  class="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Wish Wall / Guestbook -->
+      <section class="mt-12 animate-fade-in-up" style="animation-delay: 1000ms; opacity: 0; animation-fill-mode: forwards;">
+        <h2 class="mb-6 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">
+          💬 Wish Wall
+        </h2>
+
+        <!-- Submit Wish Form -->
+        <form id="wish-form" class="mb-8">
+          <div class="rounded-2xl p-5" style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}>
+            <input
+              type="text"
+              id="wish-sender"
+              placeholder="Your name"
+              required
+              class="form-text mb-3 w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm focus-ring"
+              style={`border-color: ${theme.primaryColor}20;`}
+            />
+            <textarea
+              id="wish-message"
+              placeholder="Write your congratulations..."
+              required
+              rows="3"
+              class="form-text mb-3 w-full resize-none rounded-xl border bg-white/5 px-4 py-3 text-sm focus-ring"
+              style={`border-color: ${theme.primaryColor}20;`}
+            ></textarea>
+            <button
+              type="submit"
+              id="wish-submit-btn"
+              class="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.97] cursor-pointer"
+              style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
+            >
+              Send Wishes ✨
+            </button>
+          </div>
+        </form>
+
+        <!-- Wishes List -->
+        <div id="wishes-container" class="space-y-3">
+          {typedWishes.map((wish) => (
+            <div class="rounded-xl p-4" style={`background: ${theme.primaryColor}06; border: 1px solid ${theme.primaryColor}10;`}>
+              <div class="flex items-baseline justify-between">
+                <span class="text-sm font-semibold" style={`color: ${theme.primaryColor};`}>{wish.sender_name}</span>
+                <span class="text-xs text-surface-500">
+                  {new Date(wish.created_at).toLocaleDateString()}
+                </span>
+              </div>
+              <p class="mt-1.5 text-sm text-surface-300">{wish.message}</p>
+            </div>
+          ))}
+          {typedWishes.length === 0 && (
+            <p class="py-8 text-center text-sm text-surface-500">
+              Be the first to send your wishes! 🎉
+            </p>
+          )}
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="mt-16 text-center">
+        <p class="text-xs text-surface-500">
+          Made with <span class="text-confetti-pink">♥</span> on
+          <a href="/" class="font-medium text-surface-400 hover:text-white transition-colors">CelebrateLoop</a>
+        </p>
+      </footer>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import { startSynth, stopSynth } from '../../lib/synth-audio';
+
+  // ═══════════════════════════════════════════════════════
+  // Recipient Route — Interactions
+  // ═══════════════════════════════════════════════════════
+
+  const dataEl = document.getElementById('card-data') as HTMLElement;
+  const cardId = dataEl?.dataset.cardId || '';
+  const audioUrl = dataEl?.dataset.audioUrl || '';
+  const trackId = dataEl?.dataset.trackId || 'warm-piano';
+  const hasAudio = dataEl?.dataset.hasAudio === 'true';
+  const unboxStyle = dataEl?.dataset.unboxStyle || 'envelope';
+
+  const overlay = document.getElementById('unbox-overlay');
+  const content = document.getElementById('card-content');
+
+  // Unboxing Animation
+  function triggerUnbox() {
+    if (!overlay || !content) return;
+
+    if (unboxStyle === 'envelope') {
+      const flap = document.getElementById('envelope-flap');
+      if (flap) {
+        flap.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        flap.style.transform = 'perspective(800px) rotateX(-180deg)';
+      }
+    } else if (unboxStyle === 'giftbox') {
+      const lid = document.getElementById('gift-lid');
+      if (lid) {
+        lid.style.transition = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        lid.style.transform = 'perspective(600px) rotateX(-110deg) translateY(-60px)';
+        lid.style.opacity = '0';
+      }
+    } else if (unboxStyle === 'ribbon') {
+      const rv = document.getElementById('ribbon-v');
+      const rh = document.getElementById('ribbon-h');
+      if (rv) {
+        rv.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        rv.style.transform = 'translateX(-50%) scaleY(0) translateY(-40px)';
+        rv.style.opacity = '0';
+      }
+      if (rh) {
+        rh.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s';
+        rh.style.transform = 'translateY(-50%) scaleX(0)';
+        rh.style.opacity = '0';
+      }
+    }
+
+    // Fade out overlay and show card
+    setTimeout(() => {
+      overlay.style.transition = 'opacity 0.5s ease';
+      overlay.style.opacity = '0';
+
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        content.classList.remove('hidden');
+
+        // Trigger confetti
+        triggerConfetti();
+
+        // Start audio (autoplay-compliant: user has interacted)
+        if (hasAudio) startAudio();
+      }, 500);
+    }, 900);
+  }
+
+  overlay?.addEventListener('click', triggerUnbox);
+
+  // Confetti
+  async function triggerConfetti() {
+    try {
+      const confetti = (await import('canvas-confetti')).default;
+      const canvas = document.getElementById('confetti-canvas') as HTMLCanvasElement | null;
+      if (!canvas) return;
+
+      const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+
+      // Initial burst
+      myConfetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#c084fc', '#f472b6', '#818cf8', '#ffc75f', '#ff6f91'],
+      });
+
+      // Secondary burst
+      setTimeout(() => {
+        myConfetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#c084fc', '#f472b6', '#818cf8'],
+        });
+        myConfetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#ffc75f', '#ff6f91', '#a3de83'],
+        });
+      }, 300);
+    } catch {
+      // Graceful fallback — confetti is non-critical
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Resilient Audio Controller & Fallback Management
+  // ═══════════════════════════════════════════════════════
+
+  let activeSource: 'none' | 'html5' | 'synth' = 'none';
+  let isPlaying = false;
+  let audioInitialized = false;
+
+  function updateAudioUI(playing: boolean) {
+    const iconPlay = document.getElementById('audio-icon-play');
+    const iconMute = document.getElementById('audio-icon-mute');
+    if (playing) {
+      iconPlay?.classList.remove('hidden');
+      iconMute?.classList.add('hidden');
+    } else {
+      iconPlay?.classList.add('hidden');
+      iconMute?.classList.remove('hidden');
+    }
+  }
+
+  async function fallbackToSynth() {
+    if (activeSource === 'synth' && isPlaying) return;
+
+    // Clean up HTML5 audio if active or pending
+    const audio = document.getElementById('bg-audio') as HTMLAudioElement | null;
+    if (audio) {
+      audio.pause();
+      // Remove src to stop browser network retries
+      audio.removeAttribute('src');
+    }
+
+    activeSource = 'synth';
+    const started = await startSynth(trackId, 0.35);
+    if (started) {
+      isPlaying = true;
+      updateAudioUI(true);
+    } else {
+      isPlaying = false;
+      updateAudioUI(false);
+    }
+  }
+
+  function startAudio() {
+    if (audioInitialized) return;
+    audioInitialized = true;
+
+    const audio = document.getElementById('bg-audio') as HTMLAudioElement | null;
+    const toggle = document.getElementById('audio-toggle');
+
+    if (!toggle) return;
+
+    // Check if audioUrl is a direct streamable file URL
+    // (excludes web pages like youtube.com, youtu.be, spotify.com which cannot be played by HTML5 <audio>)
+    const isDirectAudioUrl =
+      audioUrl &&
+      !audioUrl.includes('youtube.com') &&
+      !audioUrl.includes('youtu.be') &&
+      !audioUrl.includes('spotify.com');
+
+    if (audio && isDirectAudioUrl) {
+      let fallbackTriggered = false;
+
+      const onAudioError = () => {
+        if (fallbackTriggered) return;
+        fallbackTriggered = true;
+        fallbackToSynth();
+      };
+
+      audio.addEventListener('error', onAudioError, { once: true });
+      const sourceEl = audio.querySelector('source');
+      if (sourceEl) {
+        sourceEl.addEventListener('error', onAudioError, { once: true });
+      }
+
+      audio.volume = 0.4;
+      audio
+        .play()
+        .then(() => {
+          if (!fallbackTriggered) {
+            activeSource = 'html5';
+            isPlaying = true;
+            updateAudioUI(true);
+          }
+        })
+        .catch(() => {
+          // Play rejected (e.g. 404, format decode error, network failure)
+          onAudioError();
+        });
+    } else {
+      // Missing audio URL, unsupported web link (e.g. YouTube), or no <audio> element:
+      // Fallback straight to Web Audio synth
+      fallbackToSynth();
+    }
+
+    // Floating Sound Control Button (Toggle Play / Pause / Mute)
+    toggle.addEventListener('click', async () => {
+      if (isPlaying) {
+        if (activeSource === 'html5' && audio) {
+          audio.pause();
+        } else if (activeSource === 'synth') {
+          stopSynth();
+        }
+        isPlaying = false;
+        updateAudioUI(false);
+      } else {
+        if (activeSource === 'html5' && audio) {
+          audio
+            .play()
+            .then(() => {
+              isPlaying = true;
+              updateAudioUI(true);
+            })
+            .catch(() => {
+              fallbackToSynth();
+            });
+        } else {
+          fallbackToSynth();
+        }
+      }
+    });
+  }
+
+  // Countdown Timer
+  const countdownEl = document.getElementById('countdown');
+  if (countdownEl) {
+    const eventDate = new Date(countdownEl.dataset.eventDate + 'T00:00:00');
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = eventDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        document.querySelectorAll('[data-countdown]').forEach((el) => {
+          el.textContent = '🎉';
+        });
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const daysEl = document.querySelector('[data-countdown="days"]');
+      const hoursEl = document.querySelector('[data-countdown="hours"]');
+      const minutesEl = document.querySelector('[data-countdown="minutes"]');
+      const secondsEl = document.querySelector('[data-countdown="seconds"]');
+
+      if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+      if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+      if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+      if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  }
+
+  // Wish Form
+  document.getElementById('wish-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const sender = document.getElementById('wish-sender') as HTMLInputElement | null;
+    const message = document.getElementById('wish-message') as HTMLTextAreaElement | null;
+    const btn = document.getElementById('wish-submit-btn') as HTMLButtonElement | null;
+
+    if (!sender || !message || !btn) return;
+
+    (btn as HTMLButtonElement).disabled = true;
+    btn.textContent = 'Sending...';
+
+    try {
+      const res = await fetch(`/api/wishes/${cardId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender_name: sender.value,
+          message: message.value,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to send wish');
+
+      await res.json();
+
+      // Add wish to the list dynamically
+      const container = document.getElementById('wishes-container');
+      if (container) {
+        // Remove "be the first" placeholder
+        const placeholder = container.querySelector('p.text-center');
+        if (placeholder) placeholder.remove();
+
+        const wishEl = document.createElement('div');
+        wishEl.className = 'rounded-xl p-4 animate-fade-in-up';
+        wishEl.style.cssText = `background: ${getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || '#c084fc'}06; border: 1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || '#c084fc'}10;`;
+        wishEl.innerHTML = `
+          <div class="flex items-baseline justify-between">
+            <span class="text-sm font-semibold text-primary">${sender.value}</span>
+            <span class="text-xs text-surface-500">Just now</span>
+          </div>
+          <p class="mt-1.5 text-sm text-surface-300">${message.value}</p>
+        `;
+        container.prepend(wishEl);
+      }
+
+      sender.value = '';
+      message.value = '';
+    } catch {
+      alert('Failed to send wish. Please try again.');
+    } finally {
+      (btn as HTMLButtonElement).disabled = false;
+      btn.textContent = 'Send Wishes ✨';
+    }
+  });
+</script>

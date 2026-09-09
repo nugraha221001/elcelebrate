@@ -1,0 +1,165 @@
+---
+export const prerender = false;
+
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+import Button from '../components/ui/Button.astro';
+import { CATEGORY_META } from '../lib/types';
+
+const user = Astro.locals.user;
+---
+
+<BaseLayout title="Digital Greeting Cards" description="Create stunning digital greeting cards for birthdays, anniversaries, graduations, and invitations. Free, fast, and beautiful.">
+  <Navbar user={user} />
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden">
+    <!-- Ambient background -->
+    <div class="pointer-events-none absolute inset-0">
+      <div class="absolute left-1/4 top-0 h-150 w-150 rounded-full bg-primary/8 blur-[120px]"></div>
+      <div class="absolute right-1/4 top-1/3 h-125 w-125 rounded-full bg-secondary/6 blur-[100px]"></div>
+      <div class="absolute bottom-0 left-1/2 h-100 w-100 -translate-x-1/2 rounded-full bg-accent/5 blur-[80px]"></div>
+    </div>
+
+    <div class="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
+      <div class="mx-auto max-w-3xl text-center">
+        <!-- Floating emoji decorations -->
+        <div class="mb-8 flex justify-center gap-4">
+          <span class="animate-float text-4xl" style="animation-delay: 0s">🎂</span>
+          <span class="animate-float text-4xl" style="animation-delay: 0.5s">💍</span>
+          <span class="animate-float text-4xl" style="animation-delay: 1s">🎓</span>
+          <span class="animate-float text-4xl" style="animation-delay: 1.5s">✉️</span>
+        </div>
+
+        <h1 class="font-display" style="font-size: var(--text-display); font-weight: 800; line-height: 1.1;">
+          <span class="gradient-text">Celebrate</span>
+          <br />
+          <span class="text-surface-50">Every Moment</span>
+        </h1>
+
+        <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-surface-300" style="font-size: var(--text-subheading);">
+          Create beautiful digital greeting cards with stunning animations, music, and photo galleries.
+          <span class="text-surface-200 font-medium">Completely free.</span>
+        </p>
+
+        <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Button href="/dashboard/create" variant="primary" size="lg" id="hero-cta">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+            </svg>
+            Create a Card
+          </Button>
+          <Button href="#categories" variant="secondary" size="lg">
+            Explore Categories
+          </Button>
+        </div>
+
+        <!-- Stats -->
+        <div class="mt-16 grid grid-cols-3 gap-6">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-surface-50 sm:text-3xl">Free</div>
+            <div class="mt-1 text-xs text-surface-400 sm:text-sm">Forever, no catch</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-surface-50 sm:text-3xl">&lt;1s</div>
+            <div class="mt-1 text-xs text-surface-400 sm:text-sm">Load time</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-surface-50 sm:text-3xl">4</div>
+            <div class="mt-1 text-xs text-surface-400 sm:text-sm">Card categories</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section id="categories" class="relative py-(--space-section)">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="font-display text-surface-50" style="font-size: var(--text-heading); font-weight: 700;">
+          Cards for Every Celebration
+        </h2>
+        <p class="mt-4 text-surface-400">Choose a category and create something unforgettable</p>
+      </div>
+
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {Object.entries(CATEGORY_META).map(([key, meta], i) => (
+          <a
+            href="/dashboard/create"
+            class="group relative overflow-hidden rounded-2xl bg-surface-800 border border-white/5 p-6 transition-all duration-300 hover:shadow-elevated hover:-translate-y-2 hover:border-white/10"
+            id={`category-${key}`}
+            style={`animation: fade-in-up 0.6s var(--ease-smooth) forwards; animation-delay: ${i * 100}ms; opacity: 0;`}
+          >
+            <div class="mb-4 text-5xl transition-transform duration-300 group-hover:scale-110">
+              {meta.emoji}
+            </div>
+            <h3 class="text-lg font-semibold text-surface-100">{meta.label}</h3>
+            <p class="mt-2 text-sm text-surface-400">{meta.description}</p>
+            <div class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary opacity-0 transition-all duration-300 group-hover:opacity-100">
+              Create now
+              <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="relative border-t border-white/5 py-(--space-section)">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="font-display text-surface-50" style="font-size: var(--text-heading); font-weight: 700;">
+          More Than a Card
+        </h2>
+        <p class="mt-4 text-surface-400">Every card is a complete digital experience</p>
+      </div>
+
+      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {[
+          { icon: '🎁', title: 'Unboxing Animations', desc: 'Envelope flip, gift box peel, or ribbon untie — choose how your recipient opens their card' },
+          { icon: '🎵', title: 'Background Music', desc: 'Set the mood with curated instrumentals or embed Spotify/YouTube links' },
+          { icon: '📸', title: 'Photo Gallery', desc: 'Upload up to 4 photos with automatic WebP compression for blazing-fast loading' },
+          { icon: '🎊', title: 'Confetti Burst', desc: 'A shower of confetti particles celebrates the big reveal moment' },
+          { icon: '💬', title: 'Wish Wall', desc: 'Friends and family can leave congratulatory messages in real-time' },
+          { icon: '⏰', title: 'Countdown Timer', desc: 'Build anticipation with a live countdown to the event date' },
+        ].map((f, i) => (
+          <div
+            class="glass rounded-2xl p-6 transition-all duration-300 hover:shadow-glow-sm"
+            style={`animation: fade-in-up 0.6s var(--ease-smooth) forwards; animation-delay: ${i * 80}ms; opacity: 0;`}
+          >
+            <div class="mb-3 text-3xl">{f.icon}</div>
+            <h3 class="text-base font-semibold text-surface-100">{f.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-surface-400">{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="relative border-t border-white/5 py-(--space-section)">
+    <div class="pointer-events-none absolute inset-0">
+      <div class="absolute left-1/2 top-1/2 h-125 w-125 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px]"></div>
+    </div>
+    <div class="relative mx-auto max-w-2xl px-4 text-center sm:px-6">
+      <h2 class="font-display text-surface-50" style="font-size: var(--text-heading); font-weight: 700;">
+        Ready to Celebrate?
+      </h2>
+      <p class="mt-4 text-lg text-surface-300">
+        Create your first card in under 2 minutes. It's free, forever.
+      </p>
+      <div class="mt-8">
+        <Button href={user ? '/dashboard/create' : '/signup'} variant="primary" size="lg" id="cta-bottom">
+          Get Started Free
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

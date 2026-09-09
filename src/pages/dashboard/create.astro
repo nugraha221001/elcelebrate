@@ -1,0 +1,1334 @@
+---
+import DashboardLayout from '../../components/layout/DashboardLayout.astro';
+import Toast from '../../components/ui/Toast.astro';
+import { CATEGORY_META } from '../../lib/types';
+import { AUDIO_TRACKS } from '../../lib/audio-tracks';
+
+export const prerender = false;
+
+// Auth guard — must run before any HTML is emitted
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<DashboardLayout title="Create Card" description="Design a beautiful digital greeting card">
+  <Toast />
+
+  <div class="mx-auto max-w-5xl">
+    <!-- Step Indicator -->
+    <div class="mb-10" id="step-indicator">
+      <div class="flex items-center justify-between">
+        {['Category', 'Theme', 'Media', 'Message', 'Preview'].map((label, i) => (
+          <div class="flex flex-1 items-center">
+            <div class="flex flex-col items-center gap-1.5">
+              <div
+                class="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300"
+                data-step-dot={i + 1}
+              >
+                {i + 1}
+              </div>
+              <span class="hidden text-xs font-medium text-surface-400 sm:block" data-step-label={i + 1}>
+                {label}
+              </span>
+            </div>
+            {i < 4 && (
+              <div class="mx-2 h-0.5 flex-1 rounded bg-surface-700 transition-all duration-500" data-step-line={i + 1}></div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-5">
+      <!-- Wizard Panel (3 cols) -->
+      <div class="lg:col-span-3">
+        <!-- Step 1: Category -->
+        <div id="step-1" class="wizard-step">
+          <h2 class="text-xl font-bold text-surface-50">Choose a Category</h2>
+          <p class="mt-2 text-sm text-surface-400">What are we celebrating?</p>
+
+          <div class="mt-6 grid grid-cols-2 gap-4">
+            {Object.entries(CATEGORY_META).map(([key, meta]) => (
+              <button
+                type="button"
+                class="group relative overflow-hidden rounded-2xl border border-white/5 bg-surface-800 p-5 text-left transition-all duration-300 hover:border-primary/30 hover:shadow-glow-sm cursor-pointer"
+                data-category={key}
+              >
+                <div class="mb-3 text-4xl transition-transform duration-300 group-hover:scale-110">
+                  {meta.emoji}
+                </div>
+                <div class="text-base font-semibold text-surface-100">{meta.label}</div>
+                <div class="mt-1 text-xs text-surface-400">{meta.description}</div>
+                <!-- Selected indicator -->
+                <div class="absolute right-3 top-3 hidden h-6 w-6 items-center justify-center rounded-full bg-primary text-white" data-check>
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- Step 2: Theme Customizer -->
+        <div id="step-2" class="wizard-step hidden">
+          <h2 class="text-xl font-bold text-surface-50">Customize Theme</h2>
+          <p class="mt-2 text-sm text-surface-400">Set the visual mood for your card</p>
+
+          <div class="mt-6 space-y-6">
+            <!-- Colors -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="mb-1.5 block text-sm font-medium text-surface-200">Primary Color</label>
+                <div class="flex items-center gap-3">
+                  <input type="color" id="theme-primary" value="#c084fc" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
+                  <span class="text-xs text-surface-400" id="theme-primary-hex">#c084fc</span>
+                </div>
+              </div>
+              <div>
+                <label class="mb-1.5 block text-sm font-medium text-surface-200">Secondary Color</label>
+                <div class="flex items-center gap-3">
+                  <input type="color" id="theme-secondary" value="#f472b6" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
+                  <span class="text-xs text-surface-400" id="theme-secondary-hex">#f472b6</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Background Pattern -->
+            <div>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Background Pattern</label>
+              <div class="flex flex-wrap gap-2">
+                {[
+                  { id: 'none', label: '✕ None' },
+                  { id: 'confetti', label: '🎊 Confetti' },
+                  { id: 'hearts', label: '💕 Hearts' },
+                  { id: 'stars', label: '⭐ Stars' },
+                  { id: 'dots', label: '● Dots' },
+                  { id: 'waves', label: '🌊 Waves' },
+                ].map((p) => {
+                  const isDefault = p.id === 'none';
+                  return (
+                    <button
+                      type="button"
+                      class:list={[
+                        'pattern-btn rounded-lg border px-3 py-1.5 text-xs transition-all cursor-pointer',
+                        isDefault
+                          ? 'border-purple-500 ring-2 ring-purple-500/40 bg-purple-500/15 text-white font-medium shadow-lg shadow-purple-500/10'
+                          : 'bg-surface-800/60 border-white/10 text-surface-400 hover:border-white/20 hover:text-surface-200',
+                      ]}
+                      data-pattern={p.id}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <!-- Font Family -->
+            <div>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Font Style</label>
+              <div class="grid grid-cols-2 gap-3">
+                {[
+                  { id: 'sans', label: 'Modern Sans', sample: 'Aa', font: 'Inter' },
+                  { id: 'serif', label: 'Classic Serif', sample: 'Aa', font: 'Georgia' },
+                  { id: 'handwritten', label: 'Handwritten', sample: 'Aa', font: 'cursive' },
+                  { id: 'display', label: 'Display', sample: 'Aa', font: 'Outfit' },
+                ].map((f) => {
+                  const isDefault = f.id === 'sans';
+                  return (
+                    <button
+                      type="button"
+                      class:list={[
+                        'font-btn relative rounded-xl border p-3 text-left transition-all cursor-pointer',
+                        isDefault
+                          ? 'border-purple-500 ring-2 ring-purple-500/40 bg-purple-500/15 text-white font-medium shadow-lg shadow-purple-500/10'
+                          : 'bg-surface-800/60 border-white/10 text-surface-400 hover:border-white/20 hover:text-surface-200',
+                      ]}
+                      data-font={f.id}
+                    >
+                      <span class:list={[
+                        'font-active-check absolute top-2.5 right-2.5 h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-[10px] font-bold text-white shadow-sm shadow-purple-500/50',
+                        isDefault ? 'flex' : 'hidden',
+                      ]}>✓</span>
+                      <span class="text-2xl text-surface-200" style={`font-family: ${f.font}`}>{f.sample}</span>
+                      <div class="mt-1 text-xs">{f.label}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <!-- Unbox Style -->
+            <div>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Unboxing Animation</label>
+              <div class="grid grid-cols-3 gap-3">
+                {[
+                  { id: 'envelope', emoji: '✉️', label: 'Envelope Flip' },
+                  { id: 'giftbox', emoji: '🎁', label: 'Gift Box' },
+                  { id: 'ribbon', emoji: '🎀', label: 'Ribbon Untie' },
+                ].map((u) => {
+                  const isDefault = u.id === 'envelope';
+                  return (
+                    <button
+                      type="button"
+                      class:list={[
+                        'unbox-btn relative rounded-xl border p-4 text-center transition-all cursor-pointer',
+                        isDefault
+                          ? 'border-purple-500 ring-2 ring-purple-500/40 bg-purple-500/15 text-white font-medium shadow-lg shadow-purple-500/10'
+                          : 'bg-surface-800/60 border-white/10 text-surface-400 hover:border-white/20 hover:text-surface-200',
+                      ]}
+                      data-unbox={u.id}
+                    >
+                      <span class:list={[
+                        'unbox-active-check absolute top-2.5 right-2.5 h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-[10px] font-bold text-white shadow-sm shadow-purple-500/50',
+                        isDefault ? 'flex' : 'hidden',
+                      ]}>✓</span>
+                      <span class="text-2xl">{u.emoji}</span>
+                      <div class="mt-1 text-xs">{u.label}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Media Upload -->
+        <div id="step-3" class="wizard-step hidden">
+          <h2 class="text-xl font-bold text-surface-50">Add Photos</h2>
+          <p class="mt-2 text-sm text-surface-400">Upload up to 4 photos (auto-compressed to WebP, max 200KB each)</p>
+
+          <div class="mt-6">
+            <!-- Drop Zone -->
+            <div
+              id="drop-zone"
+              class="flex min-h-50 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/10 bg-surface-800/50 p-8 transition-all hover:border-primary/30 hover:bg-surface-800"
+            >
+              <svg class="mb-3 h-10 w-10 text-surface-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+              </svg>
+              <p class="text-sm font-medium text-surface-300">Drop images here or click to upload</p>
+              <p class="mt-1 text-xs text-surface-500">PNG, JPG, WebP — auto-converted to WebP</p>
+              <input type="file" id="file-input" accept="image/*" multiple class="hidden" />
+            </div>
+
+            <!-- Photo Preview Grid -->
+            <div id="photo-grid" class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Upload Progress -->
+            <div id="upload-status" class="mt-4 hidden">
+              <div class="flex items-center gap-3">
+                <div class="h-2 flex-1 overflow-hidden rounded-full bg-surface-700">
+                  <div id="upload-progress" class="h-full rounded-full bg-linear-to-r from-primary to-secondary transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <span id="upload-text" class="text-xs text-surface-400">Processing...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Message & Details -->
+        <div id="step-4" class="wizard-step hidden">
+          <h2 class="text-xl font-bold text-surface-50">Card Details</h2>
+          <p class="mt-2 text-sm text-surface-400">Add your personal message and event details</p>
+
+          <div class="mt-6 space-y-5">
+            <div>
+              <label for="recipient-name" class="mb-1.5 block text-sm font-medium text-surface-200">Recipient Name <span class="text-confetti-pink">*</span></label>
+              <input type="text" id="recipient-name" placeholder="Who is this card for?" required class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus-ring" />
+            </div>
+
+            <div>
+              <label for="sender-name" class="mb-1.5 block text-sm font-medium text-surface-200">Your Name</label>
+              <input type="text" id="sender-name" placeholder="From..." class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus-ring" />
+            </div>
+
+            <div>
+              <label for="message" class="mb-1.5 block text-sm font-medium text-surface-200">Your Message <span class="text-confetti-pink">*</span></label>
+              <textarea id="message" rows="5" placeholder="Write something heartfelt..." required class="form-input w-full resize-none rounded-xl border bg-surface-800/50 px-4 py-3 text-sm transition-all focus-ring"></textarea>
+            </div>
+
+            <div>
+              <label for="event-date" class="mb-1.5 block text-sm font-medium text-surface-200">Event Date</label>
+              <input type="date" id="event-date" class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus-ring" />
+            </div>
+
+            <!-- Audio Selector -->
+            <div>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Background Music</label>
+              <div class="space-y-2" id="audio-track-list">
+                {AUDIO_TRACKS.map((track) => (
+                  <div class="audio-track-item flex items-center gap-2 rounded-xl border border-white/5 bg-surface-800 p-2 transition-all" data-track-row={track.id}>
+                    <!-- Preview Play/Pause Button -->
+                    <button
+                      type="button"
+                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-700 text-surface-300 transition-all hover:bg-primary/20 hover:text-primary cursor-pointer"
+                      data-audio-preview={track.id}
+                      aria-label={`Preview ${track.name}`}
+                    >
+                      <svg class="audio-preview-play h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                      </svg>
+                      <svg class="audio-preview-pause hidden h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                      </svg>
+                    </button>
+
+                    <!-- Track Info & Select Target -->
+                    <button
+                      type="button"
+                      class="flex flex-1 items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-all hover:bg-white/5 cursor-pointer"
+                      data-audio-track={track.id}
+                    >
+                      <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-surface-200">{track.name}</div>
+                        <div class="text-xs text-surface-500">{track.mood} · {track.duration}s</div>
+                      </div>
+                      <!-- Selected Checkmark -->
+                      <div class="audio-check hidden h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-glow-sm">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                      </div>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div class="mt-4">
+                <label for="external-audio" class="mb-1.5 block text-xs font-medium text-surface-400">Or paste a Spotify/YouTube link</label>
+                <input type="url" id="external-audio" placeholder="https://open.spotify.com/track/..." class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2 text-sm transition-all focus-ring" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Preview -->
+        <div id="step-5" class="wizard-step hidden">
+          <h2 class="text-xl font-bold text-surface-50">Preview & Publish</h2>
+          <p class="mt-2 text-sm text-surface-400">Review your card before sharing it with the world</p>
+
+          <!-- Mobile inline preview (visible < 1020px on step 5) -->
+          <div id="step5-mobile-preview" class="mt-6 hidden">
+            <div class="mb-3 text-xs font-medium text-surface-400">Card Preview</div>
+            <div class="mx-auto w-full max-w-sm">
+              <div class="overflow-hidden rounded-[2rem] border-4 border-surface-600 bg-surface-900 shadow-elevated">
+                <div class="mx-auto h-6 w-28 rounded-b-xl bg-surface-600"></div>
+                <div id="step5-preview-screen" class="relative min-h-100 overflow-y-auto p-4" style="max-height: 520px;"></div>
+                <div class="flex justify-center py-2">
+                  <div class="h-1 w-20 rounded-full bg-surface-600"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-2xl border border-white/5 bg-surface-800 p-6">
+            <div id="preview-summary" class="space-y-4">
+              <!-- Populated by JS -->
+            </div>
+
+            <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                id="publish-btn"
+                class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-primary to-secondary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:brightness-110 active:scale-[0.97] cursor-pointer"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
+                Publish Card
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="mt-8 flex items-center justify-between">
+          <button
+            type="button"
+            id="prev-btn"
+            class="hidden items-center gap-1.5 rounded-xl border border-white/10 bg-surface-800 px-5 py-2.5 text-sm font-medium text-surface-300 transition-all hover:bg-surface-700 hover:text-white cursor-pointer"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Back
+          </button>
+          <div class="flex-1"></div>
+          <button
+            type="button"
+            id="next-btn"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-linear-to-r from-primary to-secondary px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:brightness-110 active:scale-[0.97] cursor-pointer"
+          >
+            Next
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5-7.5M21 12H3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Preview Panel (2 cols) — hidden on mobile, shown >= 1020px -->
+      <div class="desktop-preview-col hidden" id="desktop-preview-panel">
+        <div class="sticky top-24">
+          <div class="mb-3 flex items-center justify-between">
+            <span class="text-xs font-medium text-surface-400">Live Preview</span>
+          </div>
+
+          <!-- Device Frame -->
+          <div id="device-frame" class="mx-auto w-70">
+            <div class="overflow-hidden rounded-[2.5rem] border-4 border-surface-600 bg-surface-900 shadow-elevated">
+              <!-- Notch -->
+              <div class="mx-auto h-7 w-32 rounded-b-2xl bg-surface-600"></div>
+
+              <!-- Screen -->
+              <div id="preview-screen" class="relative min-h-125 overflow-y-auto p-4" style="max-height: 580px;">
+                <div class="flex h-full flex-col items-center justify-center text-center">
+                  <span class="text-4xl mb-3">✨</span>
+                  <p class="text-sm text-surface-400">Your card preview<br/>will appear here</p>
+                </div>
+              </div>
+
+              <!-- Home indicator -->
+              <div class="flex justify-center py-2">
+                <div class="h-1 w-24 rounded-full bg-surface-600"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Preview FAB (visible < 1020px, hidden on step 5) -->
+  <button
+    type="button"
+    id="preview-fab"
+    class="preview-fab-btn fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full bg-linear-to-r from-primary to-secondary px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:brightness-110 active:scale-95 cursor-pointer"
+    aria-label="Preview card"
+  >
+    <span class="text-lg">👁️</span>
+    Preview
+  </button>
+
+  <!-- Mobile Preview Fullscreen Modal -->
+  <div
+    id="preview-modal"
+    class="fixed inset-0 z-1000 hidden flex-col bg-surface-900/95 backdrop-blur-md"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Live Card Preview"
+  >
+    <!-- Fixed/Sticky Header Bar with prominent close button -->
+    <header class="sticky top-0 z-1010 flex items-center justify-between px-4 sm:px-6 py-3 bg-surface-900/90 backdrop-blur-md border-b border-white/10 shrink-0">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-xs font-semibold uppercase tracking-wider text-surface-300">Live Preview</span>
+      </div>
+      <button
+        type="button"
+        id="preview-modal-close"
+        class="bg-surface-900/90 backdrop-blur-md border border-white/10 text-white shadow-xl px-4 py-2 rounded-full inline-flex items-center gap-2 text-xs font-semibold transition-all hover:bg-surface-800 hover:border-white/20 active:scale-95 cursor-pointer"
+        aria-label="Kembali ke Editor"
+      >
+        <span class="flex h-4 w-4 items-center justify-center rounded-full bg-white/10 text-[11px] font-bold leading-none">✕</span>
+        <span>Kembali ke Editor</span>
+      </button>
+    </header>
+
+    <!-- Backdrop & Phone Preview Wrapper -->
+    <div
+      id="preview-modal-backdrop"
+      class="flex-1 overflow-y-auto p-4 sm:p-6 flex items-center justify-center min-h-0 cursor-pointer"
+    >
+      <div
+        id="preview-modal-phone"
+        class="w-full max-w-xs sm:max-w-sm my-auto cursor-default pointer-events-auto"
+      >
+        <!-- Phone Frame Container with comfortable scaling -->
+        <div class="max-h-[80vh] flex flex-col overflow-hidden rounded-[2.25rem] border-4 border-surface-600 bg-surface-900 shadow-elevated ring-1 ring-white/10">
+          <!-- Top Notch / Speaker -->
+          <div class="mx-auto h-5 w-24 rounded-b-xl bg-surface-600 shrink-0 flex items-center justify-center">
+            <div class="h-1 w-8 rounded-full bg-surface-700"></div>
+          </div>
+
+          <!-- Phone Screen -->
+          <div
+            id="modal-preview-screen"
+            class="relative flex-1 min-h-80 max-h-[calc(80vh-3.5rem)] overflow-y-auto p-4 transition-all duration-300"
+          ></div>
+
+          <!-- Bottom Home Indicator -->
+          <div class="flex justify-center py-2 bg-surface-900 shrink-0">
+            <div class="h-1 w-20 rounded-full bg-surface-600"></div>
+          </div>
+        </div>
+
+        <p class="mt-3 text-center text-xs text-surface-400 select-none">
+          Ketuk area gelap atau tekan <kbd class="px-1.5 py-0.5 rounded bg-surface-800 border border-white/10 text-surface-300 text-[10px]">Esc</kbd> untuk menutup
+        </p>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>
+
+<script>
+  import { startSynth, stopSynth, isPlayingSynth } from '../../lib/synth-audio';
+  import { compressImage, uploadToR2 } from '../../lib/image-compress';
+
+  // ═══════════════════════════════════════════════════════
+  // Creator Studio — Wizard State Machine
+  // ═══════════════════════════════════════════════════════
+
+  interface CardState {
+    category: string;
+    themeConfig: {
+      primaryColor: string;
+      secondaryColor: string;
+      backgroundColor: string;
+      fontFamily: string;
+      backgroundPattern: string;
+      unboxStyle: string;
+      audioTrackId: string | null;
+      externalAudioUrl: string | null;
+    };
+    photos: Array<{ file: File; previewUrl: string; publicUrl?: string }>;
+    recipientName: string;
+    senderName: string;
+    message: string;
+    eventDate: string;
+  }
+
+  const state: CardState = {
+    category: '',
+    themeConfig: {
+      primaryColor: '#c084fc',
+      secondaryColor: '#f472b6',
+      backgroundColor: '#1c1c28',
+      fontFamily: 'sans',
+      backgroundPattern: 'none',
+      unboxStyle: 'envelope',
+      audioTrackId: null,
+      externalAudioUrl: null,
+    },
+    photos: [],
+    recipientName: '',
+    senderName: '',
+    message: '',
+    eventDate: '',
+  };
+
+  let currentStep = 1;
+  const totalSteps = 5;
+
+  // ═══════════════════════════════════════════════════════
+  // Responsive Preview — breakpoint detection
+  // ═══════════════════════════════════════════════════════
+  const DESKTOP_BP = 1020;
+
+  function isDesktop(): boolean {
+    return window.innerWidth >= DESKTOP_BP;
+  }
+
+  function syncResponsiveLayout() {
+    const desktopPanel = document.getElementById('desktop-preview-panel');
+    const fab = document.getElementById('preview-fab');
+    const step5Mobile = document.getElementById('step5-mobile-preview');
+
+    if (isDesktop()) {
+      // Desktop: show side preview, hide FAB, dismiss mobile modal if open
+      closeModalPreview();
+      desktopPanel?.classList.remove('hidden');
+      desktopPanel?.classList.add('lg:col-span-2', 'lg:block');
+      fab?.classList.add('hidden');
+      fab?.classList.remove('inline-flex');
+      step5Mobile?.classList.add('hidden');
+    } else {
+      // Mobile: hide side preview, show FAB (except on step 5)
+      desktopPanel?.classList.add('hidden');
+      desktopPanel?.classList.remove('lg:col-span-2', 'lg:block');
+      if (currentStep === 5) {
+        fab?.classList.add('hidden');
+        fab?.classList.remove('inline-flex');
+        step5Mobile?.classList.remove('hidden');
+      } else {
+        fab?.classList.remove('hidden');
+        fab?.classList.add('inline-flex');
+        step5Mobile?.classList.add('hidden');
+      }
+    }
+  }
+
+  window.addEventListener('resize', syncResponsiveLayout);
+
+  // ═══════════════════════════════════════════════════════
+  // Step Navigation
+  // ═══════════════════════════════════════════════════════
+  function goToStep(step: number) {
+    if (step < 1 || step > totalSteps) return;
+
+    // Validation
+    if (step > currentStep) {
+      if (currentStep === 1 && !state.category) {
+        (window as any).showToast({ message: 'Please select a category', type: 'warning' });
+        return;
+      }
+      if (currentStep === 4 && !state.recipientName) {
+        (window as any).showToast({ message: 'Recipient name is required', type: 'warning' });
+        return;
+      }
+      if (currentStep === 4 && !state.message) {
+        (window as any).showToast({ message: 'Please write a message', type: 'warning' });
+        return;
+      }
+    }
+
+    currentStep = step;
+
+    // Show/hide steps
+    document.querySelectorAll('.wizard-step').forEach((el, i) => {
+      el.classList.toggle('hidden', i + 1 !== currentStep);
+    });
+
+    // Update step indicators
+    for (let i = 1; i <= totalSteps; i++) {
+      const dot = document.querySelector(`[data-step-dot="${i}"]`) as HTMLElement;
+      const line = document.querySelector(`[data-step-line="${i}"]`) as HTMLElement;
+      if (dot) {
+        if (i < currentStep) {
+          dot.className = 'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold bg-primary text-white transition-all duration-300';
+        } else if (i === currentStep) {
+          dot.className = 'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold bg-linear-to-r from-primary to-secondary text-white shadow-lg shadow-primary/25 transition-all duration-300';
+        } else {
+          dot.className = 'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold bg-surface-700 text-surface-400 transition-all duration-300';
+        }
+      }
+      if (line) {
+        line.className = i < currentStep
+          ? 'mx-2 h-0.5 flex-1 rounded bg-primary transition-all duration-500'
+          : 'mx-2 h-0.5 flex-1 rounded bg-surface-700 transition-all duration-500';
+      }
+    }
+
+    // Show/hide nav buttons
+    const prevBtn = document.getElementById('prev-btn') as HTMLElement;
+    const nextBtn = document.getElementById('next-btn') as HTMLElement;
+    prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
+    nextBtn.style.display = currentStep < totalSteps ? 'inline-flex' : 'none';
+
+    // Update preview on step 5
+    if (currentStep === 5) updatePreviewSummary();
+    if (currentStep === 2) syncThemeSelectorActiveStates();
+    updateLivePreview();
+    syncResponsiveLayout();
+  }
+
+  // Nav button listeners
+  document.getElementById('next-btn')?.addEventListener('click', () => goToStep(currentStep + 1));
+  document.getElementById('prev-btn')?.addEventListener('click', () => goToStep(currentStep - 1));
+
+  // ═══════════════════════════════════════════════════════
+  // Mobile Preview FAB & Modal
+  // ═══════════════════════════════════════════════════════
+  const previewFab = document.getElementById('preview-fab');
+  const previewModal = document.getElementById('preview-modal');
+  const previewModalClose = document.getElementById('preview-modal-close');
+  const previewModalBackdrop = document.getElementById('preview-modal-backdrop');
+  const previewModalPhone = document.getElementById('preview-modal-phone');
+
+  function openModalPreview() {
+    if (!previewModal) return;
+    updateModalPreview();
+    previewModal.classList.remove('hidden');
+    previewModal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModalPreview() {
+    if (!previewModal || previewModal.classList.contains('hidden')) return;
+    previewModal.classList.add('hidden');
+    previewModal.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+    document.body.style.overflow = '';
+  }
+
+  // Open modal when FAB is tapped
+  previewFab?.addEventListener('click', openModalPreview);
+
+  // Dismiss action 1: Close button click
+  previewModalClose?.addEventListener('click', closeModalPreview);
+
+  // Dismiss action 2: Click on dark backdrop outside phone frame
+  previewModalBackdrop?.addEventListener('click', (e) => {
+    if (previewModalPhone && !previewModalPhone.contains(e.target as Node)) {
+      closeModalPreview();
+    }
+  });
+
+  // Dismiss action 3: Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && previewModal && !previewModal.classList.contains('hidden')) {
+      closeModalPreview();
+    }
+  });
+
+  function updateModalPreview() {
+    const modalScreen = document.getElementById('modal-preview-screen');
+    applyPreviewToScreen(modalScreen, buildPreviewHTML());
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Step 1: Category Selection
+  // ═══════════════════════════════════════════════════════
+  document.querySelectorAll('[data-category]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.category = (btn as HTMLElement).dataset.category || '';
+      document.querySelectorAll('[data-category]').forEach((b) => {
+        b.classList.remove('border-primary/50', 'bg-primary/5');
+        b.querySelector('[data-check]')?.classList.add('hidden');
+        b.querySelector('[data-check]')?.classList.remove('flex');
+      });
+      btn.classList.add('border-primary/50', 'bg-primary/5');
+      btn.querySelector('[data-check]')?.classList.remove('hidden');
+      btn.querySelector('[data-check]')?.classList.add('flex');
+      updateLivePreview();
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // Step 2: Theme customizer
+  // ═══════════════════════════════════════════════════════
+  const primaryInput = document.getElementById('theme-primary') as HTMLInputElement;
+  const secondaryInput = document.getElementById('theme-secondary') as HTMLInputElement;
+
+  primaryInput?.addEventListener('input', (e) => {
+    state.themeConfig.primaryColor = (e.target as HTMLInputElement).value;
+    document.getElementById('theme-primary-hex')!.textContent = state.themeConfig.primaryColor;
+    updateLivePreview();
+  });
+  secondaryInput?.addEventListener('input', (e) => {
+    state.themeConfig.secondaryColor = (e.target as HTMLInputElement).value;
+    document.getElementById('theme-secondary-hex')!.textContent = state.themeConfig.secondaryColor;
+    updateLivePreview();
+  });
+
+  // ── Step 2 Theme Selectors Active State Management ─────────────────
+  const INACTIVE_THEME_CLASSES = [
+    'bg-surface-800/60',
+    'border-white/10',
+    'text-surface-400',
+    'hover:border-white/20',
+    'hover:text-surface-200'
+  ];
+  const ACTIVE_THEME_CLASSES = [
+    'border-purple-500',
+    'ring-2',
+    'ring-purple-500/40',
+    'bg-purple-500/15',
+    'text-white',
+    'font-medium',
+    'shadow-lg',
+    'shadow-purple-500/10'
+  ];
+
+  function syncThemeSelectorActiveStates() {
+    // 1. Background Pattern
+    const currentPattern = state.themeConfig.backgroundPattern || 'none';
+    document.querySelectorAll('[data-pattern]').forEach((btn) => {
+      const isSelected = (btn as HTMLElement).dataset.pattern === currentPattern;
+      if (isSelected) {
+        btn.classList.remove(...INACTIVE_THEME_CLASSES);
+        btn.classList.add(...ACTIVE_THEME_CLASSES);
+      } else {
+        btn.classList.remove(...ACTIVE_THEME_CLASSES);
+        btn.classList.add(...INACTIVE_THEME_CLASSES);
+      }
+    });
+
+    // 2. Font Style
+    const currentFont = state.themeConfig.fontFamily || 'sans';
+    document.querySelectorAll('[data-font]').forEach((btn) => {
+      const isSelected = (btn as HTMLElement).dataset.font === currentFont;
+      const check = btn.querySelector('.font-active-check');
+      if (isSelected) {
+        btn.classList.remove(...INACTIVE_THEME_CLASSES);
+        btn.classList.add(...ACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.remove('hidden');
+          check.classList.add('flex');
+        }
+      } else {
+        btn.classList.remove(...ACTIVE_THEME_CLASSES);
+        btn.classList.add(...INACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.add('hidden');
+          check.classList.remove('flex');
+        }
+      }
+    });
+
+    // 3. Unboxing Animation
+    const currentUnbox = state.themeConfig.unboxStyle || 'envelope';
+    document.querySelectorAll('[data-unbox]').forEach((btn) => {
+      const isSelected = (btn as HTMLElement).dataset.unbox === currentUnbox;
+      const check = btn.querySelector('.unbox-active-check');
+      if (isSelected) {
+        btn.classList.remove(...INACTIVE_THEME_CLASSES);
+        btn.classList.add(...ACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.remove('hidden');
+          check.classList.add('flex');
+        }
+      } else {
+        btn.classList.remove(...ACTIVE_THEME_CLASSES);
+        btn.classList.add(...INACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.add('hidden');
+          check.classList.remove('flex');
+        }
+      }
+    });
+  }
+
+  // Click listeners with immediate active styling, state updates & live preview re-rendering
+  document.querySelectorAll('[data-pattern]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.themeConfig.backgroundPattern = (btn as HTMLElement).dataset.pattern || 'none';
+      syncThemeSelectorActiveStates();
+      updateLivePreview();
+    });
+  });
+
+  document.querySelectorAll('[data-font]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.themeConfig.fontFamily = (btn as HTMLElement).dataset.font || 'sans';
+      syncThemeSelectorActiveStates();
+      updateLivePreview();
+    });
+  });
+
+  document.querySelectorAll('[data-unbox]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.themeConfig.unboxStyle = (btn as HTMLElement).dataset.unbox || 'envelope';
+      syncThemeSelectorActiveStates();
+      updateLivePreview();
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // Step 3: Media Upload
+  // ═══════════════════════════════════════════════════════
+  const dropZone = document.getElementById('drop-zone')!;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-primary/50', 'bg-primary/5');
+  });
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-primary/50', 'bg-primary/5');
+  });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-primary/50', 'bg-primary/5');
+    if (e.dataTransfer?.files) handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files) handleFiles(fileInput.files);
+  });
+
+  async function handleFiles(files: FileList) {
+    const remaining = 4 - state.photos.length;
+    if (remaining <= 0) {
+      (window as any).showToast({ message: 'Maximum 4 photos allowed', type: 'warning' });
+      return;
+    }
+
+    const toProcess = Array.from(files).slice(0, remaining);
+    const statusEl = document.getElementById('upload-status')!;
+    const progressEl = document.getElementById('upload-progress')!;
+    const textEl = document.getElementById('upload-text')!;
+    statusEl.classList.remove('hidden');
+
+    for (let i = 0; i < toProcess.length; i++) {
+      textEl.textContent = `Compressing ${i + 1}/${toProcess.length}...`;
+      progressEl.style.width = `${((i + 1) / toProcess.length) * 100}%`;
+
+      try {
+        const result = await compressImage(toProcess[i]);
+        state.photos.push({ file: result.file, previewUrl: result.previewUrl });
+      } catch (err: any) {
+        (window as any).showToast({ message: err.message || 'Compression failed', type: 'error' });
+      }
+    }
+
+    statusEl.classList.add('hidden');
+    renderPhotoGrid();
+    updateLivePreview();
+  }
+
+  function renderPhotoGrid() {
+    const grid = document.getElementById('photo-grid')!;
+    grid.innerHTML = state.photos.map((p, i) => `
+      <div class="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-surface-800">
+        <img src="${p.previewUrl}" alt="Photo ${i + 1}" class="h-full w-full object-cover" />
+        <button
+          type="button"
+          class="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+          data-remove-photo="${i}"
+        >
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('[data-remove-photo]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt((btn as HTMLElement).dataset.removePhoto || '0');
+        URL.revokeObjectURL(state.photos[idx].previewUrl);
+        state.photos.splice(idx, 1);
+        renderPhotoGrid();
+        updateLivePreview();
+      });
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Step 4: Message input listeners
+  // ═══════════════════════════════════════════════════════
+  document.getElementById('recipient-name')?.addEventListener('input', (e) => {
+    state.recipientName = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+  document.getElementById('sender-name')?.addEventListener('input', (e) => {
+    state.senderName = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+  document.getElementById('message')?.addEventListener('input', (e) => {
+    state.message = (e.target as HTMLTextAreaElement).value;
+    updateLivePreview();
+  });
+  document.getElementById('event-date')?.addEventListener('input', (e) => {
+    state.eventDate = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // Audio Track Selection & In-Studio Preview
+  // ═══════════════════════════════════════════════════════
+  let previewingTrackId: string | null = null;
+
+  function updateTrackSelectionUI() {
+    document.querySelectorAll('[data-track-row]').forEach((row) => {
+      const rowId = (row as HTMLElement).dataset.trackRow;
+      const isSelected = state.themeConfig.audioTrackId === rowId;
+      const isPreviewing = previewingTrackId === rowId;
+      const check = row.querySelector('.audio-check');
+      const playIcon = row.querySelector('.audio-preview-play');
+      const pauseIcon = row.querySelector('.audio-preview-pause');
+
+      // Selection active state
+      if (isSelected) {
+        row.classList.add('ring-2', 'ring-primary', 'border-primary', 'bg-primary/10');
+        row.classList.remove('border-white/5', 'bg-surface-800');
+        check?.classList.remove('hidden');
+        check?.classList.add('flex');
+      } else {
+        row.classList.remove('ring-2', 'ring-primary', 'border-primary', 'bg-primary/10');
+        row.classList.add('border-white/5', 'bg-surface-800');
+        check?.classList.add('hidden');
+        check?.classList.remove('flex');
+      }
+
+      // Preview play/pause icon
+      if (isPreviewing) {
+        playIcon?.classList.add('hidden');
+        pauseIcon?.classList.remove('hidden');
+      } else {
+        playIcon?.classList.remove('hidden');
+        pauseIcon?.classList.add('hidden');
+      }
+    });
+  }
+
+  // Select a track (does NOT start/stop preview)
+  document.querySelectorAll('[data-audio-track]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const trackId = (btn as HTMLElement).dataset.audioTrack || null;
+      state.themeConfig.audioTrackId = state.themeConfig.audioTrackId === trackId ? null : trackId;
+      updateTrackSelectionUI();
+    });
+  });
+
+  // Preview a track (play/pause toggle, does NOT change selection)
+  document.querySelectorAll('[data-audio-preview]').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation(); // Don't bubble to track-row
+      const trackId = (btn as HTMLElement).dataset.audioPreview || '';
+
+      if (previewingTrackId === trackId && isPlayingSynth()) {
+        // Pause current preview
+        stopSynth();
+        previewingTrackId = null;
+        updateTrackSelectionUI();
+        return;
+      }
+
+      // Stop any running preview first
+      if (isPlayingSynth()) stopSynth();
+
+      // Start new preview
+      previewingTrackId = trackId;
+      updateTrackSelectionUI();
+      const started = await startSynth(trackId, 0.3);
+      if (!started) {
+        previewingTrackId = null;
+        updateTrackSelectionUI();
+      }
+    });
+  });
+
+  document.getElementById('external-audio')?.addEventListener('input', (e) => {
+    state.themeConfig.externalAudioUrl = (e.target as HTMLInputElement).value || null;
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════
+  // Live Preview Updates
+  // ═══════════════════════════════════════════════════════
+  interface PreviewThemeData {
+    html: string;
+    bgImage: string;
+    bgSize: string;
+    bgColor: string;
+    font: string;
+  }
+
+  function buildPreviewHTML(): PreviewThemeData {
+    const categoryEmojis: Record<string, string> = { birthday: '🎂', anniversary: '💍', graduation: '🎓', invitation: '✉️' };
+    const emoji = categoryEmojis[state.category] || '✨';
+    const fontMap: Record<string, string> = {
+      sans: "'Inter', sans-serif",
+      serif: "'Georgia', serif",
+      handwritten: "'Caveat', 'Pacifico', cursive",
+      display: "'Outfit', sans-serif",
+    };
+    const font = fontMap[state.themeConfig.fontFamily] || fontMap.sans;
+
+    const primaryHex = (state.themeConfig.primaryColor || '#c084fc').replace('#', '');
+    const secondaryHex = (state.themeConfig.secondaryColor || '#f472b6').replace('#', '');
+
+    const patternMap: Record<string, { image: string; size: string }> = {
+      none: { image: 'none', size: 'auto' },
+      confetti: {
+        image: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23${primaryHex}' fill-opacity='0.18'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        size: '60px 60px',
+      },
+      hearts: {
+        image: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23${secondaryHex}' fill-opacity='0.18'%3E%3Cpath d='M20 10c2-4 7-5 10-2s3 8 0 12L20 30 10 20c-3-4-3-9 0-12s8-2 10 2z'/%3E%3C/svg%3E")`,
+        size: '40px 40px',
+      },
+      stars: {
+        image: `url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23${primaryHex}' fill-opacity='0.18'%3E%3Cpath d='M25 5l3 9h9l-7 5 3 9-8-6-8 6 3-9-7-5h9z'/%3E%3C/g%3E%3C/svg%3E")`,
+        size: '50px 50px',
+      },
+      dots: {
+        image: `radial-gradient(circle, ${state.themeConfig.primaryColor}35 1.5px, transparent 1.5px)`,
+        size: '18px 18px',
+      },
+      waves: {
+        image: `url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264.888-.14 1.652-1.249 2.747-2.98 3.227-4.908.48-1.929.384-3.96-.287-5.84C20.124 7.232 15.89 6.4 12.084 7.315 8.28 8.23 4.86 10.811 2.63 14.48L0 19.84V20h21.184z' fill='%23${primaryHex}' fill-opacity='0.15'/%3E%3C/svg%3E")`,
+        size: '100px 20px',
+      },
+    };
+
+    const pattern = patternMap[state.themeConfig.backgroundPattern] || patternMap.none;
+    const gradient = `linear-gradient(135deg, ${state.themeConfig.primaryColor}22, ${state.themeConfig.secondaryColor}15, #14141c)`;
+    const bgImage = pattern.image !== 'none' ? `${pattern.image}, ${gradient}` : gradient;
+    const bgSize = pattern.image !== 'none' ? `${pattern.size}, auto` : 'auto';
+    const bgColor = '#14141c';
+
+    const unboxInfo: Record<string, { icon: string; label: string }> = {
+      envelope: { icon: '✉️', label: 'Envelope Flip' },
+      giftbox: { icon: '🎁', label: 'Gift Box' },
+      ribbon: { icon: '🎀', label: 'Ribbon Untie' },
+    };
+    const currentUnbox = unboxInfo[state.themeConfig.unboxStyle] || unboxInfo.envelope;
+
+    let html = `<div class="text-center space-y-3" style="font-family: ${font}">`;
+
+    // Unbox simulation badge inside preview
+    html += `
+      <div class="flex justify-center mb-1">
+        <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium border border-white/10 bg-surface-800/90 text-surface-200 shadow-sm backdrop-blur-sm transition-all duration-300">
+          <span class="text-sm">${currentUnbox.icon}</span>
+          <span class="text-surface-400">Unboxing:</span>
+          <span class="font-semibold text-white">${currentUnbox.label}</span>
+        </span>
+      </div>
+    `;
+
+    html += `<div class="text-5xl mb-2">${emoji}</div>`;
+
+    if (state.recipientName) {
+      html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">Happy ${state.category || 'celebration'}!</h3>`;
+      html += `<p class="text-sm text-surface-200" style="font-family: ${font}">Dear ${state.recipientName},</p>`;
+    } else {
+      html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">Happy ${state.category || 'Celebration'}!</h3>`;
+      html += `<p class="text-sm text-surface-400" style="font-family: ${font}">Dear Someone Special,</p>`;
+    }
+
+    if (state.message) {
+      html += `<p class="text-xs leading-relaxed text-surface-300 mt-2" style="font-family: ${font}">${state.message.slice(0, 150)}${state.message.length > 150 ? '...' : ''}</p>`;
+    } else {
+      html += `<p class="text-xs leading-relaxed text-surface-400 mt-2 italic" style="font-family: ${font}">Your message will appear here...</p>`;
+    }
+
+    if (state.senderName) {
+      html += `<p class="text-xs text-surface-400 mt-3 italic" style="font-family: ${font}">— ${state.senderName}</p>`;
+    }
+
+    if (state.photos.length > 0) {
+      html += `<div class="grid grid-cols-2 gap-1.5 mt-3">`;
+      state.photos.slice(0, 4).forEach((p) => {
+        html += `<div class="aspect-square overflow-hidden rounded-lg"><img src="${p.previewUrl}" class="h-full w-full object-cover" /></div>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+    return { html, bgImage, bgSize, bgColor, font };
+  }
+
+  function applyPreviewToScreen(screen: HTMLElement | null, previewData: PreviewThemeData) {
+    if (!screen) return;
+    screen.style.backgroundColor = previewData.bgColor;
+    screen.style.backgroundImage = previewData.bgImage;
+    screen.style.backgroundSize = previewData.bgSize;
+    screen.style.backgroundRepeat = 'repeat';
+    screen.style.fontFamily = previewData.font;
+    screen.innerHTML = previewData.html;
+  }
+
+  function updateLivePreview() {
+    const previewData = buildPreviewHTML();
+
+    // Desktop preview
+    applyPreviewToScreen(document.getElementById('preview-screen'), previewData);
+
+    // Step 5 mobile inline preview
+    if (currentStep === 5) {
+      applyPreviewToScreen(document.getElementById('step5-preview-screen'), previewData);
+    }
+
+    // Modal preview (if open)
+    const modalScreen = document.getElementById('modal-preview-screen');
+    const modal = document.getElementById('preview-modal');
+    if (modalScreen && modal && !modal.classList.contains('hidden')) {
+      applyPreviewToScreen(modalScreen, previewData);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Preview Summary for Step 5
+  // ═══════════════════════════════════════════════════════
+  function updatePreviewSummary() {
+    const summary = document.getElementById('preview-summary');
+    if (!summary) return;
+
+    const categoryEmojis: Record<string, string> = { birthday: '🎂 Birthday', anniversary: '💍 Anniversary', graduation: '🎓 Graduation', invitation: '✉️ Invitation' };
+    const unboxSummaryMap: Record<string, string> = {
+      envelope: '✉️ Envelope Flip',
+      giftbox: '🎁 Gift Box',
+      ribbon: '🎀 Ribbon Untie',
+    };
+    const patternSummaryMap: Record<string, string> = {
+      none: 'None',
+      confetti: '🎊 Confetti',
+      hearts: '💕 Hearts',
+      stars: '⭐ Stars',
+      dots: '● Dots',
+      waves: '🌊 Waves',
+    };
+    const fontSummaryMap: Record<string, string> = {
+      sans: 'Modern Sans',
+      serif: 'Classic Serif',
+      handwritten: 'Handwritten',
+      display: 'Display',
+    };
+
+    summary.innerHTML = `
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Category</span>
+          <span class="text-sm font-medium text-surface-200">${categoryEmojis[state.category] || state.category}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Recipient</span>
+          <span class="text-sm font-medium text-surface-200">${state.recipientName}</span>
+        </div>
+        ${state.senderName ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">From</span>
+          <span class="text-sm font-medium text-surface-200">${state.senderName}</span>
+        </div>` : ''}
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Theme</span>
+          <span class="text-sm font-medium text-surface-200">${fontSummaryMap[state.themeConfig.fontFamily] || state.themeConfig.fontFamily} · ${patternSummaryMap[state.themeConfig.backgroundPattern] || state.themeConfig.backgroundPattern}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Photos</span>
+          <span class="text-sm font-medium text-surface-200">${state.photos.length} photo${state.photos.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Unboxing</span>
+          <span class="text-sm font-medium text-surface-200">${unboxSummaryMap[state.themeConfig.unboxStyle] || state.themeConfig.unboxStyle}</span>
+        </div>
+        ${state.themeConfig.audioTrackId ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Music</span>
+          <span class="text-sm font-medium text-surface-200">🎵 ${state.themeConfig.audioTrackId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+        </div>` : ''}
+        ${state.eventDate ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Event Date</span>
+          <span class="text-sm font-medium text-surface-200">${new Date(state.eventDate).toLocaleDateString()}</span>
+        </div>` : ''}
+        <hr class="border-white/5" />
+        <div>
+          <span class="text-sm text-surface-400">Message Preview</span>
+          <p class="mt-1 text-sm text-surface-300 leading-relaxed">${state.message.slice(0, 200)}${state.message.length > 200 ? '...' : ''}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Publish Card
+  // ═══════════════════════════════════════════════════════
+  document.getElementById('publish-btn')?.addEventListener('click', async () => {
+    // Stop any running audio preview before publishing
+    if (isPlayingSynth()) stopSynth();
+    previewingTrackId = null;
+    updateTrackSelectionUI();
+
+    const btn = document.getElementById('publish-btn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="animate-spin">⏳</span> Publishing...';
+
+    try {
+      // 1. Upload photos to R2 (if any)
+      const mediaUrls: string[] = [];
+      for (const photo of state.photos) {
+        // Get presigned URL
+        const presignRes = await fetch('/api/storage/presigned-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: photo.file.name,
+            contentType: 'image/webp',
+          }),
+        });
+
+        if (!presignRes.ok) {
+          const errData = await presignRes.json().catch(() => ({ error: 'Failed to get upload URL' }));
+          throw new Error(errData.error || `Failed to get upload authorization (${presignRes.status})`);
+        }
+        const { uploadUrl, publicUrl } = await presignRes.json();
+
+        // Upload directly to R2
+        await uploadToR2(uploadUrl, photo.file);
+        mediaUrls.push(publicUrl);
+      }
+
+      // 2. Create card
+      const res = await fetch('/api/cards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: state.category,
+          recipient_name: state.recipientName,
+          sender_name: state.senderName,
+          message: state.message,
+          event_date: state.eventDate || null,
+          theme_config: state.themeConfig,
+          media_urls: mediaUrls,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to create card');
+      }
+
+      const card = await res.json();
+      (window as any).showToast({ message: '🎉 Card published successfully!', type: 'success' });
+
+      // Redirect to the card
+      setTimeout(() => {
+        window.location.href = `/c/${card.slug}`;
+      }, 1500);
+    } catch (err: any) {
+      (window as any).showToast({ message: err.message || 'Failed to publish', type: 'error' });
+      btn.disabled = false;
+      btn.innerHTML = '🚀 Publish Card';
+    }
+  });
+
+  // Initialize
+  goToStep(1);
+  syncThemeSelectorActiveStates();
+</script>
+
+<style>
+  .wizard-step {
+    animation: fade-in-up 0.4s var(--ease-smooth) forwards;
+  }
+
+  /* Desktop preview column — CSS media query for reliable breakpoint */
+  @media (min-width: 1020px) {
+    .desktop-preview-col {
+      display: block !important;
+      grid-column: span 2;
+    }
+  }
+
+  /* Audio track active glow */
+  .audio-track-item.ring-2 {
+    box-shadow: 0 0 12px -2px oklch(0.7 0.15 300 / 0.35);
+  }
+
+  /* Theme customization active item glow */
+  .pattern-btn.border-purple-500,
+  .font-btn.border-purple-500,
+  .unbox-btn.border-purple-500 {
+    box-shadow: 0 0 16px -2px oklch(0.7 0.15 300 / 0.35);
+  }
+
+  /* Preview FAB subtle pulse animation */
+  .preview-fab-btn {
+    animation: fab-pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes fab-pulse {
+    0%, 100% { box-shadow: 0 4px 20px -4px oklch(0.7 0.15 300 / 0.35); }
+    50% { box-shadow: 0 6px 28px -2px oklch(0.7 0.15 300 / 0.5); }
+  }
+
+  /* Mobile preview modal frame & smooth touch scrolling */
+  #modal-preview-screen {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  #preview-modal-backdrop {
+    -webkit-overflow-scrolling: touch;
+  }
+</style>

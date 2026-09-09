@@ -1,0 +1,39 @@
+---
+export interface Props {
+  variant?: 'default' | 'glass' | 'bordered';
+  padding?: 'sm' | 'md' | 'lg';
+  hover?: boolean;
+  class?: string;
+}
+
+const {
+  variant = 'default',
+  padding = 'md',
+  hover = false,
+  class: extraClass = '',
+} = Astro.props;
+
+const variantClasses: Record<string, string> = {
+  default: 'bg-surface-800 border border-white/5',
+  glass: 'glass',
+  bordered: 'bg-surface-800/50 border-gradient',
+};
+
+const paddingClasses: Record<string, string> = {
+  sm: 'p-4',
+  md: 'p-6',
+  lg: 'p-8',
+};
+
+const classes = [
+  'rounded-2xl',
+  variantClasses[variant],
+  paddingClasses[padding],
+  hover ? 'transition-all duration-300 hover:shadow-elevated hover:-translate-y-1' : '',
+  extraClass,
+].join(' ');
+---
+
+<div class={classes}>
+  <slot />
+</div>

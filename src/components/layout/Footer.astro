@@ -1,0 +1,58 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/5 bg-surface-900/50">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- Brand -->
+      <div class="sm:col-span-2 lg:col-span-1">
+        <a href="/" class="inline-flex items-center gap-2">
+          <span class="text-2xl">🎉</span>
+          <span class="text-lg font-bold">
+            <span class="gradient-text">Celebrate</span><span class="text-surface-100">Loop</span>
+          </span>
+        </a>
+        <p class="mt-3 text-sm leading-relaxed text-surface-400">
+          Create beautiful digital greeting cards for every celebration. Free, fast, and delightful.
+        </p>
+      </div>
+
+      <!-- Product -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-300">Product</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li><a href="/dashboard/create" class="text-sm text-surface-400 transition-colors hover:text-white">Create a Card</a></li>
+          <li><a href="/dashboard" class="text-sm text-surface-400 transition-colors hover:text-white">My Cards</a></li>
+        </ul>
+      </div>
+
+      <!-- Categories -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-300">Categories</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li><span class="text-sm text-surface-400">🎂 Birthday</span></li>
+          <li><span class="text-sm text-surface-400">💍 Anniversary</span></li>
+          <li><span class="text-sm text-surface-400">🎓 Graduation</span></li>
+          <li><span class="text-sm text-surface-400">✉️ Invitation</span></li>
+        </ul>
+      </div>
+
+      <!-- Legal -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-300">Legal</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li><a href="#" class="text-sm text-surface-400 transition-colors hover:text-white">Privacy Policy</a></li>
+          <li><a href="#" class="text-sm text-surface-400 transition-colors hover:text-white">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">
+      <p class="text-sm text-surface-500">© {year} CelebrateLoop. All rights reserved.</p>
+      <p class="text-sm text-surface-500">
+        Made with <span class="text-confetti-pink">♥</span> for every celebration
+      </p>
+    </div>
+  </div>
+</footer>

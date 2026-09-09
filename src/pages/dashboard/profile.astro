@@ -1,0 +1,392 @@
+---
+import DashboardLayout from '../../components/layout/DashboardLayout.astro';
+import Toast from '../../components/ui/Toast.astro';
+import type { Profile } from '../../lib/types';
+import { resolveMediaUrl } from '../../lib/r2';
+
+export const prerender = false;
+
+// Auth guard — must run before any HTML is emitted
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const supabase = Astro.locals.supabase;
+
+// Fetch current user profile
+let profile: Profile | null = null;
+const { data } = await supabase
+  .from('profiles')
+  .select('*')
+  .eq('id', user.id)
+  .single();
+
+profile = data;
+
+const fullName = profile?.full_name || (user.user_metadata?.full_name as string) || '';
+const rawAvatarUrl = profile?.avatar_url || (user.user_metadata?.avatar_url as string) || '';
+const avatarUrl = resolveMediaUrl(rawAvatarUrl);
+const email = user.email || '';
+const initial = (fullName || email || 'U').charAt(0).toUpperCase();
+---
+
+<DashboardLayout title="Profile Settings" description="Manage your account profile and avatar">
+  <Toast />
+
+  <div class="mx-auto max-w-2xl">
+    <!-- Header -->
+    <div class="mb-8">
+      <a
+        href="/dashboard"
+        class="inline-flex items-center gap-1.5 text-sm font-medium text-surface-400 transition-colors hover:text-white mb-4"
+      >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+        Back to Cards
+      </a>
+      <h1 class="text-2xl font-bold text-surface-50">Profile Settings</h1>
+      <p class="mt-1 text-sm text-surface-400">Manage your avatar and personal details</p>
+    </div>
+
+    <!-- Profile Form Card -->
+    <div class="rounded-2xl border border-white/5 bg-surface-800 p-6 sm:p-8">
+      <form id="profile-form" class="space-y-8">
+        <!-- Avatar Section -->
+        <div>
+          <label class="mb-3 block text-sm font-medium text-surface-200">Profile Picture</label>
+          <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <!-- Avatar Display / Preview -->
+            <div class="relative group">
+              <div
+                id="avatar-container"
+                class="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white/10 bg-surface-700 shadow-elevated transition-transform group-hover:scale-105"
+              >
+                {avatarUrl ? (
+                  <img
+                    id="avatar-image"
+                    src={avatarUrl}
+                    alt={fullName || 'Avatar'}
+                    class="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div
+                    id="avatar-fallback"
+                    class="flex h-full w-full items-center justify-center bg-linear-to-br from-primary/30 to-secondary/30 text-3xl font-bold text-primary-light"
+                  >
+                    {initial}
+                  </div>
+                )}
+                <!-- Overlay badge on hover -->
+                <button
+                  type="button"
+                  id="avatar-upload-trigger"
+                  class="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+                  title="Change avatar"
+                  aria-label="Change avatar"
+                >
+                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                  </svg>
+                </button>
+              </div>
+              <input type="file" id="avatar-input" accept="image/*" class="hidden" />
+            </div>
+
+            <!-- Upload Info & Actions -->
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <button
+                  type="button"
+                  id="avatar-btn"
+                  class="rounded-xl border border-white/10 bg-surface-700 px-4 py-2 text-xs font-semibold text-surface-200 transition-colors hover:bg-surface-600 hover:text-white cursor-pointer"
+                >
+                  Upload New Photo
+                </button>
+                <button
+                  type="button"
+                  id="remove-avatar-btn"
+                  class:list={[
+                    'text-xs font-medium text-surface-400 transition-colors hover:text-error cursor-pointer',
+                    !avatarUrl ? 'hidden' : '',
+                  ]}
+                >
+                  Remove
+                </button>
+              </div>
+              <p class="text-xs text-surface-400">
+                JPG, PNG or WebP. Auto-compressed to WebP (max 100KB).
+              </p>
+              <!-- Progress indicator -->
+              <div id="avatar-status" class="hidden text-xs text-primary">
+                Processing avatar...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-white/5" />
+
+        <!-- Personal Details -->
+        <div class="space-y-5">
+          <!-- Full Name -->
+          <div>
+            <label for="full-name" class="mb-1.5 block text-sm font-medium text-surface-200">
+              Full Name <span class="text-confetti-pink">*</span>
+            </label>
+            <input
+              type="text"
+              id="full-name"
+              name="full_name"
+              value={fullName}
+              placeholder="Your full name"
+              required
+              class="form-input w-full rounded-xl border bg-surface-700/50 px-4 py-2.5 text-sm transition-all duration-200 focus-ring"
+            />
+          </div>
+
+          <!-- Email (Readonly) -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="email" class="block text-sm font-medium text-surface-200">
+                Email Address
+              </label>
+              <span class="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success">
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                Verified
+              </span>
+            </div>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              disabled
+              class="w-full cursor-not-allowed rounded-xl border border-white/5 bg-surface-900/60 px-4 py-2.5 text-sm text-surface-400 opacity-80 select-none"
+            />
+            <p class="mt-1.5 text-xs text-surface-500">
+              Your email is linked to your authentication account and cannot be changed here.
+            </p>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-4 flex items-center justify-end gap-3">
+          <a
+            href="/dashboard"
+            class="rounded-xl px-5 py-2.5 text-sm font-medium text-surface-400 transition-colors hover:text-white"
+          >
+            Cancel
+          </a>
+          <button
+            type="submit"
+            id="save-profile-btn"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-primary to-secondary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all duration-200 hover:shadow-xl hover:shadow-primary/30 hover:brightness-110 active:scale-[0.97] cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</DashboardLayout>
+
+<script>
+  import { compressAvatar, uploadToR2 } from '../../lib/image-compress';
+
+  let pendingAvatarFile: File | null = null;
+  let isRemoved = false;
+
+  const avatarInput = document.getElementById('avatar-input') as HTMLInputElement;
+  const avatarTrigger = document.getElementById('avatar-upload-trigger');
+  const avatarBtn = document.getElementById('avatar-btn');
+  const removeBtn = document.getElementById('remove-avatar-btn');
+  const avatarContainer = document.getElementById('avatar-container');
+  const avatarStatus = document.getElementById('avatar-status');
+  const profileForm = document.getElementById('profile-form');
+  const saveBtn = document.getElementById('save-profile-btn') as HTMLButtonElement;
+
+  function triggerUpload() {
+    avatarInput?.click();
+  }
+
+  avatarTrigger?.addEventListener('click', triggerUpload);
+  avatarBtn?.addEventListener('click', triggerUpload);
+
+  avatarInput?.addEventListener('change', async () => {
+    const file = avatarInput.files?.[0];
+    if (!file) return;
+
+    if (avatarStatus) {
+      avatarStatus.classList.remove('hidden');
+      avatarStatus.textContent = 'Compressing image...';
+    }
+
+    try {
+      const result = await compressAvatar(file);
+      pendingAvatarFile = result.file;
+      isRemoved = false;
+
+      // Update avatar preview
+      if (avatarContainer) {
+        avatarContainer.innerHTML = `
+          <img
+            id="avatar-image"
+            src="${result.previewUrl}"
+            alt="Preview"
+            class="h-full w-full object-cover"
+          />
+          <button
+            type="button"
+            id="avatar-upload-trigger"
+            class="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+            title="Change avatar"
+          >
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+            </svg>
+          </button>
+        `;
+        document.getElementById('avatar-upload-trigger')?.addEventListener('click', triggerUpload);
+      }
+
+      removeBtn?.classList.remove('hidden');
+
+      if (avatarStatus) {
+        avatarStatus.textContent = `Optimized to ${Math.round(result.compressedSize / 1024)}KB (${result.compressionRatio}% smaller)`;
+      }
+    } catch (err: any) {
+      (window as any).showToast({
+        message: err.message || 'Failed to process avatar',
+        type: 'error',
+      });
+      if (avatarStatus) avatarStatus.classList.add('hidden');
+    }
+  });
+
+  removeBtn?.addEventListener('click', () => {
+    pendingAvatarFile = null;
+    isRemoved = true;
+    avatarInput.value = '';
+
+    const fullNameInput = document.getElementById('full-name') as HTMLInputElement;
+    const initial = (fullNameInput?.value || 'U').charAt(0).toUpperCase();
+
+    if (avatarContainer) {
+      avatarContainer.innerHTML = `
+        <div
+          id="avatar-fallback"
+          class="flex h-full w-full items-center justify-center bg-linear-to-br from-primary/30 to-secondary/30 text-3xl font-bold text-primary-light"
+        >
+          ${initial}
+        </div>
+        <button
+          type="button"
+          id="avatar-upload-trigger"
+          class="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+          title="Change avatar"
+        >
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+          </svg>
+        </button>
+      `;
+      document.getElementById('avatar-upload-trigger')?.addEventListener('click', triggerUpload);
+    }
+
+    removeBtn.classList.add('hidden');
+    if (avatarStatus) avatarStatus.classList.add('hidden');
+  });
+
+  profileForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fullNameInput = document.getElementById('full-name') as HTMLInputElement;
+    const fullName = fullNameInput?.value.trim();
+
+    if (!fullName) {
+      (window as any).showToast({ message: 'Full name is required', type: 'warning' });
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `
+      <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Saving...
+    `;
+
+    try {
+      let finalAvatarUrl: string | null | undefined = undefined;
+
+      // 1. If new avatar file chosen, upload to R2
+      if (pendingAvatarFile) {
+        if (avatarStatus) {
+          avatarStatus.classList.remove('hidden');
+          avatarStatus.textContent = 'Uploading avatar to cloud storage...';
+        }
+
+        const presignRes = await fetch('/api/storage/presigned-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: pendingAvatarFile.name,
+            contentType: 'image/webp',
+            folder: 'avatars',
+          }),
+        });
+
+        if (!presignRes.ok) {
+          const err = await presignRes.json();
+          throw new Error(err.error || 'Failed to get upload authorization');
+        }
+
+        const { uploadUrl, publicUrl } = await presignRes.json();
+        await uploadToR2(uploadUrl, pendingAvatarFile);
+        finalAvatarUrl = publicUrl;
+      } else if (isRemoved) {
+        finalAvatarUrl = null;
+      }
+
+      // 2. Send update request to server
+      const updateRes = await fetch('/api/profile/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: fullName,
+          ...(finalAvatarUrl !== undefined ? { avatar_url: finalAvatarUrl } : {}),
+        }),
+      });
+
+      const updateData = await updateRes.json();
+
+      if (!updateRes.ok) {
+        throw new Error(updateData.error || 'Failed to update profile');
+      }
+
+      (window as any).showToast({
+        message: '✨ Profile updated successfully!',
+        type: 'success',
+      });
+
+      // Reload page after short delay to refresh Navbar avatar/name
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (err: any) {
+      (window as any).showToast({
+        message: err.message || 'An error occurred while saving',
+        type: 'error',
+      });
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Changes';
+    }
+  });
+</script>

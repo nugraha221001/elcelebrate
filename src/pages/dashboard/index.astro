@@ -1,0 +1,144 @@
+---
+import DashboardLayout from '../../components/layout/DashboardLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Toast from '../../components/ui/Toast.astro';
+import { CATEGORY_META } from '../../lib/types';
+import type { Card } from '../../lib/types';
+
+export const prerender = false;
+
+// Auth guard — must run before any HTML is emitted
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const supabase = Astro.locals.supabase;
+
+// Fetch user's cards
+let cards: Card[] = [];
+const { data } = await supabase
+  .from('cards')
+  .select('*')
+  .eq('user_id', user.id)
+  .order('created_at', { ascending: false });
+cards = data || [];
+---
+
+<DashboardLayout title="My Cards">
+  <Toast />
+
+  <!-- Header -->
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-surface-50">My Cards</h1>
+      <p class="mt-1 text-sm text-surface-400">
+        {cards.length === 0
+          ? "You haven't created any cards yet"
+          : `${cards.length} card${cards.length === 1 ? '' : 's'} created`}
+      </p>
+    </div>
+    <Button href="/dashboard/create" variant="primary" size="md" id="dashboard-create-btn">
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      New Card
+    </Button>
+  </div>
+
+  {cards.length === 0 ? (
+    <!-- Empty State -->
+    <div class="mt-16 flex flex-col items-center justify-center text-center">
+      <div class="mb-6 flex gap-3">
+        <span class="animate-float text-5xl" style="animation-delay: 0s">🎂</span>
+        <span class="animate-float text-5xl" style="animation-delay: 0.3s">🎉</span>
+        <span class="animate-float text-5xl" style="animation-delay: 0.6s">✨</span>
+      </div>
+      <h2 class="text-xl font-semibold text-surface-200">Create your first card</h2>
+      <p class="mt-2 max-w-sm text-sm text-surface-400">
+        Design a beautiful digital greeting card with photos, music, and animations — all for free.
+      </p>
+      <div class="mt-8">
+        <Button href="/dashboard/create" variant="primary" size="lg" id="empty-state-cta">
+          Start Creating
+        </Button>
+      </div>
+    </div>
+  ) : (
+    <!-- Card Grid -->
+    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {cards.map((card, i) => {
+        const meta = CATEGORY_META[card.category as keyof typeof CATEGORY_META];
+        const cardUrl = `/c/${card.slug}`;
+        return (
+          <div
+            class="group relative overflow-hidden rounded-2xl bg-surface-800 border border-white/5 transition-all duration-300 hover:shadow-elevated hover:border-white/10"
+            style={`animation: fade-in-up 0.5s var(--ease-smooth) forwards; animation-delay: ${i * 80}ms; opacity: 0;`}
+          >
+            <!-- Card header with gradient -->
+            <div
+              class="h-28 bg-linear-to-br p-4"
+              style={`background: linear-gradient(135deg, ${card.theme_config.primaryColor || '#c084fc'}40, ${card.theme_config.secondaryColor || '#f472b6'}30);`}
+            >
+              <div class="flex items-start justify-between">
+                <span class="text-3xl">{meta?.emoji || '🎉'}</span>
+                <Badge variant={card.is_published ? 'success' : 'warning'}>
+                  {card.is_published ? 'Published' : 'Draft'}
+                </Badge>
+              </div>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-base font-semibold text-surface-100 truncate">
+                For {card.recipient_name}
+              </h3>
+              <p class="mt-1 text-sm text-surface-400">
+                {meta?.label || card.category}
+                {card.event_date && (
+                  <span> · {new Date(card.event_date).toLocaleDateString()}</span>
+                )}
+              </p>
+
+              <div class="mt-4 flex items-center gap-2">
+                <a
+                  href={cardUrl}
+                  target="_blank"
+                  class="inline-flex items-center gap-1.5 rounded-lg bg-surface-700 px-3 py-1.5 text-xs font-medium text-surface-200 transition-colors hover:bg-surface-600"
+                >
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                  </svg>
+                  View
+                </a>
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1.5 rounded-lg bg-surface-700 px-3 py-1.5 text-xs font-medium text-surface-200 transition-colors hover:bg-surface-600 cursor-pointer"
+                  data-copy-url={`${Astro.url.origin}${cardUrl}`}
+                >
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                  </svg>
+                  Copy Link
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  )}
+</DashboardLayout>
+
+<script>
+  // Copy link buttons
+  document.querySelectorAll('[data-copy-url]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const url = (btn as HTMLElement).dataset.copyUrl;
+      if (url) {
+        await navigator.clipboard.writeText(url);
+        (window as any).showToast({ message: 'Link copied to clipboard!', type: 'success', duration: 2000 });
+      }
+    });
+  });
+</script>

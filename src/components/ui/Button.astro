@@ -1,0 +1,57 @@
+---
+export interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  fullWidth?: boolean;
+  id?: string;
+  class?: string;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  disabled = false,
+  fullWidth = false,
+  id,
+  class: extraClass = '',
+} = Astro.props;
+
+const baseClasses = 'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-200 focus-ring active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+
+const variantClasses: Record<string, string> = {
+  primary: 'bg-linear-to-r from-primary to-secondary text-white shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:brightness-110',
+  secondary: 'bg-surface-700 text-surface-100 border border-white/10 hover:bg-surface-600 hover:border-white/20',
+  ghost: 'text-surface-300 hover:bg-white/5 hover:text-white',
+  danger: 'bg-error/10 text-error border border-error/20 hover:bg-error/20',
+};
+
+const sizeClasses: Record<string, string> = {
+  sm: 'px-3 py-1.5 text-xs',
+  md: 'px-5 py-2.5 text-sm',
+  lg: 'px-7 py-3.5 text-base',
+};
+
+const classes = [
+  baseClasses,
+  variantClasses[variant],
+  sizeClasses[size],
+  fullWidth ? 'w-full' : '',
+  extraClass,
+].join(' ');
+
+---
+
+{href ? (
+  <a href={href} class={classes} id={id}>
+    <slot />
+  </a>
+) : (
+  <button type={type} class={classes} disabled={disabled} id={id}>
+    <slot />
+  </button>
+)}

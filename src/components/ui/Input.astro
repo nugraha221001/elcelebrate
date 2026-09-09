@@ -1,0 +1,50 @@
+---
+export interface Props {
+  label: string;
+  name: string;
+  type?: 'text' | 'email' | 'password' | 'date' | 'url' | 'number';
+  placeholder?: string;
+  required?: boolean;
+  value?: string;
+  error?: string;
+  id?: string;
+  class?: string;
+}
+
+const {
+  label,
+  name,
+  type = 'text',
+  placeholder = '',
+  required = false,
+  value = '',
+  error = '',
+  id,
+  class: extraClass = '',
+} = Astro.props;
+
+const inputId = id || `input-${name}`;
+---
+
+<div class:list={['flex flex-col gap-1.5', extraClass]}>
+  <label for={inputId} class="text-sm font-medium text-surface-200">
+    {label}
+    {required && <span class="text-confetti-pink">*</span>}
+  </label>
+  <input
+    type={type}
+    name={name}
+    id={inputId}
+    placeholder={placeholder}
+    required={required}
+    value={value}
+    class:list={[
+      'form-input rounded-xl border bg-surface-800/50 px-4 py-2.5 text-sm',
+      'transition-all duration-200 focus-ring',
+      error ? 'form-input-error' : '',
+    ]}
+  />
+  {error && (
+    <p class="text-xs text-error">{error}</p>
+  )}
+</div>

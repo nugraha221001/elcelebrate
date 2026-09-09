@@ -1,0 +1,170 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Toast from '../components/ui/Toast.astro';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (user) {
+  return Astro.redirect('/dashboard');
+}
+---
+
+<BaseLayout title="Sign In" description="Sign in to CelebrateLoop to create and manage your greeting cards.">
+  <Navbar />
+  <Toast />
+
+  <main class="flex min-h-[calc(100dvh-4rem)] items-center justify-center px-4 py-16">
+    <!-- Background decoration -->
+    <div class="pointer-events-none absolute inset-0 overflow-hidden">
+      <div class="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/5 blur-3xl"></div>
+      <div class="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-secondary/5 blur-3xl"></div>
+    </div>
+
+    <div class="relative w-full max-w-md">
+      <!-- Header -->
+      <div class="mb-8 text-center">
+        <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-secondary/20 text-3xl">
+          🎉
+        </div>
+        <h1 class="text-2xl font-bold text-surface-50">Welcome back</h1>
+        <p class="mt-2 text-sm text-surface-400">Sign in to continue creating celebrations</p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="glass rounded-2xl p-6 sm:p-8">
+        <form id="login-form" class="flex flex-col gap-5">
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            required={true}
+          />
+          <Input
+            label="Password"
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            required={true}
+          />
+
+          <Button type="submit" variant="primary" size="lg" fullWidth={true} id="login-submit-btn">
+            Sign In
+          </Button>
+        </form>
+
+        <div class="mt-6 flex items-center gap-3">
+          <div class="h-px flex-1 bg-white/10"></div>
+          <span class="text-xs text-surface-500">or</span>
+          <div class="h-px flex-1 bg-white/10"></div>
+        </div>
+
+        <!-- Magic Link -->
+        <form id="magic-link-form" class="mt-6 flex flex-col gap-4">
+          <Input
+            label="Magic Link"
+            name="magic_email"
+            type="email"
+            placeholder="Send a login link to your email"
+            required={true}
+          />
+          <Button type="submit" variant="secondary" size="md" fullWidth={true} id="magic-link-btn">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+            Send Magic Link
+          </Button>
+        </form>
+      </div>
+
+      <p class="mt-6 text-center text-sm text-surface-400">
+        Don't have an account?
+        <a href="/signup" class="font-medium text-primary hover:text-primary-light transition-colors">
+          Sign up free
+        </a>
+      </p>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  // Login form submission
+  document.getElementById('login-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const btn = document.getElementById('login-submit-btn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.get('email'),
+          password: formData.get('password'),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (data.session) {
+          try {
+            const { supabaseBrowser } = await import('../lib/supabase-browser');
+            await supabaseBrowser.auth.setSession({
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+            });
+          } catch {
+            // Ignore client sync errors
+          }
+        }
+        window.location.href = '/dashboard';
+      } else {
+        (window as any).showToast({ message: data.error || 'Login failed', type: 'error' });
+      }
+    } catch {
+      (window as any).showToast({ message: 'Network error. Please try again.', type: 'error' });
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  });
+
+  // Magic link form
+  document.getElementById('magic-link-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const btn = document.getElementById('magic-link-btn') as HTMLButtonElement;
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/auth/magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.get('magic_email') }),
+      });
+
+      if (res.ok) {
+        (window as any).showToast({ message: 'Magic link sent! Check your email.', type: 'success' });
+      } else {
+        const data = await res.json();
+        (window as any).showToast({ message: data.error || 'Failed to send link', type: 'error' });
+      }
+    } catch {
+      (window as any).showToast({ message: 'Network error. Please try again.', type: 'error' });
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
