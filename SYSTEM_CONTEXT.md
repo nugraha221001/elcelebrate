@@ -1,15 +1,15 @@
-# CelebrateLoop — System Architecture & Context Documentation
+# ElCelebrate — System Architecture & Context Documentation
 
 > **Target Audience:** External AI Architects, Engineering Leads, and Technical Contributors  
 > **Document Status:** Active & Grounded to Current Codebase  
-> **Repository:** `celebrateloop`  
+> **Repository:** `elcelebrate`  
 > **Last Verified:** September 2026
 
 ---
 
 ## 1. Project Overview & Tech Stack
 
-CelebrateLoop is an ultra-lightweight, zero-cost-tier digital celebration and greeting card web platform. It empowers users to design, customize, and share interactive digital cards featuring animations, music, countdown timers, photo galleries, and guestbooks (Wish Walls) for milestones like birthdays, anniversaries, graduations, and event invitations.
+ElCelebrate is an ultra-lightweight, zero-cost-tier digital celebration and greeting card web platform. It empowers users to design, customize, and share interactive digital cards featuring animations, music, countdown timers, photo galleries, and guestbooks (Wish Walls) for milestones like birthdays, anniversaries, graduations, and event invitations.
 
 ### 1.1 Core Technologies & Versions
 
@@ -45,7 +45,7 @@ CelebrateLoop is an ultra-lightweight, zero-cost-tier digital celebration and gr
 Below is the annotated directory tree of the project with a functional breakdown of every file:
 
 ```text
-celebrateloop/
+elcelebrate/
 ├── .env.example                     # Reference environment variables template
 ├── astro.config.mjs                 # Astro configuration (Cloudflare adapter, Tailwind Vite plugin, aliases)
 ├── package.json                     # Dependencies, scripts (dev, build, preview, check)
@@ -431,7 +431,7 @@ The database is built on PostgreSQL with Row Level Security (RLS) enabled on all
 
 * **S3 Client Endpoint:** `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
 * **Region:** `auto`
-* **Bucket:** Configured via `R2_BUCKET_NAME` (e.g., `celebrateloop-assets`)
+* **Bucket:** Configured via `R2_BUCKET_NAME` (e.g., `elcelebrate-assets`)
 * **Public Domain:** Configured via `R2_PUBLIC_DOMAIN` (e.g., `https://pub-xxxx.r2.dev` or custom domain)
 
 ---
@@ -503,4 +503,4 @@ The database is built on PostgreSQL with Row Level Security (RLS) enabled on all
 
 ---
 
-*This document serves as the authoritative technical context for the CelebrateLoop codebase. All paths, schemas, and signatures reflect the active code.*
+*This document serves as the authoritative technical context for the ElCelebrate codebase. All paths, schemas, and signatures reflect the active code.*

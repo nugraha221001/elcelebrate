@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { resolveMediaUrl } from '../../../lib/r2';
+import { resolveMediaUrl, extractR2Key, deleteR2Object } from '../../../lib/r2';
 
 export const prerender = false;
 
@@ -22,15 +22,47 @@ export const POST: APIRoute = async ({ locals, request }) => {
     }
 
     const trimmedName = full_name.trim();
+
+    // 1. Fetch user's current profile record to check existing avatar_url
+    const { data: currentProfile } = await locals.supabase
+      .from('profiles')
+      .select('avatar_url')
+      .eq('id', locals.user.id)
+      .single();
+
+    const oldAvatarUrl = currentProfile?.avatar_url || (locals.user.user_metadata?.avatar_url as string | null) || null;
+
+    // 2. Determine target new avatar URL (empty string, null, or undefined)
+    let newAvatarUrl: string | null = null;
+    if (typeof avatar_url === 'string' && avatar_url.trim()) {
+      newAvatarUrl = resolveMediaUrl(avatar_url.trim());
+    } else if (avatar_url === null || avatar_url === '') {
+      newAvatarUrl = null;
+    } else {
+      // If undefined, retain current
+      newAvatarUrl = oldAvatarUrl ? resolveMediaUrl(oldAvatarUrl) : null;
+    }
+
+    // 3. Comparison Check: If old avatar exists and is different from incoming avatar_url, delete old physical file from R2
+    if (oldAvatarUrl && oldAvatarUrl !== newAvatarUrl) {
+      const keyToDelete = extractR2Key(oldAvatarUrl);
+      if (keyToDelete) {
+        try {
+          await deleteR2Object(keyToDelete);
+        } catch (deleteErr) {
+          console.error(`Failed to delete orphaned avatar asset "${keyToDelete}":`, deleteErr);
+        }
+      }
+    }
+
     const updatePayload: Record<string, any> = {
       full_name: trimmedName,
     };
-
     if (avatar_url !== undefined) {
-      updatePayload.avatar_url = avatar_url ? resolveMediaUrl(avatar_url) : avatar_url;
+      updatePayload.avatar_url = newAvatarUrl;
     }
 
-    // 1. Update public.profiles table
+    // 4. Update public.profiles table
     const { data, error: profileError } = await locals.supabase
       .from('profiles')
       .update(updatePayload)
@@ -45,12 +77,12 @@ export const POST: APIRoute = async ({ locals, request }) => {
       });
     }
 
-    // 2. Sync to Supabase auth metadata so JWT/session immediately reflects changes
+    // 5. Sync to Supabase auth metadata so JWT/session immediately reflects changes
     const authUpdatePayload: Record<string, any> = {
       full_name: trimmedName,
     };
     if (avatar_url !== undefined) {
-      authUpdatePayload.avatar_url = avatar_url ? resolveMediaUrl(avatar_url) : avatar_url;
+      authUpdatePayload.avatar_url = newAvatarUrl;
     }
 
     await locals.supabase.auth.updateUser({

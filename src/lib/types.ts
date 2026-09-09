@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   CelebrateLoop — Shared TypeScript Types
+   ElCelebrate — Shared TypeScript Types
    ═══════════════════════════════════════════════════════════ */
 
 export type CardCategory = 'birthday' | 'anniversary' | 'graduation' | 'invitation';

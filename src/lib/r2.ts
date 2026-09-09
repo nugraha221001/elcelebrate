@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import type { PresignedUrlResponse } from './types';
 
@@ -60,6 +60,56 @@ export async function getR2Object(key: string) {
   });
 
   return await client.send(command);
+}
+
+/**
+ * Permanently deletes an object from the Cloudflare R2 bucket.
+ *
+ * @param key - The object key (path) in the bucket (e.g., "cards/userId/123-photo.webp")
+ */
+export async function deleteR2Object(key: string): Promise<void> {
+  const client = getR2Client();
+  const bucketName = import.meta.env.R2_BUCKET_NAME;
+
+  const command = new DeleteObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+  });
+
+  await client.send(command);
+}
+
+/**
+ * Extracts the storage key from a media URL.
+ * Supports /api/media/<key>, https://*.r2.dev/<key>, or raw keys.
+ */
+export function extractR2Key(url: string | null | undefined): string | null {
+  if (!url) return null;
+  // If already relative proxy path: /api/media/cards/...
+  if (url.startsWith('/api/media/')) {
+    return url.replace(/^\/api\/media\//, '').replace(/^\/+/, '');
+  }
+
+  // If public *.r2.dev URL: https://pub-xxxx.r2.dev/cards/...
+  const r2Match = url.match(/^https?:\/\/[^/]+\.r2\.dev\/(.+)$/);
+  if (r2Match && r2Match[1]) {
+    return r2Match[1].replace(/^\/+/, '');
+  }
+
+  // If matches configured R2_PUBLIC_DOMAIN
+  const publicDomain = typeof import.meta !== 'undefined' && import.meta.env?.R2_PUBLIC_DOMAIN
+    ? import.meta.env.R2_PUBLIC_DOMAIN
+    : undefined;
+  if (publicDomain && url.startsWith(publicDomain)) {
+    return url.slice(publicDomain.length).replace(/^\/+/, '');
+  }
+
+  // If already a raw storage key
+  if (url.startsWith('cards/') || url.startsWith('avatars/')) {
+    return url;
+  }
+
+  return null;
 }
 
 /**

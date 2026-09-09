@@ -53,7 +53,7 @@ if (!user) {
             {Object.entries(CATEGORY_META).map(([key, meta]) => (
               <button
                 type="button"
-                class="group relative overflow-hidden rounded-2xl border border-white/5 bg-surface-800 p-5 text-left transition-all duration-300 hover:border-primary/30 hover:shadow-glow-sm cursor-pointer"
+                class="group relative overflow-hidden rounded-2xl border border-white/8 hover:border-purple-500/30 transition-all duration-300 bg-surface-900/60 backdrop-blur-md p-5 text-left hover:shadow-glow-sm cursor-pointer"
                 data-category={key}
               >
                 <div class="mb-3 text-4xl transition-transform duration-300 group-hover:scale-110">
@@ -327,7 +327,7 @@ if (!user) {
             </div>
           </div>
 
-          <div class="mt-6 rounded-2xl border border-white/5 bg-surface-800 p-6">
+          <div class="mt-6 rounded-2xl border border-white/8 bg-surface-900/60 backdrop-blur-md p-6">
             <div id="preview-summary" class="space-y-4">
               <!-- Populated by JS -->
             </div>
@@ -336,7 +336,7 @@ if (!user) {
               <button
                 type="button"
                 id="publish-btn"
-                class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-primary to-secondary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:brightness-110 active:scale-[0.97] cursor-pointer"
+                class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 via-fuchsia-500 to-pink-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition-all hover:opacity-95 hover:shadow-fuchsia-500/30 active:scale-[0.98] cursor-pointer"
               >
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
@@ -363,11 +363,11 @@ if (!user) {
           <button
             type="button"
             id="next-btn"
-            class="inline-flex items-center gap-1.5 rounded-xl bg-linear-to-r from-primary to-secondary px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:brightness-110 active:scale-[0.97] cursor-pointer"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-linear-to-r from-violet-600 via-fuchsia-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition-all hover:opacity-95 hover:shadow-fuchsia-500/30 active:scale-[0.98] cursor-pointer"
           >
             Next
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5-7.5M21 12H3" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
           </button>
         </div>
@@ -409,7 +409,7 @@ if (!user) {
   <button
     type="button"
     id="preview-fab"
-    class="preview-fab-btn fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full bg-linear-to-r from-primary to-secondary px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:brightness-110 active:scale-95 cursor-pointer"
+    class="preview-fab-btn fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full bg-linear-to-r from-violet-600 via-fuchsia-500 to-pink-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition-all hover:opacity-95 hover:shadow-fuchsia-500/30 active:scale-95 cursor-pointer"
     aria-label="Preview card"
   >
     <span class="text-lg">👁️</span>

@@ -51,7 +51,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
     </div>
 
     <!-- Profile Form Card -->
-    <div class="rounded-2xl border border-white/5 bg-surface-800 p-6 sm:p-8">
+    <div class="rounded-2xl border border-white/8 bg-surface-900/60 backdrop-blur-md p-6 sm:p-8 shadow-elevated">
       <form id="profile-form" class="space-y-8">
         <!-- Avatar Section -->
         <div>
@@ -93,6 +93,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
                 </button>
               </div>
               <input type="file" id="avatar-input" accept="image/*" class="hidden" />
+              <input type="hidden" name="avatar_url" id="avatar_url_input" value={avatarUrl || ''} />
             </div>
 
             <!-- Upload Info & Actions -->
@@ -184,7 +185,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
           <button
             type="submit"
             id="save-profile-btn"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-primary to-secondary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all duration-200 hover:shadow-xl hover:shadow-primary/30 hover:brightness-110 active:scale-[0.97] cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 via-fuchsia-500 to-pink-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition-all duration-200 hover:opacity-95 hover:shadow-fuchsia-500/30 active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
           >
             Save Changes
           </button>
@@ -206,6 +207,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
   const removeBtn = document.getElementById('remove-avatar-btn');
   const avatarContainer = document.getElementById('avatar-container');
   const avatarStatus = document.getElementById('avatar-status');
+  const avatarUrlInput = document.getElementById('avatar_url_input') as HTMLInputElement | null;
   const profileForm = document.getElementById('profile-form');
   const saveBtn = document.getElementById('save-profile-btn') as HTMLButtonElement;
 
@@ -272,6 +274,9 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
     pendingAvatarFile = null;
     isRemoved = true;
     avatarInput.value = '';
+    if (avatarUrlInput) {
+      avatarUrlInput.value = '';
+    }
 
     const fullNameInput = document.getElementById('full-name') as HTMLInputElement;
     const initial = (fullNameInput?.value || 'U').charAt(0).toUpperCase();
@@ -324,7 +329,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
     `;
 
     try {
-      let finalAvatarUrl: string | null | undefined = undefined;
+      let finalAvatarUrl: string | null = null;
 
       // 1. If new avatar file chosen, upload to R2
       if (pendingAvatarFile) {
@@ -351,17 +356,21 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
         const { uploadUrl, publicUrl } = await presignRes.json();
         await uploadToR2(uploadUrl, pendingAvatarFile);
         finalAvatarUrl = publicUrl;
+        if (avatarUrlInput) avatarUrlInput.value = publicUrl;
       } else if (isRemoved) {
-        finalAvatarUrl = null;
+        finalAvatarUrl = '';
+        if (avatarUrlInput) avatarUrlInput.value = '';
+      } else if (avatarUrlInput) {
+        finalAvatarUrl = avatarUrlInput.value || '';
       }
 
-      // 2. Send update request to server
+      // 2. Send update request to server (explicitly send avatar_url)
       const updateRes = await fetch('/api/profile/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           full_name: fullName,
-          ...(finalAvatarUrl !== undefined ? { avatar_url: finalAvatarUrl } : {}),
+          avatar_url: finalAvatarUrl,
         }),
       });
 

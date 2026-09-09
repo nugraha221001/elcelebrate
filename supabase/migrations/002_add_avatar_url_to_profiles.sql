@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════
--- CelebrateLoop — Migration: Add avatar_url to profiles
+-- ElCelebrate — Migration: Add avatar_url to profiles
 -- ═══════════════════════════════════════════════════════════════
 
 alter table public.profiles

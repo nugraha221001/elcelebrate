@@ -1,6 +1,6 @@
 # Audio Assets Directory
 
-This directory hosts curated local background audio loops for CelebrateLoop digital cards.
+This directory hosts curated local background audio loops for ElCelebrate digital cards.
 
 ## Expected Audio Tracks
 
@@ -26,4 +26,4 @@ The application catalog in `src/lib/audio-tracks.ts` maps to the following 8 fil
 
 ## Procedural Web Audio Fallback
 
-If any `.opus` audio file is missing or returns HTTP 404, CelebrateLoop's client-side procedural Web Audio synthesizer (`src/lib/synth-audio.ts`) automatically generates real-time harmonic loops for each mood preset using browser `AudioContext`. Cards will never suffer broken audio or playback crashes.
+If any `.opus` audio file is missing or returns HTTP 404, ElCelebrate's client-side procedural Web Audio synthesizer (`src/lib/synth-audio.ts`) automatically generates real-time harmonic loops for each mood preset using browser `AudioContext`. Cards will never suffer broken audio or playback crashes.

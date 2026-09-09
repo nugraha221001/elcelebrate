@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════
--- CelebrateLoop — Database Schema
+-- ElCelebrate — Database Schema
 -- Supabase PostgreSQL with Row Level Security
 -- ═══════════════════════════════════════════════════════════════
 

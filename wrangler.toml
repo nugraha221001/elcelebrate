@@ -1,4 +1,4 @@
-name = "celebrateloop"
+name = "elcelebrate"
 compatibility_date = "2025-01-01"
 
 # The Astro Cloudflare adapter outputs to this directory
@@ -10,4 +10,4 @@ directory = "./dist/_astro"
 # R2 bucket binding (accessible via env in SSR routes)
 # [[r2_buckets]]
 # binding = "CARD_ASSETS"
-# bucket_name = "celebrateloop-assets"
+# bucket_name = "elcelebrate-assets"

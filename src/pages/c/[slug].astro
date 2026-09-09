@@ -317,10 +317,16 @@ const ogImage = typedCard.media_urls.length > 0
 
       <!-- Footer -->
       <footer class="mt-16 text-center">
-        <p class="text-xs text-surface-500">
-          Made with <span class="text-confetti-pink">♥</span> on
-          <a href="/" class="font-medium text-surface-400 hover:text-white transition-colors">CelebrateLoop</a>
-        </p>
+        <a
+          href="/"
+          class="group inline-flex items-center gap-2 rounded-full border border-white/8 bg-surface-900/60 backdrop-blur-md px-4 py-2 text-xs font-medium text-surface-400 transition-all duration-300 hover:border-purple-500/30 hover:bg-surface-800/80 hover:shadow-glow-sm"
+        >
+          <span>Created with</span>
+          <span class="inline-flex items-center gap-1">
+            <span class="bg-linear-to-r from-amber-300 via-pink-400 to-purple-400 bg-clip-text text-transparent font-extrabold tracking-tight">El</span><span class="text-white font-bold tracking-tight">Celebrate</span>
+            <span class="text-xs transition-transform duration-300 group-hover:scale-125">✨</span>
+          </span>
+        </a>
       </footer>
     </div>
   </main>

@@ -1,5 +1,5 @@
 /**
- * CelebrateLoop — Procedural Web Audio Synthesizer
+ * ElCelebrate — Procedural Web Audio Synthesizer
  *
  * Lightweight, zero-dependency procedural music generator running natively
  * in client browsers via Web Audio API. Provides continuous celebratory loop

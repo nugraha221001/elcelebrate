@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { resolveMediaUrl } from '../../../lib/r2';
+import { resolveMediaUrl, extractR2Key, deleteR2Object } from '../../../lib/r2';
 
 export const prerender = false;
 
@@ -40,17 +40,43 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
   }
 
   const { id } = params;
-  const updates = await request.json();
+  const body = await request.json();
 
-  // Remove protected fields
-  delete updates.id;
-  delete updates.user_id;
-  delete updates.slug;
-  delete updates.created_at;
+  // Allow only permitted mutable fields (protect id, user_id, slug, created_at)
+  const allowedKeys = [
+    'is_published',
+    'recipient_name',
+    'sender_name',
+    'message',
+    'event_date',
+    'theme_config',
+    'media_urls',
+    'category',
+  ];
+
+  const updatePayload: Record<string, any> = {};
+  for (const key of allowedKeys) {
+    if (key in body) {
+      updatePayload[key] = body[key];
+    }
+  }
+
+  // Validate recipient_name if provided
+  if (updatePayload.recipient_name !== undefined && !updatePayload.recipient_name.trim()) {
+    return new Response(JSON.stringify({ error: 'Recipient name cannot be empty' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Sanitize media_urls to internal proxy URLs if provided
+  if (updatePayload.media_urls && Array.isArray(updatePayload.media_urls)) {
+    updatePayload.media_urls = updatePayload.media_urls.map(resolveMediaUrl);
+  }
 
   const { data, error } = await locals.supabase
     .from('cards')
-    .update(updates)
+    .update(updatePayload)
     .eq('id', id)
     .eq('user_id', locals.user.id)
     .select()
@@ -80,7 +106,7 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
   });
 };
 
-// DELETE: Delete a card
+// DELETE: Delete a card and its physical assets from Cloudflare R2
 export const DELETE: APIRoute = async ({ params, locals }) => {
   if (!locals.user) {
     return new Response(JSON.stringify({ error: 'Authentication required' }), {
@@ -91,14 +117,45 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
 
   const { id } = params;
 
-  const { error } = await locals.supabase
+  // 1. Fetch card first to retrieve media_urls for asset cleanup
+  const { data: card, error: fetchError } = await locals.supabase
+    .from('cards')
+    .select('id, user_id, media_urls')
+    .eq('id', id)
+    .eq('user_id', locals.user.id)
+    .single();
+
+  if (fetchError || !card) {
+    return new Response(JSON.stringify({ error: 'Card not found or not authorized' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 2. Permanently delete all physical image assets from R2 bucket
+  if (Array.isArray(card.media_urls) && card.media_urls.length > 0) {
+    const keysToDelete = card.media_urls
+      .map(extractR2Key)
+      .filter((k): k is string => Boolean(k));
+
+    await Promise.allSettled(
+      keysToDelete.map((key) =>
+        deleteR2Object(key).catch((err) =>
+          console.error(`Failed to delete R2 asset "${key}":`, err)
+        )
+      )
+    );
+  }
+
+  // 3. Delete card from Supabase (cascades to wishes table)
+  const { error: deleteError } = await locals.supabase
     .from('cards')
     .delete()
     .eq('id', id)
     .eq('user_id', locals.user.id);
 
-  if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  if (deleteError) {
+    return new Response(JSON.stringify({ error: deleteError.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

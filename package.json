@@ -1,8 +1,8 @@
 {
-  "name": "celebrateloop",
+  "name": "elcelebrate",
   "type": "module",
   "version": "1.0.0",
-  "description": "Ultra-lightweight, zero-cost-tier digital celebration & greeting card platform",
+  "description": "Ultra-lightweight, zero-cost-tier digital celebration & greeting card platform by ElCelebrate",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

@@ -13,7 +13,7 @@ const {
   noIndex = false,
 } = Astro.props;
 
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://celebrateloop.com');
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://elcelebrate.com');
 ---
 
 <!doctype html>
@@ -24,22 +24,23 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://celebrat
     <meta name="generator" content={Astro.generator} />
 
     <!-- SEO -->
-    <title>{title} | CelebrateLoop</title>
+    <title>{title} | ElCelebrate</title>
     <meta name="description" content={description} />
+    <meta name="author" content="ElCelebrate" />
     <link rel="canonical" href={canonicalUrl.toString()} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={`${title} | CelebrateLoop`} />
+    <meta property="og:title" content={`${title} | ElCelebrate`} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:url" content={canonicalUrl.toString()} />
-    <meta property="og:site_name" content="CelebrateLoop" />
+    <meta property="og:site_name" content="ElCelebrate" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={`${title} | CelebrateLoop`} />
+    <meta name="twitter:title" content={`${title} | ElCelebrate`} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
