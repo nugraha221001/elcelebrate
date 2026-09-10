@@ -11,9 +11,12 @@ const user = Astro.locals.user;
 if (!user) {
   return Astro.redirect('/login');
 }
+
+const editId = Astro.url.searchParams.get('edit');
+const isEdit = Boolean(editId);
 ---
 
-<DashboardLayout title="Create Card" description="Design a beautiful digital greeting card">
+<DashboardLayout title={isEdit ? "Edit Card" : "Create Card"} description={isEdit ? "Update your digital greeting card" : "Design a beautiful digital greeting card"}>
   <Toast />
 
   <div class="mx-auto max-w-5xl">
@@ -238,12 +241,13 @@ if (!user) {
           <p class="mt-2 text-sm text-surface-400">Add your personal message and event details</p>
 
           <div class="mt-6 space-y-5">
-            <div>
+            <!-- Standard fields (hidden for wedding) -->
+            <div id="standard-recipient-field">
               <label for="recipient-name" class="mb-1.5 block text-sm font-medium text-surface-200">Recipient Name <span class="text-confetti-pink">*</span></label>
               <input type="text" id="recipient-name" placeholder="Who is this card for?" required class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus-ring" />
             </div>
 
-            <div>
+            <div id="standard-sender-field">
               <label for="sender-name" class="mb-1.5 block text-sm font-medium text-surface-200">Your Name</label>
               <input type="text" id="sender-name" placeholder="From..." class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus-ring" />
             </div>
@@ -253,9 +257,163 @@ if (!user) {
               <textarea id="message" rows="5" placeholder="Write something heartfelt..." required class="form-input w-full resize-none rounded-xl border bg-surface-800/50 px-4 py-3 text-sm transition-all focus-ring"></textarea>
             </div>
 
-            <div>
+            <div id="standard-event-date-field">
               <label for="event-date" class="mb-1.5 block text-sm font-medium text-surface-200">Event Date</label>
               <input type="date" id="event-date" class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus-ring" />
+            </div>
+
+            <!-- ═══ Wedding Detail Fields (conditionally shown) ═══ -->
+            <div id="wedding-fields" class="hidden space-y-6">
+              <hr class="border-white/5" />
+              <div class="flex items-center gap-2 text-sm font-semibold text-surface-100">
+                <span class="text-lg">💍</span> Wedding Details
+              </div>
+
+              <!-- Opening Greeting / Salam Pembuka -->
+              <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
+                <div class="text-xs font-semibold uppercase tracking-wider text-violet-400">🙏 Salam Pembuka / Opening Greeting</div>
+                <div>
+                  <label for="w-greeting-preset" class="mb-1 block text-xs font-medium text-surface-300">Preset Greeting</label>
+                  <select id="w-greeting-preset" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring cursor-pointer">
+                    <option value="">— Select a greeting preset —</option>
+                    <option value="islam">Islam</option>
+                    <option value="kristen">Kristen / Katolik</option>
+                    <option value="hindu">Hindu</option>
+                    <option value="buddha">Buddha</option>
+                    <option value="umum">Umum / Netral</option>
+                    <option value="custom">Custom (Tulis Sendiri)</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="w-greeting-text" class="mb-1 block text-xs font-medium text-surface-300">Greeting Text</label>
+                  <textarea id="w-greeting-text" rows="3" placeholder="Greeting text will appear here..." class="form-input w-full resize-none rounded-lg border bg-surface-800/50 px-3 py-2.5 text-sm focus-ring"></textarea>
+                </div>
+              </div>
+
+              <!-- Bride -->
+              <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
+                <div class="text-xs font-semibold uppercase tracking-wider text-pink-400">👰 Bride</div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Full Name <span class="text-confetti-pink">*</span></label>
+                    <input type="text" id="w-bride-name" placeholder="Full name" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Nickname</label>
+                    <input type="text" id="w-bride-nick" placeholder="Nickname" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Parents' Names</label>
+                  <input type="text" id="w-bride-parents" placeholder="e.g. Bapak Suharto & Ibu Sari" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+              </div>
+
+              <!-- Groom -->
+              <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
+                <div class="text-xs font-semibold uppercase tracking-wider text-blue-400">🤵 Groom</div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Full Name <span class="text-confetti-pink">*</span></label>
+                    <input type="text" id="w-groom-name" placeholder="Full name" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Nickname</label>
+                    <input type="text" id="w-groom-nick" placeholder="Nickname" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Parents' Names</label>
+                  <input type="text" id="w-groom-parents" placeholder="e.g. Bapak Ahmad & Ibu Dewi" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+              </div>
+
+              <!-- Akad / Holy Matrimony -->
+              <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
+                <div class="text-xs font-semibold uppercase tracking-wider text-amber-400">🕌 Akad Nikah / Holy Matrimony</div>
+                <div class="grid grid-cols-3 gap-3">
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Date <span class="text-confetti-pink">*</span></label>
+                    <input type="date" id="w-akad-date" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Start Time</label>
+                    <input type="time" id="w-akad-start" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">End Time</label>
+                    <input type="time" id="w-akad-end" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Venue Name</label>
+                  <input type="text" id="w-akad-venue" placeholder="Masjid Al-Ikhlas" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Address</label>
+                  <input type="text" id="w-akad-address" placeholder="Jl. Raya No. 123, Jakarta" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Google Maps URL</label>
+                  <input type="url" id="w-akad-maps" placeholder="https://maps.google.com/..." class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+              </div>
+
+              <!-- Resepsi / Reception -->
+              <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
+                <div class="text-xs font-semibold uppercase tracking-wider text-emerald-400">🎉 Resepsi / Reception</div>
+                <div class="grid grid-cols-3 gap-3">
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Date</label>
+                    <input type="date" id="w-resepsi-date" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Start Time</label>
+                    <input type="time" id="w-resepsi-start" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">End Time</label>
+                    <input type="time" id="w-resepsi-end" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Venue Name</label>
+                  <input type="text" id="w-resepsi-venue" placeholder="Ballroom Grand Hotel" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Address</label>
+                  <input type="text" id="w-resepsi-address" placeholder="Jl. Sudirman No. 456, Jakarta" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Google Maps URL</label>
+                  <input type="url" id="w-resepsi-maps" placeholder="https://maps.google.com/..." class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+              </div>
+
+              <!-- Digital Envelope -->
+              <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
+                <div class="text-xs font-semibold uppercase tracking-wider text-yellow-400">💰 Digital Envelope (Amplop Digital)</div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Bank / E-Wallet</label>
+                    <input type="text" id="w-bank-name" placeholder="BCA / GoPay / Dana" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Account Holder</label>
+                    <input type="text" id="w-bank-holder" placeholder="Account holder name" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Account Number</label>
+                  <input type="text" id="w-bank-number" placeholder="1234567890" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+              </div>
+
+              <!-- Love Story / Quote -->
+              <div>
+                <label for="w-love-story" class="mb-1.5 block text-sm font-medium text-surface-200">Love Story / Quote (Optional)</label>
+                <textarea id="w-love-story" rows="3" placeholder="Share your love story or a meaningful quote..." class="form-input w-full resize-none rounded-xl border bg-surface-800/50 px-4 py-3 text-sm transition-all focus-ring"></textarea>
+              </div>
             </div>
 
             <!-- Audio Selector -->
@@ -310,8 +468,8 @@ if (!user) {
 
         <!-- Step 5: Preview -->
         <div id="step-5" class="wizard-step hidden">
-          <h2 class="text-xl font-bold text-surface-50">Preview & Publish</h2>
-          <p class="mt-2 text-sm text-surface-400">Review your card before sharing it with the world</p>
+          <h2 class="text-xl font-bold text-surface-50">{isEdit ? "Preview & Save Changes" : "Preview & Publish"}</h2>
+          <p class="mt-2 text-sm text-surface-400">{isEdit ? "Review your changes before saving" : "Review your card before sharing it with the world"}</p>
 
           <!-- Mobile inline preview (visible < 1020px on step 5) -->
           <div id="step5-mobile-preview" class="mt-6 hidden">
@@ -339,9 +497,9 @@ if (!user) {
                 class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 via-fuchsia-500 to-pink-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition-all hover:opacity-95 hover:shadow-fuchsia-500/30 active:scale-[0.98] cursor-pointer"
               >
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d={isEdit ? "M5 13l4 4L19 7" : "M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"} />
                 </svg>
-                Publish Card
+                {isEdit ? "Save Changes" : "Publish Card"}
               </button>
             </div>
           </div>
@@ -485,6 +643,16 @@ if (!user) {
   // Creator Studio — Wizard State Machine
   // ═══════════════════════════════════════════════════════
 
+  interface WeddingDataState {
+    bride: { fullName: string; nickname: string; parents: string };
+    groom: { fullName: string; nickname: string; parents: string };
+    akadEvent: { date: string; timeStart: string; timeEnd: string; venue: string; address: string; mapsUrl: string };
+    receptionEvent: { date: string; timeStart: string; timeEnd: string; venue: string; address: string; mapsUrl: string };
+    digitalEnvelope: { bankName: string; accountNumber: string; accountHolder: string };
+    loveStory: string;
+    openingGreeting: string;
+  }
+
   interface CardState {
     category: string;
     themeConfig: {
@@ -496,12 +664,25 @@ if (!user) {
       unboxStyle: string;
       audioTrackId: string | null;
       externalAudioUrl: string | null;
+      weddingData?: WeddingDataState;
     };
-    photos: Array<{ file: File; previewUrl: string; publicUrl?: string }>;
+    photos: Array<{ file?: File; previewUrl: string; publicUrl?: string }>;
     recipientName: string;
     senderName: string;
     message: string;
     eventDate: string;
+  }
+
+  function emptyWeddingData(): WeddingDataState {
+    return {
+      bride: { fullName: '', nickname: '', parents: '' },
+      groom: { fullName: '', nickname: '', parents: '' },
+      akadEvent: { date: '', timeStart: '', timeEnd: '', venue: '', address: '', mapsUrl: '' },
+      receptionEvent: { date: '', timeStart: '', timeEnd: '', venue: '', address: '', mapsUrl: '' },
+      digitalEnvelope: { bankName: '', accountNumber: '', accountHolder: '' },
+      loveStory: '',
+      openingGreeting: '',
+    };
   }
 
   const state: CardState = {
@@ -578,13 +759,35 @@ if (!user) {
         (window as any).showToast({ message: 'Please select a category', type: 'warning' });
         return;
       }
-      if (currentStep === 4 && !state.recipientName) {
-        (window as any).showToast({ message: 'Recipient name is required', type: 'warning' });
-        return;
-      }
-      if (currentStep === 4 && !state.message) {
-        (window as any).showToast({ message: 'Please write a message', type: 'warning' });
-        return;
+      if (currentStep === 4) {
+        if (state.category === 'wedding') {
+          const wd = state.themeConfig.weddingData;
+          if (!wd?.bride.fullName) {
+            (window as any).showToast({ message: 'Bride\'s full name is required', type: 'warning' });
+            return;
+          }
+          if (!wd?.groom.fullName) {
+            (window as any).showToast({ message: 'Groom\'s full name is required', type: 'warning' });
+            return;
+          }
+          if (!wd?.akadEvent.date) {
+            (window as any).showToast({ message: 'Akad/ceremony date is required', type: 'warning' });
+            return;
+          }
+          if (!state.message) {
+            (window as any).showToast({ message: 'Please write an invitation message', type: 'warning' });
+            return;
+          }
+        } else {
+          if (!state.recipientName) {
+            (window as any).showToast({ message: 'Recipient name is required', type: 'warning' });
+            return;
+          }
+          if (!state.message) {
+            (window as any).showToast({ message: 'Please write a message', type: 'warning' });
+            return;
+          }
+        }
       }
     }
 
@@ -686,6 +889,30 @@ if (!user) {
   // ═══════════════════════════════════════════════════════
   // Step 1: Category Selection
   // ═══════════════════════════════════════════════════════
+  function toggleWeddingFields() {
+    const isWedding = state.category === 'wedding';
+    const weddingFields = document.getElementById('wedding-fields');
+    const recipientField = document.getElementById('standard-recipient-field');
+    const senderField = document.getElementById('standard-sender-field');
+    const eventDateField = document.getElementById('standard-event-date-field');
+
+    if (isWedding) {
+      weddingFields?.classList.remove('hidden');
+      recipientField?.classList.add('hidden');
+      senderField?.classList.add('hidden');
+      eventDateField?.classList.add('hidden');
+      // Initialize weddingData if not yet set
+      if (!state.themeConfig.weddingData) {
+        state.themeConfig.weddingData = emptyWeddingData();
+      }
+    } else {
+      weddingFields?.classList.add('hidden');
+      recipientField?.classList.remove('hidden');
+      senderField?.classList.remove('hidden');
+      eventDateField?.classList.remove('hidden');
+    }
+  }
+
   document.querySelectorAll('[data-category]').forEach((btn) => {
     btn.addEventListener('click', () => {
       state.category = (btn as HTMLElement).dataset.category || '';
@@ -697,6 +924,7 @@ if (!user) {
       btn.classList.add('border-primary/50', 'bg-primary/5');
       btn.querySelector('[data-check]')?.classList.remove('hidden');
       btn.querySelector('[data-check]')?.classList.add('flex');
+      toggleWeddingFields();
       updateLivePreview();
     });
   });
@@ -894,7 +1122,9 @@ if (!user) {
     grid.querySelectorAll('[data-remove-photo]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const idx = parseInt((btn as HTMLElement).dataset.removePhoto || '0');
-        URL.revokeObjectURL(state.photos[idx].previewUrl);
+        if (state.photos[idx]?.previewUrl?.startsWith('blob:')) {
+          URL.revokeObjectURL(state.photos[idx].previewUrl);
+        }
         state.photos.splice(idx, 1);
         renderPhotoGrid();
         updateLivePreview();
@@ -919,6 +1149,84 @@ if (!user) {
   });
   document.getElementById('event-date')?.addEventListener('input', (e) => {
     state.eventDate = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // Wedding Fields — Input Sync Listeners
+  // ═══════════════════════════════════════════════════════
+  function getWD(): WeddingDataState {
+    if (!state.themeConfig.weddingData) {
+      state.themeConfig.weddingData = emptyWeddingData();
+    }
+    return state.themeConfig.weddingData;
+  }
+
+  function wInput(id: string, cb: (val: string) => void) {
+    document.getElementById(id)?.addEventListener('input', (e) => {
+      cb((e.target as HTMLInputElement).value);
+      updateLivePreview();
+    });
+  }
+
+  // Bride
+  wInput('w-bride-name', (v) => { getWD().bride.fullName = v; });
+  wInput('w-bride-nick', (v) => { getWD().bride.nickname = v; });
+  wInput('w-bride-parents', (v) => { getWD().bride.parents = v; });
+  // Groom
+  wInput('w-groom-name', (v) => { getWD().groom.fullName = v; });
+  wInput('w-groom-nick', (v) => { getWD().groom.nickname = v; });
+  wInput('w-groom-parents', (v) => { getWD().groom.parents = v; });
+  // Akad
+  wInput('w-akad-date', (v) => { getWD().akadEvent.date = v; state.eventDate = v; });
+  wInput('w-akad-start', (v) => { getWD().akadEvent.timeStart = v; });
+  wInput('w-akad-end', (v) => { getWD().akadEvent.timeEnd = v; });
+  wInput('w-akad-venue', (v) => { getWD().akadEvent.venue = v; });
+  wInput('w-akad-address', (v) => { getWD().akadEvent.address = v; });
+  wInput('w-akad-maps', (v) => { getWD().akadEvent.mapsUrl = v; });
+  // Reception
+  wInput('w-resepsi-date', (v) => { getWD().receptionEvent.date = v; });
+  wInput('w-resepsi-start', (v) => { getWD().receptionEvent.timeStart = v; });
+  wInput('w-resepsi-end', (v) => { getWD().receptionEvent.timeEnd = v; });
+  wInput('w-resepsi-venue', (v) => { getWD().receptionEvent.venue = v; });
+  wInput('w-resepsi-address', (v) => { getWD().receptionEvent.address = v; });
+  wInput('w-resepsi-maps', (v) => { getWD().receptionEvent.mapsUrl = v; });
+  // Digital Envelope
+  wInput('w-bank-name', (v) => { getWD().digitalEnvelope.bankName = v; });
+  wInput('w-bank-number', (v) => { getWD().digitalEnvelope.accountNumber = v; });
+  wInput('w-bank-holder', (v) => { getWD().digitalEnvelope.accountHolder = v; });
+  // Love Story
+  wInput('w-love-story', (v) => { getWD().loveStory = v; });
+
+  // ═══════════════════════════════════════════════════════
+  // Opening Greeting Preset System
+  // ═══════════════════════════════════════════════════════
+  const GREETING_PRESETS: Record<string, string> = {
+    islam: "Assalamu'alaikum Warahmatullahi Wabarakatuh\nDengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i...",
+    kristen: "Salam Damai Sejahtera dalam Kasih Kristus\nAtas kasih dan karunia Tuhan Yang Maha Esa, kami bermaksud mengundang Bapak/Ibu/Saudara/i...",
+    hindu: "Om Swastyastu\nAtas Asung Kertha Wara Nugraha Ida Sang Hyang Widhi Wasa, kami bermaksud mengundang Bapak/Ibu/Saudara/i...",
+    buddha: "Namo Buddhaya\nDengan kebajikan dan ketulusan hati, kami bermaksud mengundang Bapak/Ibu/Saudara/i...",
+    umum: "Dengan memohon rahmat Tuhan Yang Maha Esa, kami berbahagia mengundang Bapak/Ibu/Saudara/i untuk menghadiri perayaan pernikahan kami...",
+  };
+
+  const greetingPresetSelect = document.getElementById('w-greeting-preset') as HTMLSelectElement | null;
+  const greetingTextArea = document.getElementById('w-greeting-text') as HTMLTextAreaElement | null;
+
+  greetingPresetSelect?.addEventListener('change', () => {
+    const key = greetingPresetSelect.value;
+    if (key && key !== 'custom' && GREETING_PRESETS[key]) {
+      const text = GREETING_PRESETS[key];
+      if (greetingTextArea) greetingTextArea.value = text;
+      getWD().openingGreeting = text;
+    } else if (key === 'custom') {
+      if (greetingTextArea) greetingTextArea.value = '';
+      getWD().openingGreeting = '';
+    }
+    updateLivePreview();
+  });
+
+  greetingTextArea?.addEventListener('input', () => {
+    getWD().openingGreeting = greetingTextArea.value;
     updateLivePreview();
   });
 
@@ -1014,7 +1322,7 @@ if (!user) {
   }
 
   function buildPreviewHTML(): PreviewThemeData {
-    const categoryEmojis: Record<string, string> = { birthday: '🎂', anniversary: '💍', graduation: '🎓', invitation: '✉️' };
+    const categoryEmojis: Record<string, string> = { birthday: '🎂', anniversary: '💍', graduation: '🎓', invitation: '✉️', wedding: '💍' };
     const emoji = categoryEmojis[state.category] || '✨';
     const fontMap: Record<string, string> = {
       sans: "'Inter', sans-serif",
@@ -1066,35 +1374,75 @@ if (!user) {
 
     let html = `<div class="text-center space-y-3" style="font-family: ${font}">`;
 
-    // Unbox simulation badge inside preview
-    html += `
-      <div class="flex justify-center mb-1">
-        <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium border border-white/10 bg-surface-800/90 text-surface-200 shadow-sm backdrop-blur-sm transition-all duration-300">
-          <span class="text-sm">${currentUnbox.icon}</span>
-          <span class="text-surface-400">Unboxing:</span>
-          <span class="font-semibold text-white">${currentUnbox.label}</span>
-        </span>
-      </div>
-    `;
+    // ── Wedding-specific preview ──
+    if (state.category === 'wedding' && state.themeConfig.weddingData) {
+      const wd = state.themeConfig.weddingData;
+      const brideName = wd.bride.nickname || wd.bride.fullName || 'Bride';
+      const groomName = wd.groom.nickname || wd.groom.fullName || 'Groom';
 
-    html += `<div class="text-5xl mb-2">${emoji}</div>`;
+      html += `<div class="text-3xl mb-1">💍</div>`;
+      html += `<p class="text-[10px] uppercase tracking-widest text-surface-400" style="font-family: ${font}">The Wedding of</p>`;
+      html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">${brideName} & ${groomName}</h3>`;
 
-    if (state.recipientName) {
-      html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">Happy ${state.category || 'celebration'}!</h3>`;
-      html += `<p class="text-sm text-surface-200" style="font-family: ${font}">Dear ${state.recipientName},</p>`;
+      if (wd.openingGreeting) {
+        html += `<p class="text-[10px] leading-relaxed text-surface-300/80 mt-2 italic whitespace-pre-line" style="font-family: ${font}">${wd.openingGreeting.slice(0, 120)}${wd.openingGreeting.length > 120 ? '...' : ''}</p>`;
+      }
+
+      if (state.message) {
+        html += `<p class="text-xs leading-relaxed text-surface-300 mt-2" style="font-family: ${font}">${state.message.slice(0, 100)}${state.message.length > 100 ? '...' : ''}</p>`;
+      }
+
+      if (wd.akadEvent.date) {
+        html += `<div class="mt-3 rounded-lg p-2 text-xs" style="background: ${state.themeConfig.primaryColor}15; border: 1px solid ${state.themeConfig.primaryColor}20;">`;
+        html += `<div class="font-semibold text-surface-200">🕌 Akad</div>`;
+        html += `<div class="text-surface-400">${new Date(wd.akadEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>`;
+        if (wd.akadEvent.venue) html += `<div class="text-surface-500">${wd.akadEvent.venue}</div>`;
+        html += `</div>`;
+      }
+
+      if (wd.receptionEvent.date) {
+        html += `<div class="mt-1.5 rounded-lg p-2 text-xs" style="background: ${state.themeConfig.secondaryColor}15; border: 1px solid ${state.themeConfig.secondaryColor}20;">`;
+        html += `<div class="font-semibold text-surface-200">🎉 Resepsi</div>`;
+        html += `<div class="text-surface-400">${new Date(wd.receptionEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>`;
+        if (wd.receptionEvent.venue) html += `<div class="text-surface-500">${wd.receptionEvent.venue}</div>`;
+        html += `</div>`;
+      }
+
+      if (wd.digitalEnvelope.bankName) {
+        html += `<div class="mt-2 text-[10px] text-surface-500">💰 ${wd.digitalEnvelope.bankName} — ${wd.digitalEnvelope.accountHolder || '...'}</div>`;
+      }
     } else {
-      html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">Happy ${state.category || 'Celebration'}!</h3>`;
-      html += `<p class="text-sm text-surface-400" style="font-family: ${font}">Dear Someone Special,</p>`;
-    }
+      // ── Standard card preview ──
+      // Unbox simulation badge inside preview
+      html += `
+        <div class="flex justify-center mb-1">
+          <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium border border-white/10 bg-surface-800/90 text-surface-200 shadow-sm backdrop-blur-sm transition-all duration-300">
+            <span class="text-sm">${currentUnbox.icon}</span>
+            <span class="text-surface-400">Unboxing:</span>
+            <span class="font-semibold text-white">${currentUnbox.label}</span>
+          </span>
+        </div>
+      `;
 
-    if (state.message) {
-      html += `<p class="text-xs leading-relaxed text-surface-300 mt-2" style="font-family: ${font}">${state.message.slice(0, 150)}${state.message.length > 150 ? '...' : ''}</p>`;
-    } else {
-      html += `<p class="text-xs leading-relaxed text-surface-400 mt-2 italic" style="font-family: ${font}">Your message will appear here...</p>`;
-    }
+      html += `<div class="text-5xl mb-2">${emoji}</div>`;
 
-    if (state.senderName) {
-      html += `<p class="text-xs text-surface-400 mt-3 italic" style="font-family: ${font}">— ${state.senderName}</p>`;
+      if (state.recipientName) {
+        html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">Happy ${state.category || 'celebration'}!</h3>`;
+        html += `<p class="text-sm text-surface-200" style="font-family: ${font}">Dear ${state.recipientName},</p>`;
+      } else {
+        html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">Happy ${state.category || 'Celebration'}!</h3>`;
+        html += `<p class="text-sm text-surface-400" style="font-family: ${font}">Dear Someone Special,</p>`;
+      }
+
+      if (state.message) {
+        html += `<p class="text-xs leading-relaxed text-surface-300 mt-2" style="font-family: ${font}">${state.message.slice(0, 150)}${state.message.length > 150 ? '...' : ''}</p>`;
+      } else {
+        html += `<p class="text-xs leading-relaxed text-surface-400 mt-2 italic" style="font-family: ${font}">Your message will appear here...</p>`;
+      }
+
+      if (state.senderName) {
+        html += `<p class="text-xs text-surface-400 mt-3 italic" style="font-family: ${font}">— ${state.senderName}</p>`;
+      }
     }
 
     if (state.photos.length > 0) {
@@ -1145,7 +1493,7 @@ if (!user) {
     const summary = document.getElementById('preview-summary');
     if (!summary) return;
 
-    const categoryEmojis: Record<string, string> = { birthday: '🎂 Birthday', anniversary: '💍 Anniversary', graduation: '🎓 Graduation', invitation: '✉️ Invitation' };
+    const categoryEmojis: Record<string, string> = { birthday: '🎂 Birthday', anniversary: '💍 Anniversary', graduation: '🎓 Graduation', invitation: '✉️ Invitation', wedding: '💒 Wedding' };
     const unboxSummaryMap: Record<string, string> = {
       envelope: '✉️ Envelope Flip',
       giftbox: '🎁 Gift Box',
@@ -1203,6 +1551,15 @@ if (!user) {
           <span class="text-sm text-surface-400">Event Date</span>
           <span class="text-sm font-medium text-surface-200">${new Date(state.eventDate).toLocaleDateString()}</span>
         </div>` : ''}
+        ${state.category === 'wedding' && state.themeConfig.weddingData ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Couple</span>
+          <span class="text-sm font-medium text-surface-200">👰 ${state.themeConfig.weddingData.bride.fullName || '—'} & 🤵 ${state.themeConfig.weddingData.groom.fullName || '—'}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Akad Date</span>
+          <span class="text-sm font-medium text-surface-200">${state.themeConfig.weddingData.akadEvent.date ? new Date(state.themeConfig.weddingData.akadEvent.date + 'T00:00:00').toLocaleDateString() : '—'}</span>
+        </div>` : ''}
         <hr class="border-white/5" />
         <div>
           <span class="text-sm text-surface-400">Message Preview</span>
@@ -1213,7 +1570,7 @@ if (!user) {
   }
 
   // ═══════════════════════════════════════════════════════
-  // Publish Card
+  // Publish / Save Card
   // ═══════════════════════════════════════════════════════
   document.getElementById('publish-btn')?.addEventListener('click', async () => {
     // Stop any running audio preview before publishing
@@ -1221,72 +1578,288 @@ if (!user) {
     previewingTrackId = null;
     updateTrackSelectionUI();
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    const isEditMode = Boolean(editId);
+
     const btn = document.getElementById('publish-btn') as HTMLButtonElement;
     btn.disabled = true;
-    btn.innerHTML = '<span class="animate-spin">⏳</span> Publishing...';
+    btn.innerHTML = isEditMode
+      ? '<span class="animate-spin">⏳</span> Saving...'
+      : '<span class="animate-spin">⏳</span> Publishing...';
 
     try {
-      // 1. Upload photos to R2 (if any)
+      // 1. Upload photos to R2 (if any new files)
       const mediaUrls: string[] = [];
       for (const photo of state.photos) {
-        // Get presigned URL
-        const presignRes = await fetch('/api/storage/presigned-url', {
-          method: 'POST',
+        if (photo.publicUrl) {
+          mediaUrls.push(photo.publicUrl);
+          continue;
+        }
+        if (photo.file) {
+          // Get presigned URL
+          const presignRes = await fetch('/api/storage/presigned-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: photo.file.name,
+              contentType: 'image/webp',
+            }),
+          });
+
+          if (!presignRes.ok) {
+            const errData = await presignRes.json().catch(() => ({ error: 'Failed to get upload URL' }));
+            throw new Error(errData.error || `Failed to get upload authorization (${presignRes.status})`);
+          }
+          const { uploadUrl, publicUrl } = await presignRes.json();
+
+          // Upload directly to R2
+          await uploadToR2(uploadUrl, photo.file);
+          mediaUrls.push(publicUrl);
+        }
+      }
+
+      // 2. Validate & format fields
+      // For wedding cards, auto-set recipient_name to couple names if empty
+      let recipientName = state.recipientName;
+      if (state.category === 'wedding' && !recipientName && state.themeConfig.weddingData) {
+        const wd = state.themeConfig.weddingData;
+        const bName = wd.bride.nickname || wd.bride.fullName;
+        const gName = wd.groom.nickname || wd.groom.fullName;
+        recipientName = `${bName} & ${gName}`;
+      }
+
+      // For wedding, sync eventDate from akad date
+      let eventDate = state.eventDate || null;
+      if (state.category === 'wedding' && state.themeConfig.weddingData?.akadEvent.date) {
+        eventDate = state.themeConfig.weddingData.akadEvent.date;
+      }
+
+      const payload = {
+        category: state.category,
+        recipient_name: recipientName,
+        sender_name: state.senderName,
+        message: state.message,
+        event_date: eventDate,
+        theme_config: state.themeConfig,
+        media_urls: mediaUrls,
+      };
+
+      if (isEditMode) {
+        // Dispatch PATCH /api/cards/${editId} with the updated payload
+        const res = await fetch(`/api/cards/${editId}`, {
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            filename: photo.file.name,
-            contentType: 'image/webp',
-          }),
+          body: JSON.stringify(payload),
         });
 
-        if (!presignRes.ok) {
-          const errData = await presignRes.json().catch(() => ({ error: 'Failed to get upload URL' }));
-          throw new Error(errData.error || `Failed to get upload authorization (${presignRes.status})`);
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Failed to update card' }));
+          throw new Error(err.error || 'Failed to update card');
         }
-        const { uploadUrl, publicUrl } = await presignRes.json();
 
-        // Upload directly to R2
-        await uploadToR2(uploadUrl, photo.file);
-        mediaUrls.push(publicUrl);
+        const updatedCard = await res.json();
+        (window as any).showToast({ message: 'Card updated successfully!', type: 'success' });
+
+        // Redirect to dashboard (or view /c/[slug])
+        setTimeout(() => {
+          window.location.href = updatedCard.slug ? `/c/${updatedCard.slug}` : '/dashboard';
+        }, 1500);
+      } else {
+        // Normal POST /api/cards flow
+        const res = await fetch('/api/cards', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Failed to create card' }));
+          throw new Error(err.error || 'Failed to create card');
+        }
+
+        const card = await res.json();
+        (window as any).showToast({ message: '🎉 Card published successfully!', type: 'success' });
+
+        // Redirect to the card
+        setTimeout(() => {
+          window.location.href = `/c/${card.slug}`;
+        }, 1500);
       }
-
-      // 2. Create card
-      const res = await fetch('/api/cards', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          category: state.category,
-          recipient_name: state.recipientName,
-          sender_name: state.senderName,
-          message: state.message,
-          event_date: state.eventDate || null,
-          theme_config: state.themeConfig,
-          media_urls: mediaUrls,
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to create card');
-      }
-
-      const card = await res.json();
-      (window as any).showToast({ message: '🎉 Card published successfully!', type: 'success' });
-
-      // Redirect to the card
-      setTimeout(() => {
-        window.location.href = `/c/${card.slug}`;
-      }, 1500);
     } catch (err: any) {
-      (window as any).showToast({ message: err.message || 'Failed to publish', type: 'error' });
+      (window as any).showToast({ message: err.message || (isEditMode ? 'Failed to update' : 'Failed to publish'), type: 'error' });
       btn.disabled = false;
-      btn.innerHTML = '🚀 Publish Card';
+      btn.innerHTML = isEditMode
+        ? '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Save Changes'
+        : '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg> Publish Card';
     }
   });
+
+  // ═══════════════════════════════════════════════════════
+  // Check & Load Edit Mode
+  // ═══════════════════════════════════════════════════════
+  async function checkAndLoadEditMode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    if (!editId) return;
+
+    try {
+      const res = await fetch(`/api/cards/${editId}`);
+      if (!res.ok) throw new Error('Failed to load card');
+      const card = await res.json();
+
+      state.category = card.category || '';
+      state.recipientName = card.recipient_name || '';
+      state.senderName = card.sender_name || '';
+      state.message = card.message || '';
+      state.eventDate = card.event_date ? card.event_date.split('T')[0] : '';
+
+      if (card.theme_config) {
+        state.themeConfig = {
+          ...state.themeConfig,
+          ...card.theme_config,
+        };
+      }
+
+      if (Array.isArray(card.media_urls)) {
+        state.photos = card.media_urls.map((url: string) => ({
+          previewUrl: url,
+          publicUrl: url,
+        }));
+      }
+
+      // Update Category Selection UI
+      if (state.category) {
+        document.querySelectorAll('[data-category]').forEach((btn) => {
+          const b = btn as HTMLElement;
+          const check = b.querySelector('[data-check]');
+          if (b.dataset.category === state.category) {
+            b.classList.add('border-primary/50', 'bg-primary/5');
+            check?.classList.remove('hidden');
+            check?.classList.add('flex');
+          } else {
+            b.classList.remove('border-primary/50', 'bg-primary/5');
+            check?.classList.add('hidden');
+            check?.classList.remove('flex');
+            // Lock non-selected categories in edit mode
+            b.classList.add('pointer-events-none', 'opacity-50');
+          }
+        });
+        toggleWeddingFields();
+
+        // Add "Category locked" badge below the category grid
+        const step1 = document.getElementById('step-1');
+        if (step1) {
+          const lockBadge = document.createElement('div');
+          lockBadge.className = 'mt-4 flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-2.5 text-xs font-medium text-amber-300';
+          lockBadge.innerHTML = `
+            <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
+            <span>Category locked in edit mode</span>
+          `;
+          step1.appendChild(lockBadge);
+        }
+      }
+
+      // Update Theme Colors
+      const primaryEl = document.getElementById('theme-primary') as HTMLInputElement | null;
+      const secondaryEl = document.getElementById('theme-secondary') as HTMLInputElement | null;
+      if (primaryEl && state.themeConfig.primaryColor) {
+        primaryEl.value = state.themeConfig.primaryColor;
+        const hex = document.getElementById('theme-primary-hex');
+        if (hex) hex.textContent = state.themeConfig.primaryColor;
+      }
+      if (secondaryEl && state.themeConfig.secondaryColor) {
+        secondaryEl.value = state.themeConfig.secondaryColor;
+        const hex = document.getElementById('theme-secondary-hex');
+        if (hex) hex.textContent = state.themeConfig.secondaryColor;
+      }
+
+      // Update Step 4 Message Inputs
+      const recInput = document.getElementById('recipient-name') as HTMLInputElement | null;
+      if (recInput) recInput.value = state.recipientName;
+      const senderInput = document.getElementById('sender-name') as HTMLInputElement | null;
+      if (senderInput) senderInput.value = state.senderName;
+      const msgInput = document.getElementById('message') as HTMLTextAreaElement | null;
+      if (msgInput) msgInput.value = state.message;
+      const dateInput = document.getElementById('event-date') as HTMLInputElement | null;
+      if (dateInput) dateInput.value = state.eventDate;
+
+      // Update Wedding Inputs if applicable
+      if (state.category === 'wedding' && state.themeConfig.weddingData) {
+        const wd = state.themeConfig.weddingData;
+        const setVal = (id: string, val: string | undefined) => {
+          const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null;
+          if (el && val !== undefined) el.value = val;
+        };
+        setVal('w-bride-name', wd.bride?.fullName);
+        setVal('w-bride-nick', wd.bride?.nickname);
+        setVal('w-bride-parents', wd.bride?.parents);
+        setVal('w-groom-name', wd.groom?.fullName);
+        setVal('w-groom-nick', wd.groom?.nickname);
+        setVal('w-groom-parents', wd.groom?.parents);
+        setVal('w-akad-date', wd.akadEvent?.date);
+        setVal('w-akad-start', wd.akadEvent?.timeStart);
+        setVal('w-akad-end', wd.akadEvent?.timeEnd);
+        setVal('w-akad-venue', wd.akadEvent?.venue);
+        setVal('w-akad-address', wd.akadEvent?.address);
+        setVal('w-akad-maps', wd.akadEvent?.mapsUrl);
+        setVal('w-resepsi-date', wd.receptionEvent?.date);
+        setVal('w-resepsi-start', wd.receptionEvent?.timeStart);
+        setVal('w-resepsi-end', wd.receptionEvent?.timeEnd);
+        setVal('w-resepsi-venue', wd.receptionEvent?.venue);
+        setVal('w-resepsi-address', wd.receptionEvent?.address);
+        setVal('w-resepsi-maps', wd.receptionEvent?.mapsUrl);
+        setVal('w-bank-name', wd.digitalEnvelope?.bankName);
+        setVal('w-bank-number', wd.digitalEnvelope?.accountNumber);
+        setVal('w-bank-holder', wd.digitalEnvelope?.accountHolder);
+        setVal('w-love-story', wd.loveStory);
+
+        // Restore opening greeting
+        if (wd.openingGreeting) {
+          const greetingTextEl = document.getElementById('w-greeting-text') as HTMLTextAreaElement | null;
+          const greetingSelectEl = document.getElementById('w-greeting-preset') as HTMLSelectElement | null;
+          if (greetingTextEl) greetingTextEl.value = wd.openingGreeting;
+          // Try to match to a preset key
+          if (greetingSelectEl) {
+            const matchedKey = Object.entries(GREETING_PRESETS).find(([_, v]) => v === wd.openingGreeting)?.[0];
+            greetingSelectEl.value = matchedKey || 'custom';
+          }
+        }
+      }
+
+      // External audio
+      const extAudio = document.getElementById('external-audio') as HTMLInputElement | null;
+      if (extAudio && state.themeConfig.externalAudioUrl) {
+        extAudio.value = state.themeConfig.externalAudioUrl;
+      }
+
+      renderPhotoGrid();
+      syncThemeSelectorActiveStates();
+      updateTrackSelectionUI();
+      updateLivePreview();
+
+      // Update Publish button label and header in edit mode
+      const pubBtn = document.getElementById('publish-btn');
+      if (pubBtn) {
+        pubBtn.innerHTML = `
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          Save Changes
+        `;
+      }
+    } catch (err) {
+      console.error('Failed to load card for editing:', err);
+      (window as any).showToast?.({ message: 'Could not load card details for editing', type: 'error' });
+    }
+  }
 
   // Initialize
   goToStep(1);
   syncThemeSelectorActiveStates();
+  checkAndLoadEditMode();
 </script>
 
 <style>

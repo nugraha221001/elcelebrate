@@ -42,7 +42,7 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
   const { id } = params;
   const body = await request.json();
 
-  // Allow only permitted mutable fields (protect id, user_id, slug, created_at)
+  // Allow only permitted mutable fields (protect id, user_id, slug, created_at, category)
   const allowedKeys = [
     'is_published',
     'recipient_name',
@@ -51,7 +51,6 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
     'event_date',
     'theme_config',
     'media_urls',
-    'category',
   ];
 
   const updatePayload: Record<string, any> = {};
@@ -72,6 +71,36 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
   // Sanitize media_urls to internal proxy URLs if provided
   if (updatePayload.media_urls && Array.isArray(updatePayload.media_urls)) {
     updatePayload.media_urls = updatePayload.media_urls.map(resolveMediaUrl);
+  }
+
+  // ── R2 Diff Cleanup: delete orphaned assets when media_urls changes ──
+  if (updatePayload.media_urls && Array.isArray(updatePayload.media_urls)) {
+    const { data: existingCard } = await locals.supabase
+      .from('cards')
+      .select('media_urls')
+      .eq('id', id)
+      .eq('user_id', locals.user.id)
+      .single();
+
+    if (existingCard && Array.isArray(existingCard.media_urls)) {
+      const oldUrls: string[] = existingCard.media_urls;
+      const newUrls: string[] = updatePayload.media_urls;
+      const removedUrls = oldUrls.filter((url: string) => !newUrls.includes(url));
+
+      if (removedUrls.length > 0) {
+        const keysToDelete = removedUrls
+          .map(extractR2Key)
+          .filter((k): k is string => Boolean(k));
+
+        await Promise.allSettled(
+          keysToDelete.map((key) =>
+            deleteR2Object(key).catch((err) =>
+              console.error(`[PATCH] Failed to delete orphaned R2 asset "${key}":`, err)
+            )
+          )
+        );
+      }
+    }
   }
 
   const { data, error } = await locals.supabase

@@ -2,9 +2,43 @@
    ElCelebrate — Shared TypeScript Types
    ═══════════════════════════════════════════════════════════ */
 
-export type CardCategory = 'birthday' | 'anniversary' | 'graduation' | 'invitation';
+export type CardCategory = 'birthday' | 'anniversary' | 'graduation' | 'invitation' | 'wedding';
 
 export type UnboxStyle = 'envelope' | 'giftbox' | 'ribbon';
+
+/** Wedding-specific structured data stored inside ThemeConfig.weddingData */
+export interface WeddingEventDetail {
+  date: string;       // ISO date string (YYYY-MM-DD)
+  timeStart: string;  // HH:MM format
+  timeEnd: string;    // HH:MM format
+  venue: string;      // Venue name
+  address: string;    // Full address
+  mapsUrl: string;    // Google Maps URL
+}
+
+export interface WeddingDigitalEnvelope {
+  bankName: string;       // Bank or e-wallet name (e.g. "BCA", "GoPay")
+  accountNumber: string;  // Account number
+  accountHolder: string;  // Account holder name
+}
+
+export interface WeddingData {
+  bride: {
+    fullName: string;
+    nickname: string;
+    parents: string;    // e.g. "Bapak Suharto & Ibu Sari"
+  };
+  groom: {
+    fullName: string;
+    nickname: string;
+    parents: string;
+  };
+  akadEvent: WeddingEventDetail;
+  receptionEvent: WeddingEventDetail;
+  digitalEnvelope: WeddingDigitalEnvelope;
+  loveStory: string;  // Optional love story / quote
+  openingGreeting: string;  // Opening greeting / Salam Pembuka
+}
 
 export interface ThemeConfig {
   primaryColor: string;
@@ -15,6 +49,7 @@ export interface ThemeConfig {
   unboxStyle: UnboxStyle;
   audioTrackId: string | null;
   externalAudioUrl: string | null;
+  weddingData?: WeddingData;
 }
 
 export interface Card {
@@ -94,5 +129,10 @@ export const CATEGORY_META: Record<CardCategory, { label: string; emoji: string;
     label: 'Invitation',
     emoji: '✉️',
     description: 'Invite loved ones to your event',
+  },
+  wedding: {
+    label: 'Wedding Invitation',
+    emoji: '💍',
+    description: 'Luxury long-scroll invitation for your big day',
   },
 };
