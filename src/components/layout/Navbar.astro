@@ -226,57 +226,69 @@ const initial = (displayName || 'U').charAt(0).toUpperCase();
 </nav>
 
 <script>
-  // Mobile menu toggle
-  const mobileBtn = document.getElementById('mobile-menu-btn');
-  const mobileMenu = document.getElementById('mobile-menu');
-  mobileBtn?.addEventListener('click', () => {
-    mobileMenu?.classList.toggle('hidden');
-  });
+  function initNavbar() {
+    // Mobile menu toggle
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mobileMenu?.classList.toggle('hidden');
+    });
 
-  // User menu dropdown toggle
-  const userMenuWrapper = document.getElementById('user-menu-wrapper');
-  const userMenuBtn = document.getElementById('user-menu-btn');
-  const userMenuDropdown = document.getElementById('user-menu-dropdown');
-  const chevron = document.getElementById('user-menu-chevron');
+    // User menu dropdown toggle
+    const userMenuWrapper = document.getElementById('user-menu-wrapper');
+    const userMenuBtn = document.getElementById('user-menu-btn');
+    const userMenuDropdown = document.getElementById('user-menu-dropdown');
+    const chevron = document.getElementById('user-menu-chevron');
 
-  function openDropdown() {
-    if (!userMenuDropdown) return;
-    userMenuDropdown.classList.remove('invisible', 'opacity-0', 'scale-95');
-    userMenuDropdown.classList.add('opacity-100', 'scale-100');
-    userMenuBtn?.setAttribute('aria-expanded', 'true');
-    chevron?.classList.add('rotate-180');
+    if (userMenuBtn && userMenuDropdown) {
+      function openDropdown() {
+        if (!userMenuDropdown) return;
+        userMenuDropdown.classList.remove('invisible', 'opacity-0', 'scale-95');
+        userMenuDropdown.classList.add('opacity-100', 'scale-100');
+        userMenuBtn?.setAttribute('aria-expanded', 'true');
+        chevron?.classList.add('rotate-180');
+      }
+
+      function closeDropdown() {
+        if (!userMenuDropdown) return;
+        userMenuDropdown.classList.remove('opacity-100', 'scale-100');
+        userMenuDropdown.classList.add('invisible', 'opacity-0', 'scale-95');
+        userMenuBtn?.setAttribute('aria-expanded', 'false');
+        chevron?.classList.remove('rotate-180');
+      }
+
+      userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isExpanded = userMenuBtn.getAttribute('aria-expanded') === 'true';
+        if (isExpanded) {
+          closeDropdown();
+        } else {
+          openDropdown();
+        }
+      });
+
+      // Click outside dismiss
+      document.addEventListener('click', (e) => {
+        if (userMenuWrapper && !userMenuWrapper.contains(e.target as Node)) {
+          closeDropdown();
+        }
+      });
+
+      // Escape key dismiss
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeDropdown();
+        }
+      });
+    }
   }
 
-  function closeDropdown() {
-    if (!userMenuDropdown) return;
-    userMenuDropdown.classList.remove('opacity-100', 'scale-100');
-    userMenuDropdown.classList.add('invisible', 'opacity-0', 'scale-95');
-    userMenuBtn?.setAttribute('aria-expanded', 'false');
-    chevron?.classList.remove('rotate-180');
+  // Direct initialization on normal DOM load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNavbar);
+  } else {
+    initNavbar();
   }
-
-  userMenuBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isExpanded = userMenuBtn.getAttribute('aria-expanded') === 'true';
-    if (isExpanded) {
-      closeDropdown();
-    } else {
-      openDropdown();
-    }
-  });
-
-  // Click outside dismiss
-  document.addEventListener('click', (e) => {
-    if (userMenuWrapper && !userMenuWrapper.contains(e.target as Node)) {
-      closeDropdown();
-    }
-  });
-
-  // Escape key dismiss
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeDropdown();
-    }
-  });
 </script>
 

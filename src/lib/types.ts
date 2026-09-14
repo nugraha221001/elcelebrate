@@ -6,6 +6,8 @@ export type CardCategory = 'birthday' | 'anniversary' | 'graduation' | 'invitati
 
 export type UnboxStyle = 'envelope' | 'giftbox' | 'ribbon';
 
+export type AmbientEffectType = 'petals' | 'golden-sparkles' | 'hearts' | 'confetti-float' | 'starlight' | 'lanterns' | 'butterflies' | 'bokeh' | 'sparklers' | 'none';
+
 /** Wedding-specific structured data stored inside ThemeConfig.weddingData */
 export interface WeddingEventDetail {
   date: string;       // ISO date string (YYYY-MM-DD)
@@ -49,6 +51,7 @@ export interface ThemeConfig {
   unboxStyle: UnboxStyle;
   audioTrackId: string | null;
   externalAudioUrl: string | null;
+  ambientEffect?: AmbientEffectType;
   weddingData?: WeddingData;
 }
 

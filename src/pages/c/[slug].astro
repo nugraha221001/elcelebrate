@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../components/layout/BaseLayout.astro';
+import AmbientEffect from '../../components/ui/AmbientEffect.astro';
 import type { Card, Wish, ThemeConfig } from '../../lib/types';
 import { CATEGORY_META } from '../../lib/types';
 import { getTrackById, getTrackUrl } from '../../lib/audio-tracks';
@@ -150,10 +151,13 @@ const ogImage = typedCard.media_urls.length > 0
     <main
       id="wedding-content"
       class="hidden min-h-dvh"
-      style={`background: ${theme.backgroundColor}; background-image: ${bgPattern}; background-size: ${theme.backgroundPattern === 'dots' ? '20px 20px' : 'auto'}; font-family: ${fontFamily};`}
+      style={`--primary: ${theme.primaryColor}; --secondary: ${theme.secondaryColor}; background: ${theme.backgroundColor}; background-image: ${bgPattern}; background-size: ${theme.backgroundPattern === 'dots' ? '20px 20px' : 'auto'}; font-family: ${fontFamily};`}
     >
       <!-- Confetti Canvas -->
       <canvas id="confetti-canvas" class="pointer-events-none fixed inset-0 z-(--z-confetti)" style="width:100%;height:100%;"></canvas>
+
+      <!-- Ambient Effect -->
+      <AmbientEffect effect={(theme as any).ambientEffect ?? 'none'} />
 
       <!-- Audio Player -->
       {hasAudio && (
@@ -179,18 +183,18 @@ const ogImage = typedCard.media_urls.length > 0
         </div>
       )}
 
-      <div class="mx-auto max-w-2xl px-4">
+      <div class="mx-auto max-w-4xl px-4">
 
         <!-- ── Couple Profile Section ── -->
-        <section class="py-16 sm:py-20 animate-fade-in-up" style="animation-delay: 200ms; opacity: 0; animation-fill-mode: forwards;">
+        <section class="py-16 sm:py-20 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 200ms; opacity: 0; animation-fill-mode: forwards;">
         {weddingData.openingGreeting ? (
           <div class="text-center mb-8">
-            <p class="text-sm sm:text-base italic leading-relaxed text-surface-300/90 whitespace-pre-line max-w-md mx-auto" style={`font-family: ${fontFamily};`}>
+            <p class="text-slate-100 font-normal leading-relaxed text-center max-w-lg mx-auto drop-shadow-xs italic whitespace-pre-line text-sm sm:text-base" style={`font-family: ${fontFamily};`}>
               {weddingData.openingGreeting}
             </p>
           </div>
         ) : (
-          <p class="text-center text-xs uppercase tracking-[0.25em] text-surface-500 mb-8" style={`font-family: ${fontFamily};`}>
+          <p class="text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase mb-8" style={`font-family: ${fontFamily};`}>
             Bismillahirrahmanirrahim
           </p>
         )}
@@ -207,7 +211,7 @@ const ogImage = typedCard.media_urls.length > 0
                 {weddingData.bride.fullName}
               </h2>
               {weddingData.bride.parents && (
-                <p class="mt-1 text-xs text-surface-400">Putri dari {weddingData.bride.parents}</p>
+                <p class="text-slate-200 font-normal text-xs md:text-sm mt-1 tracking-wide">Putri dari {weddingData.bride.parents}</p>
               )}
             </div>
 
@@ -225,19 +229,19 @@ const ogImage = typedCard.media_urls.length > 0
                 {weddingData.groom.fullName}
               </h2>
               {weddingData.groom.parents && (
-                <p class="mt-1 text-xs text-surface-400">Putra dari {weddingData.groom.parents}</p>
+                <p class="text-slate-200 font-normal text-xs md:text-sm mt-1 tracking-wide">Putra dari {weddingData.groom.parents}</p>
               )}
             </div>
           </div>
         </section>
 
         <!-- ── Invitation Message ── -->
-        <section class="pb-12 animate-fade-in-up max-w-full overflow-hidden" style="animation-delay: 400ms; opacity: 0; animation-fill-mode: forwards;">
+        <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto overflow-hidden" style="animation-delay: 400ms; opacity: 0; animation-fill-mode: forwards;">
           <div
             class="rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden"
             style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}
           >
-            <p class="wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden text-base leading-relaxed text-surface-200 sm:text-lg" style={`font-family: ${fontFamily};`}>
+            <p class="wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden text-slate-100 text-sm md:text-base font-medium leading-relaxed" style={`font-family: ${fontFamily};`}>
               {typedCard.message}
             </p>
           </div>
@@ -245,10 +249,10 @@ const ogImage = typedCard.media_urls.length > 0
 
         <!-- ── Love Story / Quote ── -->
         {weddingData.loveStory && (
-          <section class="pb-12 animate-fade-in-up max-w-full overflow-hidden" style="animation-delay: 500ms; opacity: 0; animation-fill-mode: forwards;">
-            <div class="text-center w-full max-w-md mx-auto overflow-hidden">
+          <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto overflow-hidden" style="animation-delay: 500ms; opacity: 0; animation-fill-mode: forwards;">
+            <div class="text-center w-full max-w-lg mx-auto overflow-hidden">
               <div class="text-4xl mb-4" style={`color: ${theme.primaryColor}30;`}>❝</div>
-              <p class="text-sm leading-relaxed text-surface-300 italic wrap-anywhere whitespace-pre-wrap overflow-hidden" style={`font-family: ${fontFamily};`}>
+              <p class="text-slate-100 font-normal leading-relaxed text-center max-w-lg mx-auto drop-shadow-xs italic wrap-anywhere whitespace-pre-wrap overflow-hidden text-sm md:text-base" style={`font-family: ${fontFamily};`}>
                 {weddingData.loveStory}
               </p>
               <div class="text-4xl mt-4" style={`color: ${theme.primaryColor}30;`}>❞</div>
@@ -258,9 +262,9 @@ const ogImage = typedCard.media_urls.length > 0
 
         <!-- ── Countdown Timer ── -->
         {weddingData.akadEvent.date && (
-          <section class="pb-12 animate-fade-in-up" style="animation-delay: 600ms; opacity: 0; animation-fill-mode: forwards;">
+          <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 600ms; opacity: 0; animation-fill-mode: forwards;">
             <div class="text-center">
-              <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-surface-400">Menghitung Hari</h2>
+              <h2 class="mb-4 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Menghitung Hari</h2>
               <div id="countdown" class="flex justify-center gap-3 sm:gap-5" data-event-date={weddingData.akadEvent.date}>
                 {['Hari', 'Jam', 'Mnt', 'Dtk'].map((unit, idx) => (
                   <div class="flex flex-col items-center">
@@ -271,7 +275,7 @@ const ogImage = typedCard.media_urls.length > 0
                     >
                       --
                     </div>
-                    <span class="mt-1.5 text-xs text-surface-400">{unit}</span>
+                    <span class="mt-1.5 text-slate-200 text-xs font-medium tracking-wider">{unit}</span>
                   </div>
                 ))}
               </div>
@@ -280,8 +284,8 @@ const ogImage = typedCard.media_urls.length > 0
         )}
 
         <!-- ── Event Schedule ── -->
-        <section class="pb-12 animate-fade-in-up" style="animation-delay: 700ms; opacity: 0; animation-fill-mode: forwards;">
-          <h2 class="mb-6 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">Jadwal Acara</h2>
+        <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 700ms; opacity: 0; animation-fill-mode: forwards;">
+          <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Jadwal Acara</h2>
 
           <div class="space-y-4">
             <!-- Akad -->
@@ -290,18 +294,18 @@ const ogImage = typedCard.media_urls.length > 0
                 <span class="text-lg">🕌</span>
                 <h3 class="text-base font-semibold" style={`color: ${theme.primaryColor};`}>Akad Nikah</h3>
               </div>
-              <div class="space-y-1.5 text-sm text-surface-300">
+              <div class="space-y-1.5 text-sm">
                 {weddingData.akadEvent.date && (
-                  <p>📅 {new Date(weddingData.akadEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  <p class="text-slate-100 font-medium">📅 {new Date(weddingData.akadEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 )}
                 {(weddingData.akadEvent.timeStart || weddingData.akadEvent.timeEnd) && (
-                  <p>🕐 {weddingData.akadEvent.timeStart || '--:--'} — {weddingData.akadEvent.timeEnd || 'Selesai'}</p>
+                  <p class="text-slate-100 font-medium">🕐 {weddingData.akadEvent.timeStart || '--:--'} — {weddingData.akadEvent.timeEnd || 'Selesai'}</p>
                 )}
                 {weddingData.akadEvent.venue && (
-                  <p class="font-medium text-surface-200">📍 {weddingData.akadEvent.venue}</p>
+                  <p class="font-medium text-slate-100">📍 {weddingData.akadEvent.venue}</p>
                 )}
                 {weddingData.akadEvent.address && (
-                  <p class="text-xs text-surface-400">{weddingData.akadEvent.address}</p>
+                  <p class="text-slate-200 text-xs md:text-sm leading-normal mt-0.5">{weddingData.akadEvent.address}</p>
                 )}
               </div>
               {weddingData.akadEvent.mapsUrl && (
@@ -324,18 +328,18 @@ const ogImage = typedCard.media_urls.length > 0
                   <span class="text-lg">🎉</span>
                   <h3 class="text-base font-semibold" style={`color: ${theme.secondaryColor};`}>Resepsi</h3>
                 </div>
-                <div class="space-y-1.5 text-sm text-surface-300">
+                <div class="space-y-1.5 text-sm">
                   {weddingData.receptionEvent.date && (
-                    <p>📅 {new Date(weddingData.receptionEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    <p class="text-slate-100 font-medium">📅 {new Date(weddingData.receptionEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                   )}
                   {(weddingData.receptionEvent.timeStart || weddingData.receptionEvent.timeEnd) && (
-                    <p>🕐 {weddingData.receptionEvent.timeStart || '--:--'} — {weddingData.receptionEvent.timeEnd || 'Selesai'}</p>
+                    <p class="text-slate-100 font-medium">🕐 {weddingData.receptionEvent.timeStart || '--:--'} — {weddingData.receptionEvent.timeEnd || 'Selesai'}</p>
                   )}
                   {weddingData.receptionEvent.venue && (
-                    <p class="font-medium text-surface-200">📍 {weddingData.receptionEvent.venue}</p>
+                    <p class="font-medium text-slate-100">📍 {weddingData.receptionEvent.venue}</p>
                   )}
                   {weddingData.receptionEvent.address && (
-                    <p class="text-xs text-surface-400">{weddingData.receptionEvent.address}</p>
+                    <p class="text-slate-200 text-xs md:text-sm leading-normal mt-0.5">{weddingData.receptionEvent.address}</p>
                   )}
                 </div>
                 {weddingData.receptionEvent.mapsUrl && (
@@ -357,23 +361,41 @@ const ogImage = typedCard.media_urls.length > 0
         <!-- ── Photo Gallery ── -->
         {typedCard.media_urls.length > 2 && (
           <section class="pb-12 animate-fade-in-up" style="animation-delay: 800ms; opacity: 0; animation-fill-mode: forwards;">
-            <h2 class="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">Galeri Foto</h2>
-            <div class:list={[
-              'grid gap-3',
-              typedCard.media_urls.length - 2 === 1 ? 'grid-cols-1' : 'grid-cols-2',
-            ]}>
-              {typedCard.media_urls.slice(2).map((url, i) => (
-                <div
-                  class="group overflow-hidden rounded-2xl bg-surface-800"
-                  style={`border: 1px solid ${theme.primaryColor}20;`}
-                >
-                  <img
-                    src={resolveMediaUrl(url)}
-                    alt={`Gallery ${i + 1}`}
-                    loading="lazy"
-                    decoding="async"
-                    class="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+            <div class="text-center mb-8">
+              <p class="text-xs uppercase tracking-[0.3em] font-semibold text-slate-300 mb-1">OUR SWEET MOMENTS</p>
+              <h2 class="text-3xl md:text-4xl font-serif font-bold tracking-tight bg-linear-to-r from-(--primary) to-(--secondary) bg-clip-text text-transparent inline-block">
+                Galeri Foto
+              </h2>
+              <p class="text-xs md:text-sm text-slate-200/90 font-light max-w-md mx-auto leading-relaxed mt-2 text-center">
+                Setiap potret mengabadikan tawa dan cerita, mengiringi langkah kami menuju ikatan suci yang abadi.
+              </p>
+            </div>
+            <div class="w-full max-w-md md:max-w-lg mx-auto flex flex-col gap-8 md:gap-12 px-4 mt-6">
+              {typedCard.media_urls.slice(2).map((url, index) => (
+                <div class="romantic-photo-wrapper">
+                  <div
+                    class="border border-white/25 rounded-3xl overflow-hidden shadow-2xl bg-white/5 backdrop-blur-xs relative group gallery-item cursor-pointer"
+                    data-gallery-src={resolveMediaUrl(url)}
+                  >
+                    <!-- Milestone Badge -->
+                    <span class="absolute top-4 left-4 z-30 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-[11px] font-medium tracking-widest text-slate-100 uppercase">
+                      Momen {index + 1} ✨
+                    </span>
+                    <!-- Photo -->
+                    <img
+                      src={resolveMediaUrl(url)}
+                      alt={`Galeri Foto ${index + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                    <!-- Bottom Gradient CTA -->
+                    <div class="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black/50 via-black/20 to-transparent pointer-events-none flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-400">
+                      <span class="text-[11px] text-white/80 tracking-wide font-light">Ketuk untuk perbesar</span>
+                    </div>
+                  </div>
+                  <!-- Dreamy Cloud Veil -->
+                  <div class="cloud-veil rounded-3xl"></div>
                 </div>
               ))}
             </div>
@@ -382,14 +404,14 @@ const ogImage = typedCard.media_urls.length > 0
 
         <!-- ── Digital Envelope (Amplop Digital) ── -->
         {(weddingData.digitalEnvelope.bankName || weddingData.digitalEnvelope.accountNumber) && (
-          <section class="pb-12 animate-fade-in-up" style="animation-delay: 900ms; opacity: 0; animation-fill-mode: forwards;">
-            <h2 class="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">💰 Amplop Digital</h2>
+          <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 900ms; opacity: 0; animation-fill-mode: forwards;">
+            <h2 class="mb-4 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">💰 Amplop Digital</h2>
             <div
               class="rounded-2xl p-5 sm:p-6 text-center"
               style={`background: linear-gradient(135deg, ${theme.primaryColor}10, ${theme.secondaryColor}08); border: 1px solid ${theme.primaryColor}20;`}
             >
               {weddingData.digitalEnvelope.bankName && (
-                <p class="text-sm font-semibold text-surface-200 mb-1">{weddingData.digitalEnvelope.bankName}</p>
+                <p class="text-sm font-semibold text-slate-100 mb-1">{weddingData.digitalEnvelope.bankName}</p>
               )}
               {weddingData.digitalEnvelope.accountNumber && (
                 <p class="text-xl font-mono font-bold tracking-wider text-surface-100 mb-1" id="wedding-account-number">
@@ -397,7 +419,7 @@ const ogImage = typedCard.media_urls.length > 0
                 </p>
               )}
               {weddingData.digitalEnvelope.accountHolder && (
-                <p class="text-xs text-surface-400 mb-4">a.n. {weddingData.digitalEnvelope.accountHolder}</p>
+                <p class="text-slate-200 text-xs md:text-sm font-medium mb-4">a.n. {weddingData.digitalEnvelope.accountHolder}</p>
               )}
               <button
                 id="copy-account-btn"
@@ -414,8 +436,8 @@ const ogImage = typedCard.media_urls.length > 0
         )}
 
         <!-- ── RSVP & Wish Wall ── -->
-        <section class="pb-12 animate-fade-in-up" style="animation-delay: 1000ms; opacity: 0; animation-fill-mode: forwards;">
-          <h2 class="mb-6 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">
+        <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 1000ms; opacity: 0; animation-fill-mode: forwards;">
+          <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
             💬 Ucapan & Doa
           </h2>
 
@@ -427,7 +449,7 @@ const ogImage = typedCard.media_urls.length > 0
                 id="wish-sender"
                 placeholder="Nama Anda"
                 required
-                class="form-text mb-3 w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm focus-ring"
+                class="form-text mb-3 w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm focus-ring placeholder:text-slate-300 placeholder:opacity-80 focus:border-(--primary) focus:ring-1 focus:ring-(--primary)"
                 style={`border-color: ${theme.primaryColor}20;`}
               />
 
@@ -452,14 +474,14 @@ const ogImage = typedCard.media_urls.length > 0
                 placeholder="Tulis ucapan & doa untuk kedua mempelai..."
                 required
                 rows="3"
-                class="form-text mb-3 w-full resize-none rounded-xl border bg-white/5 px-4 py-3 text-sm focus-ring"
+                class="form-text mb-3 w-full resize-none rounded-xl border bg-white/5 px-4 py-3 text-sm focus-ring placeholder:text-slate-300 placeholder:opacity-80 focus:border-(--primary) focus:ring-1 focus:ring-(--primary)"
                 style={`border-color: ${theme.primaryColor}20;`}
               ></textarea>
               <button
                 type="submit"
                 id="wish-submit-btn"
-                class="inline-flex items-center justify-center gap-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-white font-semibold px-5 py-2.5 text-sm transition-all duration-200 border border-white/15 shadow-sm hover:border-white/25 hover:shadow-md active:scale-[0.97] cursor-pointer"
-                style={`box-shadow: 0 4px 16px -2px ${theme.primaryColor}35;`}
+                class="text-white font-semibold shadow-lg shadow-primary/25 hover:brightness-110 active:scale-95 transition-all duration-200 px-6 py-2.5 rounded-full flex items-center justify-center gap-2 cursor-pointer border-0"
+                style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
               >
                 <span>Kirim Ucapan</span>
                 <span>✨</span>
@@ -472,16 +494,16 @@ const ogImage = typedCard.media_urls.length > 0
             {typedWishes.map((wish) => (
               <div class="rounded-xl p-4 max-w-full overflow-hidden" style={`background: ${theme.primaryColor}06; border: 1px solid ${theme.primaryColor}10;`}>
                 <div class="flex items-baseline justify-between gap-2 max-w-full">
-                  <span class="text-sm font-semibold wrap-anywhere min-w-0" style={`color: ${theme.primaryColor};`}>{wish.sender_name}</span>
+                  <span class="text-sm font-semibold text-white wrap-anywhere min-w-0">{wish.sender_name}</span>
                   <span class="text-xs text-surface-500 shrink-0">
                     {new Date(wish.created_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p class="mt-1.5 text-sm text-surface-300 wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden">{wish.message}</p>
+                <p class="mt-1.5 text-sm text-slate-200 leading-relaxed wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden">{wish.message}</p>
               </div>
             ))}
             {typedWishes.length === 0 && (
-              <p class="py-8 text-center text-sm text-surface-500">
+              <p class="text-slate-200 text-sm font-medium tracking-wide text-center py-4 drop-shadow-xs">
                 Jadilah yang pertama mengirim ucapan! 🎉
               </p>
             )}
@@ -572,10 +594,13 @@ const ogImage = typedCard.media_urls.length > 0
     <main
       id="card-content"
       class="hidden min-h-dvh"
-      style={`background: linear-gradient(180deg, ${theme.backgroundColor}, ${theme.primaryColor}10); background-image: ${bgPattern}; background-size: ${theme.backgroundPattern === 'dots' ? '20px 20px' : 'auto'}; font-family: ${fontFamily};`}
+      style={`--primary: ${theme.primaryColor}; --secondary: ${theme.secondaryColor}; background: linear-gradient(180deg, ${theme.backgroundColor}, ${theme.primaryColor}10); background-image: ${bgPattern}; background-size: ${theme.backgroundPattern === 'dots' ? '20px 20px' : 'auto'}; font-family: ${fontFamily};`}
     >
       <!-- Confetti Canvas -->
       <canvas id="confetti-canvas" class="pointer-events-none fixed inset-0 z-(--z-confetti)" style="width:100%;height:100%;"></canvas>
+
+      <!-- Ambient Effect -->
+      <AmbientEffect effect={(theme as any).ambientEffect ?? 'none'} />
 
       <!-- Audio Player (hidden, autoplay-compliant) -->
       {hasAudio && (
@@ -666,8 +691,9 @@ const ogImage = typedCard.media_urls.length > 0
             ]}>
               {typedCard.media_urls.map((url, i) => (
                 <div
-                  class="group overflow-hidden rounded-2xl bg-surface-800"
+                  class="group overflow-hidden rounded-2xl bg-surface-800 cursor-pointer gallery-item"
                   style={`border: 1px solid ${theme.primaryColor}20;`}
+                  data-gallery-src={resolveMediaUrl(url)}
                 >
                   <img
                     src={resolveMediaUrl(url)}
@@ -684,7 +710,7 @@ const ogImage = typedCard.media_urls.length > 0
 
         <!-- Wish Wall / Guestbook -->
         <section class="mt-12 animate-fade-in-up" style="animation-delay: 1000ms; opacity: 0; animation-fill-mode: forwards;">
-          <h2 class="mb-6 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">
+          <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
             💬 Wish Wall
           </h2>
 
@@ -696,7 +722,7 @@ const ogImage = typedCard.media_urls.length > 0
                 id="wish-sender"
                 placeholder="Your name"
                 required
-                class="form-text mb-3 w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm focus-ring"
+                class="form-text mb-3 w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm focus-ring placeholder:text-slate-300 placeholder:opacity-80 focus:border-(--primary) focus:ring-1 focus:ring-(--primary)"
                 style={`border-color: ${theme.primaryColor}20;`}
               />
               <textarea
@@ -704,14 +730,14 @@ const ogImage = typedCard.media_urls.length > 0
                 placeholder="Write your congratulations..."
                 required
                 rows="3"
-                class="form-text mb-3 w-full resize-none rounded-xl border bg-white/5 px-4 py-3 text-sm focus-ring"
+                class="form-text mb-3 w-full resize-none rounded-xl border bg-white/5 px-4 py-3 text-sm focus-ring placeholder:text-slate-300 placeholder:opacity-80 focus:border-(--primary) focus:ring-1 focus:ring-(--primary)"
                 style={`border-color: ${theme.primaryColor}20;`}
               ></textarea>
               <button
                 type="submit"
                 id="wish-submit-btn"
-                class="inline-flex items-center justify-center gap-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-white font-semibold px-5 py-2.5 text-sm transition-all duration-200 border border-white/15 shadow-sm hover:border-white/25 hover:shadow-md active:scale-[0.97] cursor-pointer"
-                style={`box-shadow: 0 4px 16px -2px ${theme.primaryColor}35;`}
+                class="text-white font-semibold shadow-lg shadow-primary/25 hover:brightness-110 active:scale-95 transition-all duration-200 px-6 py-2.5 rounded-full flex items-center justify-center gap-2 cursor-pointer border-0"
+                style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
               >
                 <span>Send Wishes</span>
                 <span>✨</span>
@@ -724,16 +750,16 @@ const ogImage = typedCard.media_urls.length > 0
             {typedWishes.map((wish) => (
               <div class="rounded-xl p-4 max-w-full overflow-hidden" style={`background: ${theme.primaryColor}06; border: 1px solid ${theme.primaryColor}10;`}>
                 <div class="flex items-baseline justify-between gap-2 max-w-full">
-                  <span class="text-sm font-semibold wrap-anywhere min-w-0" style={`color: ${theme.primaryColor};`}>{wish.sender_name}</span>
+                  <span class="text-sm font-semibold text-white wrap-anywhere min-w-0">{wish.sender_name}</span>
                   <span class="text-xs text-surface-500 shrink-0">
                     {new Date(wish.created_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p class="mt-1.5 text-sm text-surface-300 wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden">{wish.message}</p>
+                <p class="mt-1.5 text-sm text-slate-200 leading-relaxed wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden">{wish.message}</p>
               </div>
             ))}
             {typedWishes.length === 0 && (
-              <p class="py-8 text-center text-sm text-surface-500">
+              <p class="text-slate-200 text-sm font-medium tracking-wide text-center py-4 drop-shadow-xs">
                 Be the first to send your wishes! 🎉
               </p>
             )}
@@ -756,6 +782,34 @@ const ogImage = typedCard.media_urls.length > 0
       </div>
     </main>
   )}
+
+  <!-- Fullscreen Image Lightbox Modal -->
+  <div
+    id="gallery-lightbox"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-md p-4 transition-all duration-300 opacity-0"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Preview Foto"
+  >
+    <button
+      id="lightbox-close"
+      type="button"
+      class="absolute top-5 right-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-all hover:bg-white/20 active:scale-95 cursor-pointer"
+      aria-label="Tutup preview"
+    >
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="relative max-h-[90vh] max-w-[90vw] overflow-hidden flex items-center justify-center" id="lightbox-content">
+      <img
+        id="lightbox-img"
+        src=""
+        alt="Preview Foto"
+        class="max-h-[90vh] max-w-full rounded-xl object-contain shadow-2xl transition-transform duration-300 scale-95"
+      />
+    </div>
+  </div>
 </BaseLayout>
 
 <script>
@@ -1140,10 +1194,10 @@ const ogImage = typedCard.media_urls.length > 0
         wishEl.style.cssText = `background: ${getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || '#c084fc'}06; border: 1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || '#c084fc'}10;`;
         wishEl.innerHTML = `
           <div class="flex items-baseline justify-between gap-2 max-w-full">
-            <span class="text-sm font-semibold text-primary wrap-anywhere min-w-0">${escapeHtml(sender.value)}</span>
+            <span class="text-sm font-semibold text-white wrap-anywhere min-w-0">${escapeHtml(sender.value)}</span>
             <span class="text-xs text-surface-500 shrink-0">Just now</span>
           </div>
-          <p class="mt-1.5 text-sm text-surface-300 wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden">${escapeHtml(message.value)}</p>
+          <p class="mt-1.5 text-sm text-slate-200 leading-relaxed wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden">${escapeHtml(wish_message)}</p>
         `;
         container.prepend(wishEl);
       }
@@ -1157,4 +1211,153 @@ const ogImage = typedCard.media_urls.length > 0
       btn.innerHTML = originalBtnHtml;
     }
   });
+
+  // ═══════════════════════════════════════════════════════
+  // Gallery Fullscreen Lightbox
+  // ═══════════════════════════════════════════════════════
+  const lightbox = document.getElementById('gallery-lightbox');
+  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+  const lightboxClose = document.getElementById('lightbox-close');
+
+  function openLightbox(src: string) {
+    if (!lightbox || !lightboxImg) return;
+    lightboxImg.src = src;
+    lightbox.classList.remove('hidden');
+    void lightbox.offsetHeight; // Force layout recalculation for opacity transition
+    lightbox.classList.remove('opacity-0');
+    lightbox.classList.add('flex', 'opacity-100');
+    lightboxImg.classList.remove('scale-95');
+    lightboxImg.classList.add('scale-100');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    if (!lightbox || !lightboxImg) return;
+    lightbox.classList.remove('opacity-100');
+    lightbox.classList.add('opacity-0');
+    lightboxImg.classList.remove('scale-100');
+    lightboxImg.classList.add('scale-95');
+    setTimeout(() => {
+      lightbox.classList.remove('flex');
+      lightbox.classList.add('hidden');
+      lightboxImg.src = '';
+      document.body.style.overflow = '';
+    }, 250);
+  }
+
+  document.querySelectorAll('.gallery-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      const src = (item as HTMLElement).dataset.gallerySrc;
+      if (src) openLightbox(src);
+    });
+  });
+
+  lightboxClose?.addEventListener('click', closeLightbox);
+
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox || (e.target as HTMLElement).id === 'lightbox-content') {
+      closeLightbox();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox && !lightbox.classList.contains('hidden')) {
+      closeLightbox();
+    }
+  });
+
+  // ═════════════════════════════════════════════════════════
+  // Romantic Photo Scroll Reveal (IntersectionObserver)
+  // ═════════════════════════════════════════════════════════
+  const romanticObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          romanticObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+  );
+
+  document.querySelectorAll('.romantic-photo-wrapper').forEach((el) => {
+    romanticObserver.observe(el);
+  });
 </script>
+
+<style define:vars={{ primary: theme.primaryColor, secondary: theme.secondaryColor }}>
+  :root {
+    --primary: var(--primary);
+    --secondary: var(--secondary);
+  }
+
+  /* ── Romantic Cloud Mist & Soft Reveal ── */
+  .romantic-photo-wrapper {
+    opacity: 0;
+    transform: translateY(35px) scale(0.95);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+  .romantic-photo-wrapper.in-view {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Dreamy mist veil that dissolves away upon entering view */
+  .romantic-photo-wrapper .cloud-veil {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(255, 235, 240, 0.2) 50%, transparent 80%);
+    backdrop-filter: blur(12px);
+    pointer-events: none;
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s ease-out;
+    opacity: 1;
+    transform: scale(1.05);
+    z-index: 20;
+  }
+  .romantic-photo-wrapper.in-view .cloud-veil {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+
+  /* ── Legacy gallery support (non-wedding) ── */
+  @keyframes photoReveal {
+    from {
+      opacity: 0;
+      transform: translateY(28px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .gallery-card-reveal {
+    animation: photoReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .group:hover .group-hover\:scale-108 {
+    transform: scale(1.08);
+  }
+
+  /* ── Form styling ── */
+  #wish-sender,
+  #wish-message {
+    color: #ffffff;
+  }
+
+  #wish-sender:focus,
+  #wish-message:focus {
+    border-color: var(--primary) !important;
+  }
+</style>

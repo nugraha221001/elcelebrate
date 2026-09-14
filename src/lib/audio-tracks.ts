@@ -1,4 +1,4 @@
-import type { AudioTrack, CardCategory } from './types';
+import type { AudioTrack, CardCategory, AmbientEffectType } from './types';
 
 /**
  * Curated collection of royalty-free instrumental loops.
@@ -72,10 +72,53 @@ export const AUDIO_TRACKS: AudioTrack[] = [
 ];
 
 /**
+ * Recommended track IDs per category, sorted by relevance.
+ * These tracks appear first in the audio selector with a "Recommended" badge.
+ */
+export const RECOMMENDED_TRACKS: Record<CardCategory, string[]> = {
+  wedding: ['warm-piano', 'gentle-strings', 'soft-acoustic', 'jazzy-lounge'],
+  anniversary: ['warm-piano', 'soft-acoustic', 'jazzy-lounge', 'gentle-strings'],
+  birthday: ['upbeat-celebration', 'dreamy-bells', 'tropical-vibes'],
+  graduation: ['cinematic-warmth', 'gentle-strings', 'upbeat-celebration'],
+  invitation: ['upbeat-celebration', 'dreamy-bells', 'tropical-vibes'],
+};
+
+/**
+ * Smart defaults applied when a category is selected.
+ * Provides ambient effect and recommended audio track for each category.
+ */
+export const CATEGORY_DEFAULTS: Record<CardCategory, { ambientEffect: AmbientEffectType; audioTrackId: string }> = {
+  wedding:     { ambientEffect: 'petals',         audioTrackId: 'warm-piano' },
+  anniversary: { ambientEffect: 'hearts',         audioTrackId: 'soft-acoustic' },
+  birthday:    { ambientEffect: 'confetti-float',  audioTrackId: 'upbeat-celebration' },
+  graduation:  { ambientEffect: 'starlight',       audioTrackId: 'cinematic-warmth' },
+  invitation:  { ambientEffect: 'golden-sparkles', audioTrackId: 'upbeat-celebration' },
+};
+
+/**
  * Get audio tracks filtered by card category.
  */
 export function getTracksForCategory(category: CardCategory): AudioTrack[] {
   return AUDIO_TRACKS.filter((track) => track.category.includes(category));
+}
+
+/**
+ * Get audio tracks sorted with recommended ones first for a given category.
+ * Returns all tracks, with recommended ones at the top.
+ */
+export function getRecommendedTracksForCategory(category: CardCategory): { track: AudioTrack; isRecommended: boolean }[] {
+  const recommendedIds = RECOMMENDED_TRACKS[category] || [];
+  const recommended = recommendedIds
+    .map((id) => AUDIO_TRACKS.find((t) => t.id === id))
+    .filter(Boolean)
+    .map((t) => ({ track: t!, isRecommended: true }));
+
+  const remainingIds = new Set(recommendedIds);
+  const rest = AUDIO_TRACKS
+    .filter((t) => !remainingIds.has(t.id))
+    .map((t) => ({ track: t, isRecommended: false }));
+
+  return [...recommended, ...rest];
 }
 
 /**
