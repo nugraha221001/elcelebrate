@@ -1,4 +1,6 @@
 ---
+import '../../styles/global.css';
+
 export interface Props {
   title: string;
   description?: string;
@@ -54,9 +56,6 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://elcelebr
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Global CSS -->
-    <link rel="stylesheet" href="/src/styles/global.css" />
   </head>
   <body
     class="min-h-dvh bg-surface-900 text-surface-100 font-sans antialiased"
