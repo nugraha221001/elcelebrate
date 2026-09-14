@@ -37,10 +37,21 @@ export interface WeddingData {
   };
   akadEvent: WeddingEventDetail;
   receptionEvent: WeddingEventDetail;
+  unduhMantu?: {
+    enabled: boolean;
+    title?: string;
+    date?: string;
+    time?: string;
+    locationName?: string;
+    address?: string;
+    mapUrl?: string;
+  };
   digitalEnvelope: WeddingDigitalEnvelope;
   loveStory: string;  // Optional love story / quote
   openingGreeting: string;  // Opening greeting / Salam Pembuka
 }
+
+export type WeddingConfig = WeddingData;
 
 export interface ThemeConfig {
   primaryColor: string;

@@ -50,7 +50,7 @@ const fontFamily = fontMap[theme.fontFamily] || fontMap.sans;
 // Wedding-specific data
 const isWedding = typedCard.category === 'wedding';
 const weddingData = theme.weddingData || null;
-const guestName = Astro.url.searchParams.get('to') || '';
+const guestName = Astro.url.searchParams.get('to') || 'Tamu Undangan';
 
 // Pattern SVGs
 const patternMap: Record<string, string> = {
@@ -88,11 +88,11 @@ const ogImage = typedCard.media_urls.length > 0
     <!-- WEDDING LUXURY LONG-SCROLL LAYOUT                        -->
     <!-- ═══════════════════════════════════════════════════════════ -->
 
-    <!-- Wedding Cover (scroll-locked) -->
+    <!-- Wedding Cover (scroll-locked, 100dvh gatekeeper) -->
     <div
       id="wedding-cover"
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
-      style={`background: linear-gradient(180deg, ${theme.backgroundColor}, ${theme.primaryColor}15, ${theme.secondaryColor}10, ${theme.backgroundColor}); font-family: ${fontFamily};`}
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden h-dvh"
+      style={`background: linear-gradient(180deg, ${theme.backgroundColor}, ${theme.primaryColor}15, ${theme.secondaryColor}10, ${theme.backgroundColor}); font-family: ${fontFamily}; transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);`}
     >
       <!-- Decorative particles -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none">
@@ -116,12 +116,11 @@ const ogImage = typedCard.media_urls.length > 0
           {weddingData.groom.nickname || weddingData.groom.fullName}
         </h1>
 
-        {guestName && (
-          <div class="mb-6 animate-fade-in-up max-w-full" style="animation-delay: 400ms; opacity: 0; animation-fill-mode: forwards;">
-            <p class="text-xs text-surface-500 mb-1">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-            <p class="text-lg font-semibold text-surface-100 wrap-anywhere max-w-full">{guestName}</p>
-          </div>
-        )}
+        <!-- Always show guest greeting -->
+        <div class="mb-6 animate-fade-in-up max-w-full" style="animation-delay: 400ms; opacity: 0; animation-fill-mode: forwards;">
+          <p class="text-xs text-surface-500 mb-1">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+          <p class="text-lg font-semibold text-surface-100 wrap-anywhere max-w-full">{guestName}</p>
+        </div>
 
         {weddingData.akadEvent.date && (
           <p class="text-sm text-surface-400 mb-8" style={`font-family: ${fontFamily};`}>
@@ -159,34 +158,41 @@ const ogImage = typedCard.media_urls.length > 0
       <!-- Ambient Effect -->
       <AmbientEffect effect={(theme as any).ambientEffect ?? 'none'} />
 
-      <!-- Audio Player -->
+      <!-- Rotating Music Disc -->
       {hasAudio && (
-        <div id="audio-bar" class="fixed bottom-4 right-4 z-40">
-          <button
-            id="audio-toggle"
-            class="flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-110 cursor-pointer"
-            style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
-            aria-label="Toggle music"
-          >
-            <svg id="audio-icon-play" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+        <button
+          id="audio-toggle"
+          class="music-disc"
+          style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
+          aria-label="Toggle music"
+        >
+          <div class="disc-inner">
+            <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path id="audio-icon-path" stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
             </svg>
-            <svg id="audio-icon-mute" class="hidden h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
-            </svg>
-          </button>
-          {audioUrl && (
-            <audio id="bg-audio" loop preload="none">
-              <source src={audioUrl} type="audio/ogg" />
-            </audio>
-          )}
-        </div>
+          </div>
+        </button>
       )}
+      {audioUrl && (
+        <audio id="bg-audio" loop preload="none">
+          <source src={audioUrl} type="audio/ogg" />
+        </audio>
+      )}
+
+      <!-- Floating Bottom Dock -->
+      <nav id="floating-dock" class="floating-dock" aria-label="Section navigation">
+        <a href="#couple" title="Mempelai">💑</a>
+        <a href="#event" title="Acara">📅</a>
+        <a href="#countdown" title="Hitung Mundur">⏳</a>
+        <a href="#gallery" title="Galeri">🖼️</a>
+        <a href="#gift" title="Amplop Digital">🎁</a>
+        <a href="#wishes" title="Ucapan">💬</a>
+      </nav>
 
       <div class="mx-auto max-w-4xl px-4">
 
         <!-- ── Couple Profile Section ── -->
-        <section class="py-16 sm:py-20 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 200ms; opacity: 0; animation-fill-mode: forwards;">
+        <section id="couple" class="py-16 sm:py-20 max-w-2xl mx-auto" data-reveal="fade-up">
         {weddingData.openingGreeting ? (
           <div class="text-center mb-8">
             <p class="text-slate-100 font-normal leading-relaxed text-center max-w-lg mx-auto drop-shadow-xs italic whitespace-pre-line text-sm sm:text-base" style={`font-family: ${fontFamily};`}>
@@ -201,7 +207,7 @@ const ogImage = typedCard.media_urls.length > 0
 
           <div class="flex flex-col items-center gap-8 sm:flex-row sm:justify-center sm:gap-12">
             <!-- Bride -->
-            <div class="text-center flex-1 max-w-50">
+            <div class="text-center flex-1 max-w-50" data-reveal="fade-right" data-reveal-delay="100">
               {typedCard.media_urls.length > 0 && (
                 <div class="mx-auto mb-4 h-36 w-36 overflow-hidden rounded-full border-4 shadow-lg" style={`border-color: ${theme.primaryColor}40;`}>
                   <img src={resolveMediaUrl(typedCard.media_urls[0])} alt={weddingData.bride.fullName} class="h-full w-full object-cover" />
@@ -216,10 +222,10 @@ const ogImage = typedCard.media_urls.length > 0
             </div>
 
             <!-- Separator -->
-            <div class="text-4xl font-light" style={`color: ${theme.secondaryColor}60; font-family: ${fontFamily};`}>&</div>
+            <div class="text-4xl font-light" style={`color: ${theme.secondaryColor}60; font-family: ${fontFamily};`} data-reveal="zoom-in" data-reveal-delay="200">&</div>
 
             <!-- Groom -->
-            <div class="text-center flex-1 max-w-50">
+            <div class="text-center flex-1 max-w-50" data-reveal="fade-left" data-reveal-delay="300">
               {typedCard.media_urls.length > 1 && (
                 <div class="mx-auto mb-4 h-36 w-36 overflow-hidden rounded-full border-4 shadow-lg" style={`border-color: ${theme.secondaryColor}40;`}>
                   <img src={resolveMediaUrl(typedCard.media_urls[1])} alt={weddingData.groom.fullName} class="h-full w-full object-cover" />
@@ -236,7 +242,7 @@ const ogImage = typedCard.media_urls.length > 0
         </section>
 
         <!-- ── Invitation Message ── -->
-        <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto overflow-hidden" style="animation-delay: 400ms; opacity: 0; animation-fill-mode: forwards;">
+        <section class="pb-12 max-w-2xl mx-auto overflow-hidden" data-reveal="fade-up">
           <div
             class="rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden"
             style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}
@@ -249,7 +255,7 @@ const ogImage = typedCard.media_urls.length > 0
 
         <!-- ── Love Story / Quote ── -->
         {weddingData.loveStory && (
-          <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto overflow-hidden" style="animation-delay: 500ms; opacity: 0; animation-fill-mode: forwards;">
+          <section class="pb-12 max-w-2xl mx-auto overflow-hidden" data-reveal="fade-up">
             <div class="text-center w-full max-w-lg mx-auto overflow-hidden">
               <div class="text-4xl mb-4" style={`color: ${theme.primaryColor}30;`}>❝</div>
               <p class="text-slate-100 font-normal leading-relaxed text-center max-w-lg mx-auto drop-shadow-xs italic wrap-anywhere whitespace-pre-wrap overflow-hidden text-sm md:text-base" style={`font-family: ${fontFamily};`}>
@@ -262,10 +268,10 @@ const ogImage = typedCard.media_urls.length > 0
 
         <!-- ── Countdown Timer ── -->
         {weddingData.akadEvent.date && (
-          <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 600ms; opacity: 0; animation-fill-mode: forwards;">
+          <section id="countdown" class="pb-12 max-w-2xl mx-auto" data-reveal="fade-up">
             <div class="text-center">
               <h2 class="mb-4 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Menghitung Hari</h2>
-              <div id="countdown" class="flex justify-center gap-3 sm:gap-5" data-event-date={weddingData.akadEvent.date}>
+              <div class="countdown-timer flex justify-center gap-3 sm:gap-5" data-target-date={weddingData.akadEvent.date || typedCard.event_date || ''}>
                 {['Hari', 'Jam', 'Mnt', 'Dtk'].map((unit, idx) => (
                   <div class="flex flex-col items-center">
                     <div
@@ -284,7 +290,7 @@ const ogImage = typedCard.media_urls.length > 0
         )}
 
         <!-- ── Event Schedule ── -->
-        <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 700ms; opacity: 0; animation-fill-mode: forwards;">
+        <section id="event" class="pb-12 max-w-2xl mx-auto" data-reveal="fade-up">
           <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Jadwal Acara</h2>
 
           <div class="space-y-4">
@@ -355,12 +361,52 @@ const ogImage = typedCard.media_urls.length > 0
                 )}
               </div>
             )}
+
+            <!-- Unduh Mantu -->
+            {weddingData.unduhMantu?.enabled && (
+              <div
+                class="border border-white/15 bg-white/5 backdrop-blur-xs rounded-3xl p-5 sm:p-6"
+                data-reveal="fade-up"
+              >
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="text-lg">🏡</span>
+                  <h3 class="text-base font-semibold" style={`color: ${theme.primaryColor};`}>
+                    {weddingData.unduhMantu.title || 'Unduh Mantu'}
+                  </h3>
+                </div>
+                <div class="space-y-1.5 text-sm">
+                  {weddingData.unduhMantu.date && (
+                    <p class="text-slate-100 font-medium">📅 {new Date(weddingData.unduhMantu.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  )}
+                  {weddingData.unduhMantu.time && (
+                    <p class="text-slate-100 font-medium">🕐 {weddingData.unduhMantu.time}</p>
+                  )}
+                  {weddingData.unduhMantu.locationName && (
+                    <p class="font-medium text-slate-100">📍 {weddingData.unduhMantu.locationName}</p>
+                  )}
+                  {weddingData.unduhMantu.address && (
+                    <p class="text-slate-200 text-xs md:text-sm leading-normal mt-0.5">{weddingData.unduhMantu.address}</p>
+                  )}
+                </div>
+                {weddingData.unduhMantu.mapUrl && (
+                  <a
+                    href={weddingData.unduhMantu.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-3 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110"
+                    style={`background: ${theme.primaryColor};`}
+                  >
+                    <span>📍</span> Buka Google Maps
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </section>
 
         <!-- ── Photo Gallery ── -->
         {typedCard.media_urls.length > 2 && (
-          <section class="pb-12 animate-fade-in-up" style="animation-delay: 800ms; opacity: 0; animation-fill-mode: forwards;">
+          <section id="gallery" class="pb-12" data-reveal="fade-up">
             <div class="text-center mb-8">
               <p class="text-xs uppercase tracking-[0.3em] font-semibold text-slate-300 mb-1">OUR SWEET MOMENTS</p>
               <h2 class="text-3xl md:text-4xl font-serif font-bold tracking-tight bg-linear-to-r from-(--primary) to-(--secondary) bg-clip-text text-transparent inline-block">
@@ -387,7 +433,7 @@ const ogImage = typedCard.media_urls.length > 0
                       alt={`Galeri Foto ${index + 1}`}
                       loading="lazy"
                       decoding="async"
-                      class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      class="w-full aspect-4/5 object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                     <!-- Bottom Gradient CTA -->
                     <div class="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black/50 via-black/20 to-transparent pointer-events-none flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-400">
@@ -404,7 +450,7 @@ const ogImage = typedCard.media_urls.length > 0
 
         <!-- ── Digital Envelope (Amplop Digital) ── -->
         {(weddingData.digitalEnvelope.bankName || weddingData.digitalEnvelope.accountNumber) && (
-          <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 900ms; opacity: 0; animation-fill-mode: forwards;">
+          <section id="gift" class="pb-12 max-w-2xl mx-auto" data-reveal="fade-up">
             <h2 class="mb-4 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">💰 Amplop Digital</h2>
             <div
               class="rounded-2xl p-5 sm:p-6 text-center"
@@ -436,7 +482,7 @@ const ogImage = typedCard.media_urls.length > 0
         )}
 
         <!-- ── RSVP & Wish Wall ── -->
-        <section class="pb-12 animate-fade-in-up max-w-2xl mx-auto" style="animation-delay: 1000ms; opacity: 0; animation-fill-mode: forwards;">
+        <section id="wishes" class="pb-12 max-w-2xl mx-auto" data-reveal="fade-up">
           <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
             💬 Ucapan & Doa
           </h2>
@@ -511,7 +557,7 @@ const ogImage = typedCard.media_urls.length > 0
         </section>
 
         <!-- Footer -->
-        <footer class="pb-16 text-center">
+        <footer class="pb-24 text-center">
           <a
             href="/"
             class="group inline-flex items-center gap-2 rounded-full border border-white/8 bg-surface-900/60 backdrop-blur-md px-4 py-2 text-xs font-medium text-surface-400 transition-all duration-300 hover:border-purple-500/30 hover:bg-surface-800/80 hover:shadow-glow-sm"
@@ -628,8 +674,15 @@ const ogImage = typedCard.media_urls.length > 0
 
       <div class="mx-auto w-full max-w-2xl px-4 py-12 sm:py-16 overflow-hidden">
         <!-- Greeting Header -->
-        <header class="text-center animate-fade-in-up max-w-full overflow-hidden" style="animation-delay: 200ms; opacity: 0; animation-fill-mode: forwards;">
-          <div class="mb-4 text-6xl sm:text-7xl">{meta?.emoji || '🎉'}</div>
+        <header class="text-center max-w-full overflow-hidden" data-reveal="fade-up">
+          <div class="mb-4 text-6xl sm:text-7xl" data-reveal="zoom-in" data-reveal-delay="100">{meta?.emoji || '🎉'}</div>
+          {meta?.label && (
+            <div class="mb-3" data-reveal="zoom-in" data-reveal-delay="200">
+              <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-widest bg-white/10 text-white/90 border border-white/15 backdrop-blur-sm">
+                {meta.label} ✨
+              </span>
+            </div>
+          )}
           <h1
             class="font-display text-3xl font-bold sm:text-4xl wrap-anywhere max-w-full"
             style={`color: ${theme.primaryColor}; font-size: var(--text-hero);`}
@@ -642,7 +695,7 @@ const ogImage = typedCard.media_urls.length > 0
         </header>
 
         <!-- Message -->
-        <section class="mt-10 animate-fade-in-up max-w-full overflow-hidden" style="animation-delay: 400ms; opacity: 0; animation-fill-mode: forwards;">
+        <section class="mt-10 max-w-full overflow-hidden" data-reveal="fade-up">
           <div
             class="rounded-2xl p-6 sm:p-8 max-w-full overflow-hidden"
             style={`background: ${theme.primaryColor}10; border: 1px solid ${theme.primaryColor}20;`}
@@ -660,10 +713,10 @@ const ogImage = typedCard.media_urls.length > 0
 
         <!-- Countdown Timer -->
         {typedCard.event_date && (
-          <section class="mt-10 animate-fade-in-up" style="animation-delay: 600ms; opacity: 0; animation-fill-mode: forwards;">
+          <section class="mt-10" data-reveal="fade-up">
             <div class="text-center">
               <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-surface-400">Countdown</h2>
-              <div id="countdown" class="flex justify-center gap-3 sm:gap-5" data-event-date={typedCard.event_date}>
+              <div class="countdown-timer flex justify-center gap-3 sm:gap-5" data-target-date={typedCard.event_date}>
                 {['Days', 'Hours', 'Min', 'Sec'].map((unit) => (
                   <div class="flex flex-col items-center">
                     <div
@@ -683,7 +736,7 @@ const ogImage = typedCard.media_urls.length > 0
 
         <!-- Photo Gallery -->
         {typedCard.media_urls.length > 0 && (
-          <section class="mt-10 animate-fade-in-up" style="animation-delay: 800ms; opacity: 0; animation-fill-mode: forwards;">
+          <section class="mt-10" data-reveal="fade-up">
             <h2 class="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">Memories</h2>
             <div class:list={[
               'grid gap-3',
@@ -694,6 +747,8 @@ const ogImage = typedCard.media_urls.length > 0
                   class="group overflow-hidden rounded-2xl bg-surface-800 cursor-pointer gallery-item"
                   style={`border: 1px solid ${theme.primaryColor}20;`}
                   data-gallery-src={resolveMediaUrl(url)}
+                  data-reveal="zoom-in"
+                  data-reveal-delay={`${(i % 4) * 100}`}
                 >
                   <img
                     src={resolveMediaUrl(url)}
@@ -709,13 +764,13 @@ const ogImage = typedCard.media_urls.length > 0
         )}
 
         <!-- Wish Wall / Guestbook -->
-        <section class="mt-12 animate-fade-in-up" style="animation-delay: 1000ms; opacity: 0; animation-fill-mode: forwards;">
+        <section class="mt-12" data-reveal="fade-up">
           <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
             💬 Wish Wall
           </h2>
 
           <!-- Submit Wish Form -->
-          <form id="wish-form" class="mb-8">
+          <form id="wish-form" class="mb-8" data-reveal="fade-up">
             <div class="rounded-2xl p-5" style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}>
               <input
                 type="text"
@@ -747,8 +802,8 @@ const ogImage = typedCard.media_urls.length > 0
 
           <!-- Wishes List -->
           <div id="wishes-container" class="space-y-3 max-w-full overflow-hidden">
-            {typedWishes.map((wish) => (
-              <div class="rounded-xl p-4 max-w-full overflow-hidden" style={`background: ${theme.primaryColor}06; border: 1px solid ${theme.primaryColor}10;`}>
+            {typedWishes.map((wish, idx) => (
+              <div class="rounded-xl p-4 max-w-full overflow-hidden" style={`background: ${theme.primaryColor}06; border: 1px solid ${theme.primaryColor}10;`} data-reveal="fade-up" data-reveal-delay={`${Math.min((idx % 5) * 100, 400)}`}>
                 <div class="flex items-baseline justify-between gap-2 max-w-full">
                   <span class="text-sm font-semibold text-white wrap-anywhere min-w-0">{wish.sender_name}</span>
                   <span class="text-xs text-surface-500 shrink-0">
@@ -839,9 +894,10 @@ const ogImage = typedCard.media_urls.length > 0
     document.body.style.overflow = 'hidden';
 
     document.getElementById('wedding-cover-btn')?.addEventListener('click', () => {
-      weddingCover.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      // Slide cover up and fade out
+      weddingCover.style.transform = 'translateY(-100%)';
       weddingCover.style.opacity = '0';
-      weddingCover.style.transform = 'scale(1.05)';
+      weddingCover.style.pointerEvents = 'none';
 
       setTimeout(() => {
         weddingCover.style.display = 'none';
@@ -851,18 +907,43 @@ const ogImage = typedCard.media_urls.length > 0
         // Smooth scroll to top of content
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
+        // Reveal floating dock & music disc
+        const dock = document.getElementById('floating-dock');
+        const disc = document.querySelector('.music-disc');
+        if (dock) dock.classList.add('dock-visible');
+        if (disc) disc.classList.add('disc-visible');
+
         // Trigger confetti
         triggerConfetti();
 
         // Start audio (autoplay-compliant: user has interacted)
         if (hasAudio) startAudio();
-      }, 600);
+
+        // Observe scroll-reveal elements
+        setTimeout(() => {
+          observeRevealElements();
+        }, 100);
+      }, 1000);
     });
   }
 
   // ═══════════════════════════════════════════════════════
   // Copy Account Number (Digital Envelope)
   // ═══════════════════════════════════════════════════════
+  // Helper: show invitation toast
+  function showInvitationToast(message: string) {
+    // Remove any existing toast
+    document.querySelectorAll('.invitation-toast').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'invitation-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('toast-exit');
+      setTimeout(() => toast.remove(), 300);
+    }, 2500);
+  }
+
   document.getElementById('copy-account-btn')?.addEventListener('click', async () => {
     const accountEl = document.getElementById('wedding-account-number');
     const btnText = document.getElementById('copy-btn-text');
@@ -874,6 +955,7 @@ const ogImage = typedCard.media_urls.length > 0
         btnText.textContent = 'Tersalin! ✅';
         setTimeout(() => { btnText.textContent = 'Salin Nomor Rekening'; }, 2000);
       }
+      showInvitationToast('Nomor rekening disalin! ✨');
     } catch {
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
@@ -886,6 +968,7 @@ const ogImage = typedCard.media_urls.length > 0
         btnText.textContent = 'Tersalin! ✅';
         setTimeout(() => { btnText.textContent = 'Salin Nomor Rekening'; }, 2000);
       }
+      showInvitationToast('Nomor rekening disalin! ✨');
     }
   });
 
@@ -935,6 +1018,11 @@ const ogImage = typedCard.media_urls.length > 0
 
         // Start audio (autoplay-compliant: user has interacted)
         if (hasAudio) startAudio();
+
+        // Observe scroll-reveal elements
+        setTimeout(() => {
+          observeRevealElements();
+        }, 100);
       }, 500);
     }, 900);
   }
@@ -989,14 +1077,21 @@ const ogImage = typedCard.media_urls.length > 0
   let audioInitialized = false;
 
   function updateAudioUI(playing: boolean) {
-    const iconPlay = document.getElementById('audio-icon-play');
-    const iconMute = document.getElementById('audio-icon-mute');
-    if (playing) {
-      iconPlay?.classList.remove('hidden');
-      iconMute?.classList.add('hidden');
-    } else {
-      iconPlay?.classList.add('hidden');
-      iconMute?.classList.remove('hidden');
+    const disc = document.querySelector('.music-disc');
+    const iconPath = document.getElementById('audio-icon-path');
+    if (disc) {
+      if (playing) {
+        disc.classList.add('is-playing');
+      } else {
+        disc.classList.remove('is-playing');
+      }
+    }
+    // Update icon: music note when playing, muted icon when paused
+    if (iconPath) {
+      iconPath.setAttribute('d', playing
+        ? 'M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3'
+        : 'M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z'
+      );
     }
   }
 
@@ -1103,39 +1198,47 @@ const ogImage = typedCard.media_urls.length > 0
   }
 
   // Countdown Timer
-  const countdownEl = document.getElementById('countdown');
+  const countdownEl = document.querySelector('[data-target-date]') as HTMLElement | null;
   if (countdownEl) {
-    const eventDate = new Date(countdownEl.dataset.eventDate + 'T00:00:00');
+    const rawDate = countdownEl.dataset.targetDate || '';
+    const parseableStr = rawDate.length === 10 && !rawDate.includes('T') ? `${rawDate}T00:00:00` : rawDate;
+    const target = new Date(parseableStr || countdownEl.dataset.targetDate || '').getTime();
 
-    function updateCountdown() {
-      const now = new Date();
-      const diff = eventDate.getTime() - now.getTime();
+    if (!target || isNaN(target)) {
+      countdownEl.style.display = 'none';
+      const parentSec = countdownEl.closest('section');
+      if (parentSec) parentSec.style.display = 'none';
+    } else {
+      function updateCountdown() {
+        const now = Date.now();
+        const diff = target - now;
 
-      if (diff <= 0) {
-        document.querySelectorAll('[data-countdown]').forEach((el) => {
-          el.textContent = '🎉';
-        });
-        return;
+        if (diff <= 0) {
+          countdownEl?.querySelectorAll('[data-countdown]').forEach((el) => {
+            el.textContent = '🎉';
+          });
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        const daysEl = countdownEl?.querySelector('[data-countdown="days"]');
+        const hoursEl = countdownEl?.querySelector('[data-countdown="hours"]');
+        const minutesEl = countdownEl?.querySelector('[data-countdown="minutes"]');
+        const secondsEl = countdownEl?.querySelector('[data-countdown="seconds"]');
+
+        if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
       }
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      const daysEl = document.querySelector('[data-countdown="days"]');
-      const hoursEl = document.querySelector('[data-countdown="hours"]');
-      const minutesEl = document.querySelector('[data-countdown="minutes"]');
-      const secondsEl = document.querySelector('[data-countdown="seconds"]');
-
-      if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
-      if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
-      if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
-      if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
     }
-
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
   }
 
   // Wish Form
@@ -1284,6 +1387,29 @@ const ogImage = typedCard.media_urls.length > 0
   document.querySelectorAll('.romantic-photo-wrapper').forEach((el) => {
     romanticObserver.observe(el);
   });
+
+  // ═════════════════════════════════════════════════════════
+  // Lightweight Scroll-Reveal Engine (data-reveal driven)
+  // ═════════════════════════════════════════════════════════
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+  );
+
+  function observeRevealElements() {
+    document.querySelectorAll('[data-reveal]:not(.revealed)').forEach((el) => {
+      revealObserver.observe(el);
+    });
+  }
+
+  observeRevealElements();
 </script>
 
 <style define:vars={{ primary: theme.primaryColor, secondary: theme.secondaryColor }}>

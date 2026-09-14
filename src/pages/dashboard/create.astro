@@ -243,7 +243,7 @@ const isEdit = Boolean(editId);
         <!-- Step 3: Media Upload -->
         <div id="step-3" class="wizard-step hidden">
           <h2 class="text-xl font-bold text-surface-50">Add Photos</h2>
-          <p class="mt-2 text-sm text-surface-400">Upload up to 4 photos (auto-compressed to WebP, max 200KB each)</p>
+          <p class="mt-2 text-sm text-surface-400" id="photo-upload-hint">Upload up to 4 photos (auto-compressed to WebP, max 200KB each)</p>
 
           <div class="mt-6">
             <!-- Drop Zone -->
@@ -260,7 +260,7 @@ const isEdit = Boolean(editId);
             </div>
 
             <!-- Photo Preview Grid -->
-            <div id="photo-grid" class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div id="photo-grid" class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-5">
               <!-- Populated by JS -->
             </div>
 
@@ -428,6 +428,48 @@ const isEdit = Boolean(editId);
                 <div>
                   <label class="mb-1 block text-xs font-medium text-surface-300">Google Maps URL</label>
                   <input type="url" id="w-resepsi-maps" placeholder="https://maps.google.com/..." class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                </div>
+              </div>
+
+              <!-- Unduh Mantu (Opsional) -->
+              <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-4">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">🏡</span>
+                    <div>
+                      <div class="text-xs font-semibold uppercase tracking-wider text-teal-400">Unduh Mantu (Opsional)</div>
+                      <p class="text-[11px] text-surface-400">Acara syukuran ngunduh mantu pihak keluarga pria</p>
+                    </div>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="w-unduh-mantu-toggle" class="sr-only" />
+                    <div class="toggle-switch"></div>
+                  </label>
+                </div>
+
+                <div id="w-unduh-mantu-fields" class="hidden space-y-3 pt-2 border-t border-white/5">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label for="w-unduh-mantu-date" class="mb-1 block text-xs font-medium text-surface-300">Tanggal Unduh Mantu</label>
+                      <input type="date" id="w-unduh-mantu-date" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                    </div>
+                    <div>
+                      <label for="w-unduh-mantu-time" class="mb-1 block text-xs font-medium text-surface-300">Waktu</label>
+                      <input type="text" id="w-unduh-mantu-time" placeholder="10:00 — 14:00 WIB" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                    </div>
+                  </div>
+                  <div>
+                    <label for="w-unduh-mantu-venue" class="mb-1 block text-xs font-medium text-surface-300">Nama Lokasi / Gedung</label>
+                    <input type="text" id="w-unduh-mantu-venue" placeholder="Kediaman Mempelai Pria" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                  <div>
+                    <label for="w-unduh-mantu-address" class="mb-1 block text-xs font-medium text-surface-300">Alamat Lengkap</label>
+                    <input type="text" id="w-unduh-mantu-address" placeholder="Jl. Mawar No. 10, Solo" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
+                  <div>
+                    <label for="w-unduh-mantu-maps" class="mb-1 block text-xs font-medium text-surface-300">Tautan Google Maps</label>
+                    <input type="url" id="w-unduh-mantu-maps" placeholder="https://maps.google.com/..." class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  </div>
                 </div>
               </div>
 
@@ -689,6 +731,15 @@ const isEdit = Boolean(editId);
     groom: { fullName: string; nickname: string; parents: string };
     akadEvent: { date: string; timeStart: string; timeEnd: string; venue: string; address: string; mapsUrl: string };
     receptionEvent: { date: string; timeStart: string; timeEnd: string; venue: string; address: string; mapsUrl: string };
+    unduhMantu?: {
+      enabled: boolean;
+      title?: string;
+      date?: string;
+      time?: string;
+      locationName?: string;
+      address?: string;
+      mapUrl?: string;
+    };
     digitalEnvelope: { bankName: string; accountNumber: string; accountHolder: string };
     loveStory: string;
     openingGreeting: string;
@@ -721,6 +772,15 @@ const isEdit = Boolean(editId);
       groom: { fullName: '', nickname: '', parents: '' },
       akadEvent: { date: '', timeStart: '', timeEnd: '', venue: '', address: '', mapsUrl: '' },
       receptionEvent: { date: '', timeStart: '', timeEnd: '', venue: '', address: '', mapsUrl: '' },
+      unduhMantu: {
+        enabled: false,
+        title: 'Unduh Mantu',
+        date: '',
+        time: '',
+        locationName: '',
+        address: '',
+        mapUrl: '',
+      },
       digitalEnvelope: { bankName: '', accountNumber: '', accountHolder: '' },
       loveStory: '',
       openingGreeting: '',
@@ -932,6 +992,14 @@ const isEdit = Boolean(editId);
   // ═══════════════════════════════════════════════════════
   // Step 1: Category Selection
   // ═══════════════════════════════════════════════════════
+  function updatePhotoLimitUI() {
+    const maxPhotos = state.category === 'wedding' ? 10 : 4;
+    const hintEl = document.getElementById('photo-upload-hint');
+    if (hintEl) {
+      hintEl.textContent = `Upload up to ${maxPhotos} photos (auto-compressed to WebP, max 200KB each)`;
+    }
+  }
+
   function toggleWeddingFields() {
     const isWedding = state.category === 'wedding';
     const weddingFields = document.getElementById('wedding-fields');
@@ -954,6 +1022,8 @@ const isEdit = Boolean(editId);
       senderField?.classList.remove('hidden');
       eventDateField?.classList.remove('hidden');
     }
+
+    updatePhotoLimitUI();
   }
 
   document.querySelectorAll('[data-category]').forEach((btn) => {
@@ -1157,9 +1227,10 @@ const isEdit = Boolean(editId);
   });
 
   async function handleFiles(files: FileList) {
-    const remaining = 4 - state.photos.length;
+    const maxPhotos = state.category === 'wedding' ? 10 : 4;
+    const remaining = maxPhotos - state.photos.length;
     if (remaining <= 0) {
-      (window as any).showToast({ message: 'Maximum 4 photos allowed', type: 'warning' });
+      (window as any).showToast({ message: `Maximum ${maxPhotos} photos allowed`, type: 'warning' });
       return;
     }
 
@@ -1275,6 +1346,52 @@ const isEdit = Boolean(editId);
   wInput('w-resepsi-venue', (v) => { getWD().receptionEvent.venue = v; });
   wInput('w-resepsi-address', (v) => { getWD().receptionEvent.address = v; });
   wInput('w-resepsi-maps', (v) => { getWD().receptionEvent.mapsUrl = v; });
+  // Unduh Mantu
+  const unduhMantuToggle = document.getElementById('w-unduh-mantu-toggle') as HTMLInputElement | null;
+  const unduhMantuFields = document.getElementById('w-unduh-mantu-fields');
+
+  unduhMantuToggle?.addEventListener('change', () => {
+    const isEnabled = unduhMantuToggle.checked;
+    if (unduhMantuFields) {
+      if (isEnabled) {
+        unduhMantuFields.classList.remove('hidden');
+      } else {
+        unduhMantuFields.classList.add('hidden');
+      }
+    }
+    const wd = getWD();
+    if (!wd.unduhMantu) {
+      wd.unduhMantu = { enabled: false, title: 'Unduh Mantu', date: '', time: '', locationName: '', address: '', mapUrl: '' };
+    }
+    wd.unduhMantu.enabled = isEnabled;
+    updateLivePreview();
+  });
+
+  wInput('w-unduh-mantu-date', (v) => {
+    const wd = getWD();
+    if (!wd.unduhMantu) wd.unduhMantu = { enabled: true, title: 'Unduh Mantu' };
+    wd.unduhMantu.date = v;
+  });
+  wInput('w-unduh-mantu-time', (v) => {
+    const wd = getWD();
+    if (!wd.unduhMantu) wd.unduhMantu = { enabled: true, title: 'Unduh Mantu' };
+    wd.unduhMantu.time = v;
+  });
+  wInput('w-unduh-mantu-venue', (v) => {
+    const wd = getWD();
+    if (!wd.unduhMantu) wd.unduhMantu = { enabled: true, title: 'Unduh Mantu' };
+    wd.unduhMantu.locationName = v;
+  });
+  wInput('w-unduh-mantu-address', (v) => {
+    const wd = getWD();
+    if (!wd.unduhMantu) wd.unduhMantu = { enabled: true, title: 'Unduh Mantu' };
+    wd.unduhMantu.address = v;
+  });
+  wInput('w-unduh-mantu-maps', (v) => {
+    const wd = getWD();
+    if (!wd.unduhMantu) wd.unduhMantu = { enabled: true, title: 'Unduh Mantu' };
+    wd.unduhMantu.mapUrl = v;
+  });
   // Digital Envelope
   wInput('w-bank-name', (v) => { getWD().digitalEnvelope.bankName = v; });
   wInput('w-bank-number', (v) => { getWD().digitalEnvelope.accountNumber = v; });
@@ -1566,8 +1683,9 @@ const isEdit = Boolean(editId);
     }
 
     if (state.photos.length > 0) {
+      const previewLimit = state.category === 'wedding' ? 6 : 4;
       html += `<div class="grid grid-cols-2 gap-1.5 mt-3">`;
-      state.photos.slice(0, 4).forEach((p) => {
+      state.photos.slice(0, previewLimit).forEach((p) => {
         html += `<div class="aspect-square overflow-hidden rounded-lg"><img src="${p.previewUrl}" class="h-full w-full object-cover" /></div>`;
       });
       html += `</div>`;
@@ -1947,6 +2065,26 @@ const isEdit = Boolean(editId);
         setVal('w-resepsi-venue', wd.receptionEvent?.venue);
         setVal('w-resepsi-address', wd.receptionEvent?.address);
         setVal('w-resepsi-maps', wd.receptionEvent?.mapsUrl);
+
+        // Restore Unduh Mantu
+        if (wd.unduhMantu) {
+          if (unduhMantuToggle) {
+            unduhMantuToggle.checked = Boolean(wd.unduhMantu.enabled);
+          }
+          if (unduhMantuFields) {
+            if (wd.unduhMantu.enabled) {
+              unduhMantuFields.classList.remove('hidden');
+            } else {
+              unduhMantuFields.classList.add('hidden');
+            }
+          }
+          setVal('w-unduh-mantu-date', wd.unduhMantu.date);
+          setVal('w-unduh-mantu-time', wd.unduhMantu.time);
+          setVal('w-unduh-mantu-venue', wd.unduhMantu.locationName);
+          setVal('w-unduh-mantu-address', wd.unduhMantu.address);
+          setVal('w-unduh-mantu-maps', wd.unduhMantu.mapUrl);
+        }
+
         setVal('w-bank-name', wd.digitalEnvelope?.bankName);
         setVal('w-bank-number', wd.digitalEnvelope?.accountNumber);
         setVal('w-bank-holder', wd.digitalEnvelope?.accountHolder);
@@ -1965,6 +2103,7 @@ const isEdit = Boolean(editId);
         }
       }
 
+      updatePhotoLimitUI();
       renderPhotoGrid();
       syncThemeSelectorActiveStates();
       updateTrackSelectionUI();
@@ -1996,6 +2135,33 @@ const isEdit = Boolean(editId);
 <style>
   .wizard-step {
     animation: fade-in-up 0.4s var(--ease-smooth) forwards;
+  }
+
+  /* Toggle switch */
+  .toggle-switch {
+    width: 2.75rem;
+    height: 1.5rem;
+    background-color: var(--color-surface-700, #1c1c28);
+    border-radius: 9999px;
+    position: relative;
+    transition: background-color 0.2s ease;
+  }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: #ffffff;
+    border-radius: 9999px;
+    transition: transform 0.2s ease;
+  }
+  #w-unduh-mantu-toggle:checked + .toggle-switch {
+    background-color: #14b8a6;
+  }
+  #w-unduh-mantu-toggle:checked + .toggle-switch::after {
+    transform: translateX(1.25rem);
   }
 
   /* Desktop preview column — CSS media query for reliable breakpoint */
