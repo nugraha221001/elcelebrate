@@ -34,7 +34,7 @@ const initial = (displayName || 'U').charAt(0).toUpperCase();
     </a>
 
     <!-- Desktop Nav Links -->
-    <div class="hidden items-center gap-1.5 sm:flex">
+    <div class="hidden items-center gap-1.5 md:flex">
       {user ? (
         <>
           <a
@@ -172,7 +172,7 @@ const initial = (displayName || 'U').charAt(0).toUpperCase();
     <!-- Mobile Menu Button -->
     <button
       type="button"
-      class="rounded-lg p-2 text-surface-400 transition-colors hover:text-white sm:hidden"
+      class="rounded-lg p-2 text-surface-400 transition-colors hover:text-white md:hidden"
       id="mobile-menu-btn"
       aria-label="Toggle menu"
     >
@@ -183,7 +183,7 @@ const initial = (displayName || 'U').charAt(0).toUpperCase();
   </div>
 
   <!-- Mobile Menu (hidden by default) -->
-  <div class="hidden border-t border-white/5 px-4 py-4 sm:hidden bg-surface-900/95 backdrop-blur-xl" id="mobile-menu">
+  <div class="hidden border-t border-white/5 px-4 py-4 md:hidden bg-surface-900/95 backdrop-blur-xl" id="mobile-menu">
     {user ? (
       <div class="flex flex-col gap-2.5">
         <!-- User Badge in mobile drawer -->

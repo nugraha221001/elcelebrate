@@ -14,6 +14,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const { data, error } = await supabase.auth.getUser();
     if (!error && data?.user) {
       user = data.user;
+    } else if (error && (error.message?.includes('Refresh Token') || (error as any).code === 'refresh_token_not_found')) {
+      context.cookies.delete('sb-access-token', { path: '/' });
+      context.cookies.delete('sb-refresh-token', { path: '/' });
     }
   } catch {
     user = null;
@@ -59,6 +62,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
               maxAge: 60 * 60 * 24 * 7,
             });
           }
+        } else if (refreshError) {
+          context.cookies.delete('sb-access-token', { path: '/' });
+          context.cookies.delete('sb-refresh-token', { path: '/' });
         }
       }
     } catch {

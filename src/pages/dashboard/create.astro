@@ -1061,12 +1061,14 @@ const isEdit = Boolean(editId);
 
   primaryInput?.addEventListener('input', (e) => {
     state.themeConfig.primaryColor = (e.target as HTMLInputElement).value;
-    document.getElementById('theme-primary-hex')!.textContent = state.themeConfig.primaryColor;
+    const hex = document.getElementById('theme-primary-hex');
+    if (hex) hex.textContent = state.themeConfig.primaryColor;
     updateLivePreview();
   });
   secondaryInput?.addEventListener('input', (e) => {
     state.themeConfig.secondaryColor = (e.target as HTMLInputElement).value;
-    document.getElementById('theme-secondary-hex')!.textContent = state.themeConfig.secondaryColor;
+    const hex = document.getElementById('theme-secondary-hex');
+    if (hex) hex.textContent = state.themeConfig.secondaryColor;
     updateLivePreview();
   });
 
@@ -1206,25 +1208,27 @@ const isEdit = Boolean(editId);
   // ═══════════════════════════════════════════════════════
   // Step 3: Media Upload
   // ═══════════════════════════════════════════════════════
-  const dropZone = document.getElementById('drop-zone')!;
-  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input') as HTMLInputElement | null;
 
-  dropZone.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('border-primary/50', 'bg-primary/5');
-  });
-  dropZone.addEventListener('dragleave', () => {
-    dropZone.classList.remove('border-primary/50', 'bg-primary/5');
-  });
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('border-primary/50', 'bg-primary/5');
-    if (e.dataTransfer?.files) handleFiles(e.dataTransfer.files);
-  });
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files) handleFiles(fileInput.files);
-  });
+  if (dropZone && fileInput) {
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-primary/50', 'bg-primary/5');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-primary/50', 'bg-primary/5');
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-primary/50', 'bg-primary/5');
+      if (e.dataTransfer?.files) handleFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files) handleFiles(fileInput.files);
+    });
+  }
 
   async function handleFiles(files: FileList) {
     const maxPhotos = state.category === 'wedding' ? 10 : 4;
@@ -1235,14 +1239,14 @@ const isEdit = Boolean(editId);
     }
 
     const toProcess = Array.from(files).slice(0, remaining);
-    const statusEl = document.getElementById('upload-status')!;
-    const progressEl = document.getElementById('upload-progress')!;
-    const textEl = document.getElementById('upload-text')!;
-    statusEl.classList.remove('hidden');
+    const statusEl = document.getElementById('upload-status');
+    const progressEl = document.getElementById('upload-progress');
+    const textEl = document.getElementById('upload-text');
+    if (statusEl) statusEl.classList.remove('hidden');
 
     for (let i = 0; i < toProcess.length; i++) {
-      textEl.textContent = `Compressing ${i + 1}/${toProcess.length}...`;
-      progressEl.style.width = `${((i + 1) / toProcess.length) * 100}%`;
+      if (textEl) textEl.textContent = `Compressing ${i + 1}/${toProcess.length}...`;
+      if (progressEl) progressEl.style.width = `${((i + 1) / toProcess.length) * 100}%`;
 
       try {
         const result = await compressImage(toProcess[i]);
@@ -1252,13 +1256,14 @@ const isEdit = Boolean(editId);
       }
     }
 
-    statusEl.classList.add('hidden');
+    if (statusEl) statusEl.classList.add('hidden');
     renderPhotoGrid();
     updateLivePreview();
   }
 
   function renderPhotoGrid() {
-    const grid = document.getElementById('photo-grid')!;
+    const grid = document.getElementById('photo-grid');
+    if (!grid) return;
     grid.innerHTML = state.photos.map((p, i) => `
       <div class="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-surface-800">
         <img src="${p.previewUrl}" alt="Photo ${i + 1}" class="h-full w-full object-cover" />

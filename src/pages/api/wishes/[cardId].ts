@@ -28,7 +28,17 @@ export const GET: APIRoute = async ({ params, locals }) => {
 // POST: Submit a new wish (public — no auth required)
 export const POST: APIRoute = async ({ params, locals, request }) => {
   const { cardId } = params;
-  const { sender_name, message } = await request.json();
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid or malformed JSON payload' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const { sender_name, message } = body || {};
 
   // Validation
   if (!sender_name || !message) {

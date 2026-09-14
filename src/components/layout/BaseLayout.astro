@@ -19,10 +19,10 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://elcelebr
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="dark w-full max-w-full overflow-x-hidden">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
 
     <!-- SEO -->
@@ -58,7 +58,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://elcelebr
     />
   </head>
   <body
-    class="min-h-dvh bg-surface-900 text-surface-100 font-sans antialiased"
+    class="w-full max-w-full overflow-x-hidden min-h-dvh bg-surface-900 text-surface-100 font-sans antialiased"
   >
     <slot />
   </body>

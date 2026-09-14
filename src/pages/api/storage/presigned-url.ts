@@ -12,7 +12,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
     });
   }
 
-  const { filename, contentType, folder = 'cards' } = await request.json();
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid or malformed JSON payload' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const { filename, contentType, folder = 'cards' } = body || {};
 
   // Validate file extension — only .webp allowed
   if (!filename || !filename.endsWith('.webp')) {

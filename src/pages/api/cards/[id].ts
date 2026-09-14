@@ -40,7 +40,15 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
   }
 
   const { id } = params;
-  const body = await request.json();
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid or malformed JSON payload' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   // Allow only permitted mutable fields (protect id, user_id, slug, created_at, category)
   const allowedKeys = [

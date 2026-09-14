@@ -41,7 +41,16 @@ export const POST: APIRoute = async ({ locals, request }) => {
     });
   }
 
-  const body = await request.json();
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid or malformed JSON payload' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const {
     category,
     recipient_name,
@@ -50,7 +59,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
     event_date = null,
     theme_config = {},
     media_urls = [],
-  } = body;
+  } = body || {};
 
   // Validation
   if (!category || !recipient_name) {
@@ -67,8 +76,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
     });
   }
 
-  if (media_urls.length > 4) {
-    return new Response(JSON.stringify({ error: 'Maximum 4 photos allowed' }), {
+  const maxPhotos = category === 'wedding' ? 10 : 4;
+  if (Array.isArray(media_urls) && media_urls.length > maxPhotos) {
+    return new Response(JSON.stringify({ error: `Maximum ${maxPhotos} photos allowed` }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
