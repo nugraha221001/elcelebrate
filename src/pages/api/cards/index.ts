@@ -69,7 +69,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
     });
   }
 
-  if (!['birthday', 'anniversary', 'graduation', 'invitation', 'wedding'].includes(category)) {
+  if (!['birthday', 'anniversary', 'graduation', 'invitation', 'wedding', 'love', 'greetings'].includes(category)) {
     return new Response(JSON.stringify({ error: 'Invalid category' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },

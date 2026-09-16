@@ -139,12 +139,13 @@ export async function compressAvatar(file: File): Promise<CompressedImage> {
 export async function uploadToR2(
   presignedUrl: string,
   file: File,
-  onProgress?: (percent: number) => void
+  onProgress?: (percent: number) => void,
+  contentType?: string
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', presignedUrl, true);
-    xhr.setRequestHeader('Content-Type', 'image/webp');
+    xhr.setRequestHeader('Content-Type', contentType || file.type || 'image/webp');
 
     if (onProgress) {
       xhr.upload.onprogress = (e) => {

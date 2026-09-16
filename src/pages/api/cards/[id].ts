@@ -81,25 +81,43 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
     updatePayload.media_urls = updatePayload.media_urls.map(resolveMediaUrl);
   }
 
-  // ── R2 Diff Cleanup: delete orphaned assets when media_urls changes ──
-  if (updatePayload.media_urls && Array.isArray(updatePayload.media_urls)) {
+  // ── R2 Diff Cleanup: delete orphaned media assets & custom audio ──
+  const needMediaCheck = updatePayload.media_urls && Array.isArray(updatePayload.media_urls);
+  const needAudioCheck = updatePayload.theme_config && 'customAudioUrl' in updatePayload.theme_config;
+
+  if (needMediaCheck || needAudioCheck) {
     const { data: existingCard } = await locals.supabase
       .from('cards')
-      .select('media_urls')
+      .select('media_urls, theme_config')
       .eq('id', id)
       .eq('user_id', locals.user.id)
       .single();
 
-    if (existingCard && Array.isArray(existingCard.media_urls)) {
-      const oldUrls: string[] = existingCard.media_urls;
-      const newUrls: string[] = updatePayload.media_urls;
-      const removedUrls = oldUrls.filter((url: string) => !newUrls.includes(url));
+    if (existingCard) {
+      const keysToDelete: string[] = [];
 
-      if (removedUrls.length > 0) {
-        const keysToDelete = removedUrls
-          .map(extractR2Key)
-          .filter((k): k is string => Boolean(k));
+      // Check media_urls diff
+      if (needMediaCheck && Array.isArray(existingCard.media_urls)) {
+        const oldUrls: string[] = existingCard.media_urls;
+        const newUrls: string[] = updatePayload.media_urls;
+        const removedUrls = oldUrls.filter((url: string) => !newUrls.includes(url));
+        for (const url of removedUrls) {
+          const k = extractR2Key(url);
+          if (k) keysToDelete.push(k);
+        }
+      }
 
+      // Check customAudioUrl diff
+      if (needAudioCheck) {
+        const oldAudio = existingCard.theme_config?.customAudioUrl;
+        const newAudio = updatePayload.theme_config?.customAudioUrl;
+        if (oldAudio && oldAudio !== newAudio) {
+          const k = extractR2Key(oldAudio);
+          if (k) keysToDelete.push(k);
+        }
+      }
+
+      if (keysToDelete.length > 0) {
         await Promise.allSettled(
           keysToDelete.map((key) =>
             deleteR2Object(key).catch((err) =>
@@ -154,10 +172,10 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
 
   const { id } = params;
 
-  // 1. Fetch card first to retrieve media_urls for asset cleanup
+  // 1. Fetch card first to retrieve media_urls and theme_config for asset cleanup
   const { data: card, error: fetchError } = await locals.supabase
     .from('cards')
-    .select('id, user_id, media_urls')
+    .select('id, user_id, media_urls, theme_config')
     .eq('id', id)
     .eq('user_id', locals.user.id)
     .single();
@@ -169,12 +187,21 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     });
   }
 
-  // 2. Permanently delete all physical image assets from R2 bucket
+  // 2. Permanently delete all physical image assets and custom audio from R2 bucket
+  const keysToDelete: string[] = [];
   if (Array.isArray(card.media_urls) && card.media_urls.length > 0) {
-    const keysToDelete = card.media_urls
-      .map(extractR2Key)
-      .filter((k): k is string => Boolean(k));
+    for (const url of card.media_urls) {
+      const k = extractR2Key(url);
+      if (k) keysToDelete.push(k);
+    }
+  }
 
+  if (card.theme_config?.customAudioUrl) {
+    const k = extractR2Key(card.theme_config.customAudioUrl);
+    if (k) keysToDelete.push(k);
+  }
+
+  if (keysToDelete.length > 0) {
     await Promise.allSettled(
       keysToDelete.map((key) =>
         deleteR2Object(key).catch((err) =>

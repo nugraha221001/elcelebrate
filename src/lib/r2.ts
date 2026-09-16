@@ -105,7 +105,7 @@ export function extractR2Key(url: string | null | undefined): string | null {
   }
 
   // If already a raw storage key
-  if (url.startsWith('cards/') || url.startsWith('avatars/')) {
+  if (url.startsWith('cards/') || url.startsWith('avatars/') || url.startsWith('audio/')) {
     return url;
   }
 

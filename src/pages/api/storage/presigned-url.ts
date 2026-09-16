@@ -24,27 +24,53 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
   const { filename, contentType, folder = 'cards' } = body || {};
 
-  // Validate file extension — only .webp allowed
-  if (!filename || !filename.endsWith('.webp')) {
-    return new Response(JSON.stringify({ error: 'Only .webp files are allowed' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  let key: string;
+
+  if (folder === 'audio') {
+    const ALLOWED_AUDIO_EXTENSIONS = ['.mp3', '.ogg', '.opus'];
+    const ALLOWED_AUDIO_MIMES = ['audio/mpeg', 'audio/ogg', 'audio/opus'];
+
+    const hasValidExt = typeof filename === 'string' && ALLOWED_AUDIO_EXTENSIONS.some((ext) => filename.toLowerCase().endsWith(ext));
+    if (!hasValidExt) {
+      return new Response(JSON.stringify({ error: 'Only .mp3, .ogg, and .opus audio files are allowed' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!ALLOWED_AUDIO_MIMES.includes(contentType)) {
+      return new Response(JSON.stringify({ error: 'Content type must be audio/mpeg, audio/ogg, or audio/opus' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const random = Math.random().toString(36).substring(2, 8);
+    const ext = filename.split('.').pop()?.toLowerCase() || 'mp3';
+    key = `audio/${locals.user.id}/${Date.now()}-${random}.${ext}`;
+  } else {
+    // Validate file extension — only .webp allowed for cards & avatars
+    if (!filename || !filename.endsWith('.webp')) {
+      return new Response(JSON.stringify({ error: 'Only .webp files are allowed' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Validate content type
+    if (contentType !== 'image/webp') {
+      return new Response(JSON.stringify({ error: 'Content type must be image/webp' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Sanitize folder to either 'cards' or 'avatars'
+    const targetFolder = folder === 'avatars' ? 'avatars' : 'cards';
+
+    // Generate a unique key: {folder}/{userId}/{timestamp}-{filename}
+    key = `${targetFolder}/${locals.user.id}/${Date.now()}-${filename}`;
   }
-
-  // Validate content type
-  if (contentType !== 'image/webp') {
-    return new Response(JSON.stringify({ error: 'Content type must be image/webp' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  // Sanitize folder to either 'cards' or 'avatars'
-  const targetFolder = folder === 'avatars' ? 'avatars' : 'cards';
-
-  // Generate a unique key: {folder}/{userId}/{timestamp}-{filename}
-  const key = `${targetFolder}/${locals.user.id}/${Date.now()}-${filename}`;
 
   try {
     const result = await getPresignedUploadUrl(key, contentType, 300); // 5 minute expiry

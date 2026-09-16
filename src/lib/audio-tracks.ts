@@ -11,7 +11,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     filename: 'warm-piano.opus',
     duration: 45,
     mood: 'Gentle & heartfelt',
-    category: ['birthday', 'anniversary'],
+    category: ['birthday', 'anniversary', 'wedding', 'love', 'greetings'],
   },
   {
     id: 'gentle-strings',
@@ -19,7 +19,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     filename: 'gentle-strings.opus',
     duration: 50,
     mood: 'Elegant & emotional',
-    category: ['anniversary', 'graduation'],
+    category: ['anniversary', 'graduation', 'wedding', 'love'],
   },
   {
     id: 'upbeat-celebration',
@@ -27,7 +27,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     filename: 'upbeat-celebration.opus',
     duration: 40,
     mood: 'Joyful & energetic',
-    category: ['birthday', 'graduation', 'invitation'],
+    category: ['birthday', 'graduation', 'invitation', 'greetings'],
   },
   {
     id: 'soft-acoustic',
@@ -35,7 +35,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     filename: 'soft-acoustic.opus',
     duration: 55,
     mood: 'Warm & intimate',
-    category: ['birthday', 'anniversary'],
+    category: ['birthday', 'anniversary', 'wedding', 'love', 'greetings'],
   },
   {
     id: 'dreamy-bells',
@@ -43,7 +43,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     filename: 'dreamy-bells.opus',
     duration: 42,
     mood: 'Magical & whimsical',
-    category: ['birthday', 'invitation'],
+    category: ['birthday', 'invitation', 'greetings'],
   },
   {
     id: 'jazzy-lounge',
@@ -51,7 +51,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     filename: 'jazzy-lounge.opus',
     duration: 48,
     mood: 'Sophisticated & smooth',
-    category: ['anniversary', 'invitation'],
+    category: ['anniversary', 'invitation', 'love'],
   },
   {
     id: 'cinematic-warmth',
@@ -81,6 +81,8 @@ export const RECOMMENDED_TRACKS: Record<CardCategory, string[]> = {
   birthday: ['upbeat-celebration', 'dreamy-bells', 'tropical-vibes'],
   graduation: ['cinematic-warmth', 'gentle-strings', 'upbeat-celebration'],
   invitation: ['upbeat-celebration', 'dreamy-bells', 'tropical-vibes'],
+  love: ['soft-acoustic', 'warm-piano', 'gentle-strings', 'jazzy-lounge'],
+  greetings: ['warm-piano', 'dreamy-bells', 'soft-acoustic', 'upbeat-celebration'],
 };
 
 /**
@@ -93,6 +95,8 @@ export const CATEGORY_DEFAULTS: Record<CardCategory, { ambientEffect: AmbientEff
   birthday:    { ambientEffect: 'confetti-float',  audioTrackId: 'upbeat-celebration' },
   graduation:  { ambientEffect: 'starlight',       audioTrackId: 'cinematic-warmth' },
   invitation:  { ambientEffect: 'golden-sparkles', audioTrackId: 'upbeat-celebration' },
+  love:        { ambientEffect: 'hearts-petals',  audioTrackId: 'soft-acoustic' },
+  greetings:   { ambientEffect: 'lanterns',       audioTrackId: 'warm-piano' },
 };
 
 /**

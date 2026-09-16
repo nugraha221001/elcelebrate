@@ -34,10 +34,11 @@ const typedCard = card as Card;
 const typedWishes = (wishes || []) as Wish[];
 const theme = typedCard.theme_config as ThemeConfig;
 const meta = CATEGORY_META[typedCard.category as keyof typeof CATEGORY_META];
+const customAudioUrl = theme.customAudioUrl ? resolveMediaUrl(theme.customAudioUrl) : null;
 const audioTrack = theme.audioTrackId ? getTrackById(theme.audioTrackId) : null;
-const audioUrl = audioTrack ? getTrackUrl(audioTrack.filename) : (theme.externalAudioUrl || null);
-const trackId = theme.audioTrackId || (audioTrack ? audioTrack.id : 'warm-piano');
-const hasAudio = Boolean(theme.audioTrackId || theme.externalAudioUrl || audioTrack);
+const audioUrl = customAudioUrl || (audioTrack ? getTrackUrl(audioTrack.filename) : (theme.externalAudioUrl || null));
+const trackId = customAudioUrl ? 'custom' : (theme.audioTrackId || (audioTrack ? audioTrack.id : 'warm-piano'));
+const hasAudio = Boolean(customAudioUrl || theme.audioTrackId || theme.externalAudioUrl || audioTrack);
 
 const fontMap: Record<string, string> = {
   sans: "'Inter', sans-serif",
@@ -50,7 +51,9 @@ const fontFamily = fontMap[theme.fontFamily] || fontMap.sans;
 // Wedding-specific data
 const isWedding = typedCard.category === 'wedding';
 const weddingData = theme.weddingData || null;
-const guestName = Astro.url.searchParams.get('to') || 'Tamu Undangan';
+const recipientParam = Astro.url.searchParams.get('to');
+const recipientName = recipientParam || typedCard.recipient_name;
+const guestName = recipientParam || 'Tamu Undangan';
 
 // Pattern SVGs
 const patternMap: Record<string, string> = {
@@ -64,10 +67,21 @@ const bgPattern = patternMap[theme.backgroundPattern] || 'none';
 const ogImage = typedCard.media_urls.length > 0
   ? resolveMediaUrl(typedCard.media_urls[0])
   : '/og-default.png';
+
+// Ambient effect resolution with smart defaults for love & greetings
+const resolvedAmbientEffect = (theme as any).ambientEffect && (theme as any).ambientEffect !== 'none'
+  ? (theme as any).ambientEffect
+  : (typedCard.category === 'love'
+      ? 'hearts-petals'
+      : (typedCard.category === 'greetings'
+          ? (theme.occasion === 'natal-tahun-baru' ? 'snowfall' : 'lanterns')
+          : 'none'));
+
+const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && theme.passcode.trim().length === 4);
 ---
 
 <BaseLayout
-  title={isWedding && weddingData ? `Wedding of ${weddingData.bride.nickname || weddingData.bride.fullName} & ${weddingData.groom.nickname || weddingData.groom.fullName}` : `${meta?.label || 'Card'} for ${typedCard.recipient_name}`}
+  title={isWedding && weddingData ? `Wedding of ${weddingData.bride.nickname || weddingData.bride.fullName} & ${weddingData.groom.nickname || weddingData.groom.fullName}` : `${meta?.label || 'Card'} for ${recipientName}`}
   description={typedCard.message.slice(0, 155)}
   ogImage={ogImage}
 >
@@ -80,6 +94,9 @@ const ogImage = typedCard.media_urls.length > 0
     data-has-audio={hasAudio ? 'true' : 'false'}
     data-unbox-style={theme.unboxStyle}
     data-is-wedding={isWedding ? 'true' : 'false'}
+    data-category={typedCard.category}
+    data-passcode={theme.passcode || ''}
+    data-has-passcode={hasPasscode ? 'true' : 'false'}
     class="hidden"
   ></div>
 
@@ -174,8 +191,8 @@ const ogImage = typedCard.media_urls.length > 0
         </button>
       )}
       {audioUrl && (
-        <audio id="bg-audio" loop preload="none">
-          <source src={audioUrl} type="audio/ogg" />
+        <audio id="bg-audio" src={audioUrl} loop preload="none">
+          <source src={audioUrl} />
         </audio>
       )}
 
@@ -576,6 +593,72 @@ const ogImage = typedCard.media_urls.length > 0
     <!-- STANDARD CARD LAYOUT (non-wedding)                        -->
     <!-- ═══════════════════════════════════════════════════════════ -->
 
+    {hasPasscode && (
+      <!-- Passcode Gate (Enforced before unboxing) -->
+      <div
+        id="passcode-gate"
+        class="fixed inset-0 z-60 flex items-center justify-center p-4 bg-surface-900/90 backdrop-blur-xl transition-all duration-500"
+        style={`font-family: ${fontFamily};`}
+      >
+        <div class="relative w-full max-w-sm rounded-3xl border border-pink-500/30 bg-surface-900/95 p-6 text-center shadow-2xl backdrop-blur-md" style={`box-shadow: 0 10px 40px ${theme.primaryColor}25;`}>
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-pink-500/10 border border-pink-500/20 text-3xl animate-bounce" style="animation-duration: 3s;">
+            🔐
+          </div>
+          <h2 class="text-xl font-bold text-white mb-1" style={`color: ${theme.primaryColor};`}>
+            Surat Cinta Terkunci
+          </h2>
+          <p class="text-xs text-surface-300 mb-6">
+            Masukkan 4 digit PIN rahasia untuk membuka pesan ini 💕
+          </p>
+
+          <!-- 4 Visual PIN Boxes -->
+          <div class="flex justify-center gap-3 mb-4" id="pin-boxes-container">
+            <div class="pin-box flex h-14 w-12 items-center justify-center rounded-2xl border-2 border-white/15 bg-surface-800/80 text-2xl font-bold text-white shadow-inner transition-all duration-200" data-pin-idx="0"></div>
+            <div class="pin-box flex h-14 w-12 items-center justify-center rounded-2xl border-2 border-white/15 bg-surface-800/80 text-2xl font-bold text-white shadow-inner transition-all duration-200" data-pin-idx="1"></div>
+            <div class="pin-box flex h-14 w-12 items-center justify-center rounded-2xl border-2 border-white/15 bg-surface-800/80 text-2xl font-bold text-white shadow-inner transition-all duration-200" data-pin-idx="2"></div>
+            <div class="pin-box flex h-14 w-12 items-center justify-center rounded-2xl border-2 border-white/15 bg-surface-800/80 text-2xl font-bold text-white shadow-inner transition-all duration-200" data-pin-idx="3"></div>
+          </div>
+
+          <!-- Hidden Input to capture keyboard -->
+          <input
+            type="password"
+            id="pin-hidden-input"
+            maxlength="4"
+            pattern="[0-9]*"
+            inputmode="numeric"
+            class="opacity-0 absolute -z-10"
+            autocomplete="off"
+            autofocus
+          />
+
+          <!-- Error Alert -->
+          <div id="pin-error-msg" class="hidden text-xs font-semibold text-rose-400 mb-4 transition-all">
+            Kode PIN salah, silakan coba lagi! 💔
+          </div>
+
+          <!-- Touch Numpad for mobile convenience -->
+          <div class="grid grid-cols-3 gap-2.5 max-w-xs mx-auto">
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map((num) => {
+              if (!num) return <div class="h-12"></div>;
+              return (
+                <button
+                  type="button"
+                  class="numpad-key flex h-12 items-center justify-center rounded-xl border border-white/10 bg-surface-800/60 text-base font-semibold text-surface-200 transition-all duration-150 hover:bg-white/10 active:scale-95 cursor-pointer select-none"
+                  data-num={num}
+                >
+                  {num}
+                </button>
+              );
+            })}
+          </div>
+
+          <p class="mt-5 text-[11px] text-surface-400">
+            Dibuat dengan cinta untuk <span class="text-pink-300 font-medium">{recipientName}</span>
+          </p>
+        </div>
+      </div>
+    )}
+
     <!-- Envelope Unboxing Overlay -->
     <div
       id="unbox-overlay"
@@ -646,7 +729,7 @@ const ogImage = typedCard.media_urls.length > 0
       <canvas id="confetti-canvas" class="pointer-events-none fixed inset-0 z-(--z-confetti)" style="width:100%;height:100%;"></canvas>
 
       <!-- Ambient Effect -->
-      <AmbientEffect effect={(theme as any).ambientEffect ?? 'none'} />
+      <AmbientEffect effect={resolvedAmbientEffect} />
 
       <!-- Audio Player (hidden, autoplay-compliant) -->
       {hasAudio && (
@@ -665,8 +748,8 @@ const ogImage = typedCard.media_urls.length > 0
             </svg>
           </button>
           {audioUrl && (
-            <audio id="bg-audio" loop preload="none">
-              <source src={audioUrl} type="audio/ogg" />
+            <audio id="bg-audio" src={audioUrl} loop preload="none">
+              <source src={audioUrl} />
             </audio>
           )}
         </div>
@@ -690,9 +773,73 @@ const ogImage = typedCard.media_urls.length > 0
             Happy {meta?.label || 'Celebration'}!
           </h1>
           <p class="mt-2 text-xl text-surface-200 sm:text-2xl wrap-anywhere max-w-full" style="font-family: inherit;">
-            Dear <span class="font-semibold wrap-anywhere" style={`color: ${theme.secondaryColor};`}>{typedCard.recipient_name}</span>
+            Dear <span class="font-semibold wrap-anywhere" style={`color: ${theme.secondaryColor};`}>{recipientName}</span>
           </p>
         </header>
+
+        {/* Category-Specific Milestone / Event Chips */}
+        {typedCard.category === 'birthday' && theme.ageMilestone && (
+          <div class="mt-4 flex justify-center" data-reveal="zoom-in" data-reveal-delay="250">
+            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-pink-500/15 border border-pink-500/30 text-pink-300 shadow-sm backdrop-blur-sm">
+              <span>🎂</span>
+              <span>Milestone: {theme.ageMilestone}</span>
+            </span>
+          </div>
+        )}
+
+        {typedCard.category === 'anniversary' && theme.anniversaryMilestone && (
+          <div class="mt-4 flex justify-center" data-reveal="zoom-in" data-reveal-delay="250">
+            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 border border-rose-500/30 text-rose-300 shadow-sm backdrop-blur-sm">
+              <span>💍</span>
+              <span>{theme.anniversaryMilestone}</span>
+            </span>
+          </div>
+        )}
+
+        {typedCard.category === 'graduation' && (theme.degreeMajor || theme.schoolCampus) && (
+          <div class="mt-4 flex flex-col items-center gap-1" data-reveal="zoom-in" data-reveal-delay="250">
+            {theme.degreeMajor && (
+              <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-blue-500/15 border border-blue-500/30 text-blue-300 shadow-sm backdrop-blur-sm">
+                <span>🎓</span>
+                <span>{theme.degreeMajor}</span>
+              </span>
+            )}
+            {theme.schoolCampus && (
+              <span class="text-xs text-surface-400 font-medium">
+                🏛️ {theme.schoolCampus}
+              </span>
+            )}
+          </div>
+        )}
+
+        {typedCard.category === 'invitation' && (theme.invitationEventType || theme.invitationTime || theme.invitationVenue) && (
+          <div class="mt-6 mx-auto max-w-md rounded-2xl p-4 text-center border backdrop-blur-sm" style={`background: ${theme.primaryColor}0d; border-color: ${theme.primaryColor}25;`} data-reveal="fade-up" data-reveal-delay="250">
+            {theme.invitationEventType && (
+              <div class="text-sm font-bold text-surface-100 flex items-center justify-center gap-1.5">
+                <span>✉️</span> <span>{theme.invitationEventType}</span>
+              </div>
+            )}
+            {theme.invitationTime && (
+              <div class="mt-1 text-xs text-surface-300">
+                ⏰ {theme.invitationTime}
+              </div>
+            )}
+            {theme.invitationVenue && (
+              <div class="mt-1 text-xs text-surface-400">
+                📍 {theme.invitationVenue}
+              </div>
+            )}
+          </div>
+        )}
+
+        {typedCard.category === 'greetings' && theme.occasion && (
+          <div class="mt-4 flex justify-center" data-reveal="zoom-in" data-reveal-delay="250">
+            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300 shadow-sm backdrop-blur-sm capitalize">
+              <span>🌙</span>
+              <span>{theme.occasion.replace(/-/g, ' ')}</span>
+            </span>
+          </div>
+        )}
 
         <!-- Message -->
         <section class="mt-10 max-w-full overflow-hidden" data-reveal="fade-up">
@@ -708,8 +855,70 @@ const ogImage = typedCard.media_urls.length > 0
                 With love, <span class="font-medium text-surface-300 wrap-anywhere">{typedCard.sender_name}</span>
               </p>
             )}
+            {theme.signature && (
+              <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-end gap-2 text-surface-300">
+                <span class="text-[11px] uppercase tracking-wider text-surface-400">Salam hangat:</span>
+                <span class="font-serif italic text-base sm:text-lg font-medium" style={`color: ${theme.primaryColor}; font-family: ${fontFamily};`}>
+                  {theme.signature}
+                </span>
+              </div>
+            )}
           </div>
         </section>
+
+        <!-- Interactive Confession Section (Love Category) -->
+        {typedCard.category === 'love' && theme.interactiveConfession?.enabled && (
+          <section class="mt-10 max-w-full overflow-hidden" data-reveal="fade-up" id="confession-section">
+            <div
+              id="confession-card"
+              class="relative overflow-hidden rounded-3xl p-6 sm:p-8 text-center backdrop-blur-md shadow-2xl transition-all duration-500"
+              style={`background: linear-gradient(135deg, ${theme.primaryColor}15, ${theme.secondaryColor}20, ${theme.backgroundColor}); border: 1px solid ${theme.primaryColor}40; box-shadow: 0 10px 40px ${theme.primaryColor}20;`}
+            >
+              <div id="confession-question-state">
+                <div class="text-4xl sm:text-5xl mb-3 animate-bounce" style="animation-duration: 2.5s;">💘</div>
+                <h2 class="text-xl sm:text-2xl font-bold mb-2 text-white" style={`font-family: ${fontFamily};`}>
+                  {theme.interactiveConfession.prompt || 'Maukah kamu jadi pasanganku? 💕'}
+                </h2>
+                <p class="text-xs sm:text-sm text-surface-300 mb-6">Pilih jawabanmu dengan sepenuh hati 💖</p>
+
+                <!-- Button Area for Runaway No and Celebratory Yes -->
+                <div id="confession-buttons-container" class="relative flex items-center justify-center gap-4 min-h-24 sm:min-h-28 px-4">
+                  <button
+                    type="button"
+                    id="confession-yes-btn"
+                    class="group relative inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer z-10"
+                    style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor}); box-shadow: 0 4px 20px ${theme.primaryColor}50;`}
+                  >
+                    <span>{theme.interactiveConfession.yesText || 'Iya, Aku Mau! 💖'}</span>
+                    <span class="text-base group-hover:scale-125 transition-transform">🥰</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="confession-no-btn"
+                    class="relative inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-semibold text-surface-300 border border-white/20 bg-surface-800/80 shadow-md transition-all duration-150 cursor-pointer select-none"
+                  >
+                    <span>{theme.interactiveConfession.noText || 'Nggak Mau 😜'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Celebratory Accepted State -->
+              <div id="confession-celebration-state" class="hidden py-4 animate-fade-in-up">
+                <div class="text-5xl sm:text-6xl mb-3 animate-bounce">💍✨🥰</div>
+                <h2 class="text-2xl sm:text-3xl font-bold mb-2 text-transparent bg-clip-text" style={`background-image: linear-gradient(135deg, #fff, ${theme.primaryColor}, ${theme.secondaryColor}); font-family: ${fontFamily};`}>
+                  She / He Said YES! ❤️
+                </h2>
+                <p class="text-sm sm:text-base text-surface-200 mt-2 max-w-md mx-auto">
+                  Ini adalah awal dari kisah terindah kita. Terima kasih telah memilihku untuk menemani setiap langkahmu! 🌹
+                </p>
+                <div class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-500/20 border border-pink-500/30 text-xs font-semibold text-pink-300">
+                  <span>🎉 Disahkan dengan cinta abadi</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         <!-- Countdown Timer -->
         {typedCard.event_date && (
@@ -881,7 +1090,10 @@ const ogImage = typedCard.media_urls.length > 0
   const hasAudio = dataEl?.dataset.hasAudio === 'true';
   const unboxStyle = dataEl?.dataset.unboxStyle || 'envelope';
   const isWedding = dataEl?.dataset.isWedding === 'true';
+  const cardPasscode = dataEl?.dataset.passcode || '';
+  const hasPasscode = dataEl?.dataset.hasPasscode === 'true';
 
+  const passcodeGate = document.getElementById('passcode-gate');
   const overlay = document.getElementById('unbox-overlay');
   const content = document.getElementById('card-content');
   const weddingCover = document.getElementById('wedding-cover');
@@ -975,6 +1187,7 @@ const ogImage = typedCard.media_urls.length > 0
   // Standard Unboxing Animation (non-wedding)
   function triggerUnbox() {
     if (!overlay || !content) return;
+    if (hasPasscode && passcodeGate && passcodeGate.style.display !== 'none') return;
 
     if (unboxStyle === 'envelope') {
       const flap = document.getElementById('envelope-flap');
@@ -1028,6 +1241,303 @@ const ogImage = typedCard.media_urls.length > 0
   }
 
   overlay?.addEventListener('click', triggerUnbox);
+
+  // ═══════════════════════════════════════════════════════
+  // Passcode Verification Gate
+  // ═══════════════════════════════════════════════════════
+  if (hasPasscode && passcodeGate && cardPasscode) {
+    let currentPin = '';
+    const pinBoxes = document.querySelectorAll<HTMLElement>('.pin-box');
+    const pinErrorMsg = document.getElementById('pin-error-msg');
+    const pinHiddenInput = document.getElementById('pin-hidden-input') as HTMLInputElement | null;
+    const pinBoxesContainer = document.getElementById('pin-boxes-container');
+
+    function updatePinDisplay() {
+      pinBoxes.forEach((box, idx) => {
+        if (idx < currentPin.length) {
+          box.textContent = '•';
+          box.classList.add('border-pink-500', 'bg-pink-500/20', 'scale-105');
+          box.classList.remove('border-white/15');
+        } else {
+          box.textContent = '';
+          box.classList.remove('border-pink-500', 'bg-pink-500/20', 'scale-105', 'border-emerald-400', 'bg-emerald-500/20', 'text-emerald-300');
+          box.classList.add('border-white/15');
+        }
+      });
+    }
+
+    function checkPin() {
+      if (currentPin.length !== 4) return;
+
+      if (currentPin === cardPasscode) {
+        // Success!
+        if (pinErrorMsg) pinErrorMsg.classList.add('hidden');
+        pinBoxes.forEach((box) => {
+          box.classList.remove('border-pink-500', 'bg-pink-500/20');
+          box.classList.add('border-emerald-400', 'bg-emerald-500/20', 'text-emerald-300');
+        });
+
+        // Trigger pleasant chime audio
+        playChimeAudio();
+
+        const gateEl = passcodeGate;
+        setTimeout(() => {
+          if (gateEl) {
+            gateEl.style.transition = 'opacity 0.5s ease';
+            gateEl.style.opacity = '0';
+            gateEl.style.pointerEvents = 'none';
+            setTimeout(() => {
+              gateEl.style.display = 'none';
+            }, 500);
+          }
+        }, 400);
+      } else {
+        // Error
+        if (pinErrorMsg) pinErrorMsg.classList.remove('hidden');
+        if (pinBoxesContainer) {
+          pinBoxesContainer.classList.add('shake');
+          setTimeout(() => {
+            pinBoxesContainer.classList.remove('shake');
+          }, 450);
+        }
+
+        setTimeout(() => {
+          currentPin = '';
+          if (pinHiddenInput) pinHiddenInput.value = '';
+          updatePinDisplay();
+        }, 600);
+      }
+    }
+
+    function handlePinInput(char: string) {
+      if (char === '⌫' || char === 'Backspace') {
+        if (currentPin.length > 0) {
+          currentPin = currentPin.slice(0, -1);
+          if (pinHiddenInput) pinHiddenInput.value = currentPin;
+          if (pinErrorMsg) pinErrorMsg.classList.add('hidden');
+          updatePinDisplay();
+        }
+      } else if (/^[0-9]$/.test(char)) {
+        if (currentPin.length < 4) {
+          currentPin += char;
+          if (pinHiddenInput) pinHiddenInput.value = currentPin;
+          if (pinErrorMsg) pinErrorMsg.classList.add('hidden');
+          updatePinDisplay();
+          if (currentPin.length === 4) {
+            checkPin();
+          }
+        }
+      }
+    }
+
+    // Touch Numpad buttons
+    document.querySelectorAll('.numpad-key').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const num = (btn as HTMLElement).dataset.num;
+        if (num) handlePinInput(num);
+      });
+    });
+
+    // Hidden input / Physical Keyboard
+    pinHiddenInput?.addEventListener('input', (e) => {
+      const val = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 4);
+      currentPin = val;
+      updatePinDisplay();
+      if (currentPin.length === 4) {
+        checkPin();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (!passcodeGate || passcodeGate.style.display === 'none') return;
+      if (e.key === 'Backspace') {
+        handlePinInput('Backspace');
+      } else if (/^[0-9]$/.test(e.key)) {
+        handlePinInput(e.key);
+      }
+    });
+
+    // Keep hidden input focused for desktop typing convenience
+    passcodeGate.addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('.numpad-key')) {
+        pinHiddenInput?.focus();
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Interactive Confession Logic (Love Category)
+  // ═══════════════════════════════════════════════════════
+  const confessionYesBtn = document.getElementById('confession-yes-btn');
+  const confessionNoBtn = document.getElementById('confession-no-btn');
+  const confessionQuestionState = document.getElementById('confession-question-state');
+  const confessionCelebrationState = document.getElementById('confession-celebration-state');
+  const confessionContainer = document.getElementById('confession-buttons-container');
+
+  if (confessionNoBtn && confessionContainer) {
+    const playfulNoTexts = [
+      'Nggak Mau 😜',
+      'Yakin? 🥺',
+      'Coba lagi! 🏃‍♂️',
+      'Gak kena! 😝',
+      'Pikir dulu~ 🥰',
+      'Eits meleset! 💨',
+      'Harus mau! 💖',
+      'Jangan dong 😭',
+    ];
+    let runawayCount = 0;
+
+    function runawayNoBtn(e?: Event) {
+      if (e) {
+        e.preventDefault();
+      }
+      runawayCount++;
+
+      // Cycle playful text
+      const nextText = playfulNoTexts[runawayCount % playfulNoTexts.length];
+      const span = confessionNoBtn?.querySelector('span');
+      if (span) span.textContent = nextText;
+
+      // Calculate container bounds
+      const containerRect = confessionContainer?.getBoundingClientRect();
+      const btnRect = confessionNoBtn?.getBoundingClientRect();
+
+      if (containerRect && btnRect && confessionNoBtn) {
+        const maxX = Math.max((containerRect.width - btnRect.width) / 2, 40);
+        const maxY = 35;
+
+        // Random position inside container
+        const randomX = (Math.random() - 0.5) * (maxX * 1.8);
+        const randomY = (Math.random() - 0.5) * (maxY * 2);
+
+        confessionNoBtn.style.transition = 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        confessionNoBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${Math.max(0.75, 1 - runawayCount * 0.04)})`;
+      }
+
+      // Slightly expand Yes button to invite click!
+      if (confessionYesBtn) {
+        confessionYesBtn.style.transform = `scale(${Math.min(1.25, 1 + runawayCount * 0.05)})`;
+      }
+    }
+
+    // Trigger on hover and touch attempts
+    confessionNoBtn.addEventListener('pointerover', runawayNoBtn);
+    confessionNoBtn.addEventListener('mouseenter', runawayNoBtn);
+    confessionNoBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      runawayNoBtn(e);
+    }, { passive: false });
+    confessionNoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      runawayNoBtn(e);
+    });
+  }
+
+  if (confessionYesBtn && confessionQuestionState && confessionCelebrationState) {
+    confessionYesBtn.addEventListener('click', () => {
+      // Hide question state and reveal celebration state
+      confessionQuestionState.style.display = 'none';
+      confessionCelebrationState.classList.remove('hidden');
+
+      // Double confetti explosion!
+      triggerConfetti();
+      setTimeout(triggerConfetti, 400);
+
+      // Play joyful fanfare audio
+      playFanfareAudio();
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Web Audio Synthesizers for PIN Chime & Celebration Fanfare
+  // ═══════════════════════════════════════════════════════
+  function getAudioCtx(): AudioContext | null {
+    try {
+      const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtxClass) return null;
+      return new AudioCtxClass();
+    } catch {
+      return null;
+    }
+  }
+
+  function playChimeAudio() {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1318.51, now); // E6
+      osc.frequency.setValueAtTime(1975.53, now + 0.12); // B6
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.55);
+    } catch {
+      // Non-critical audio
+    }
+  }
+
+  function playFanfareAudio() {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      // Joyful celebratory fanfare: C5, E5, G5, C6
+      const notes = [
+        { freq: 523.25, time: 0, duration: 0.12 },
+        { freq: 659.25, time: 0.12, duration: 0.12 },
+        { freq: 783.99, time: 0.24, duration: 0.15 },
+        { freq: 1046.50, time: 0.40, duration: 0.7 },
+      ];
+
+      notes.forEach(({ freq, time, duration }) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + time);
+
+        gain.gain.setValueAtTime(0.25, now + time);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + time + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now + time);
+        osc.stop(now + time + duration + 0.05);
+      });
+
+      // Supporting harmony chord at climax (E5 + G5 with C6)
+      [659.25, 783.99].forEach((freq) => {
+        const chordOsc = ctx.createOscillator();
+        const chordGain = ctx.createGain();
+
+        chordOsc.type = 'sine';
+        chordOsc.frequency.setValueAtTime(freq, now + 0.40);
+
+        chordGain.gain.setValueAtTime(0.15, now + 0.40);
+        chordGain.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+
+        chordOsc.connect(chordGain);
+        chordGain.connect(ctx.destination);
+
+        chordOsc.start(now + 0.40);
+        chordOsc.stop(now + 1.15);
+      });
+    } catch {
+      // Non-critical audio
+    }
+  }
 
   // Confetti
   async function triggerConfetti() {
@@ -1485,5 +1995,15 @@ const ogImage = typedCard.media_urls.length > 0
   #wish-sender:focus,
   #wish-message:focus {
     border-color: var(--primary) !important;
+  }
+
+  /* ── Shake animation for Passcode error ── */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+  .shake {
+    animation: shake 0.4s ease-in-out;
   }
 </style>

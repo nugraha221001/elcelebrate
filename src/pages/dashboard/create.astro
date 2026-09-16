@@ -49,6 +49,17 @@ const isEdit = Boolean(editId);
       <div class="lg:col-span-3">
         <!-- Step 1: Category -->
         <div id="step-1" class="wizard-step">
+          <div class="mb-4">
+            <a
+              href="/dashboard"
+              class="inline-flex items-center gap-1.5 text-xs font-medium text-surface-400 transition-colors hover:text-[#f5c563]"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
+              ← Back to Dashboard
+            </a>
+          </div>
           <h2 class="text-xl font-bold text-surface-50">Choose a Category</h2>
           <p class="mt-2 text-sm text-surface-400">What are we celebrating?</p>
 
@@ -56,7 +67,7 @@ const isEdit = Boolean(editId);
             {Object.entries(CATEGORY_META).map(([key, meta]) => (
               <button
                 type="button"
-                class="group relative overflow-hidden rounded-2xl border border-white/8 hover:border-purple-500/30 transition-all duration-300 bg-surface-900/60 backdrop-blur-md p-5 text-left hover:shadow-glow-sm cursor-pointer"
+                class="group relative overflow-hidden rounded-2xl border border-white/8 hover:border-[#f5c563]/40 transition-all duration-300 bg-surface-900/60 backdrop-blur-md p-5 text-left hover:shadow-glow-sm cursor-pointer"
                 data-category={key}
               >
                 <div class="mb-3 text-4xl transition-transform duration-300 group-hover:scale-110">
@@ -65,7 +76,7 @@ const isEdit = Boolean(editId);
                 <div class="text-base font-semibold text-surface-100">{meta.label}</div>
                 <div class="mt-1 text-xs text-surface-400">{meta.description}</div>
                 <!-- Selected indicator -->
-                <div class="absolute right-3 top-3 hidden h-6 w-6 items-center justify-center rounded-full bg-primary text-white" data-check>
+                <div class="absolute right-3 top-3 hidden h-6 w-6 items-center justify-center rounded-full bg-[#f5c563] text-[#0f0d15]" data-check>
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
@@ -81,20 +92,59 @@ const isEdit = Boolean(editId);
           <p class="mt-2 text-sm text-surface-400">Set the visual mood for your card</p>
 
           <div class="mt-6 space-y-6">
+            <!-- Greetings Occasion Selector (Step 2) -->
+            <div id="greetings-occasion-panel" class="hidden rounded-2xl border border-amber-500/20 bg-surface-900/60 p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <label class="block text-sm font-semibold text-surface-200">✨ Select Occasion / Perayaan</label>
+                <span class="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-medium">Holiday & Greetings</span>
+              </div>
+              <p class="text-xs text-surface-400">Choose the occasion to tailor ambient effects and holiday presets:</p>
+              <div class="grid grid-cols-2 gap-2.5" id="occasion-grid">
+                {[
+                  { id: 'idul-fitri', emoji: '🌙', label: 'Idul Fitri', effect: 'lanterns' },
+                  { id: 'natal-tahun-baru', emoji: '🎄', label: 'Natal & Tahun Baru', effect: 'snowfall' },
+                  { id: 'hari-ibu-ayah', emoji: '💐', label: 'Hari Ibu / Ayah', effect: 'petals' },
+                  { id: 'general', emoji: '✨', label: 'General / Lainnya', effect: 'golden-sparkles' },
+                ].map((occ, idx) => (
+                  <button
+                    type="button"
+                    class:list={[
+                      'occasion-btn relative flex items-center gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer',
+                      idx === 0
+                        ? 'border-[#f5c563] ring-2 ring-[#f5c563]/40 bg-[#f5c563]/15 text-white font-medium shadow-lg shadow-[#f5c563]/10'
+                        : 'border-white/10 bg-surface-800/60 text-surface-400 hover:border-white/20 hover:text-surface-200',
+                    ]}
+                    data-occasion={occ.id}
+                    data-effect={occ.effect}
+                  >
+                    <span class="text-2xl">{occ.emoji}</span>
+                    <div class="min-w-0 flex-1">
+                      <div class="text-xs font-semibold text-surface-200 truncate">{occ.label}</div>
+                      <div class="text-[10px] text-surface-400">Ambience: {occ.effect}</div>
+                    </div>
+                    <span class:list={[
+                      'occasion-active-check absolute top-2 right-2 h-4 w-4 items-center justify-center rounded-full bg-[#f5c563] text-[10px] font-bold text-[#0f0d15]',
+                      idx === 0 ? 'flex' : 'hidden',
+                    ]}>✓</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <!-- Colors -->
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="mb-1.5 block text-sm font-medium text-surface-200">Primary Color</label>
                 <div class="flex items-center gap-3">
-                  <input type="color" id="theme-primary" value="#c084fc" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
-                  <span class="text-xs text-surface-400" id="theme-primary-hex">#c084fc</span>
+                  <input type="color" id="theme-primary" value="#f5c563" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
+                  <span class="text-xs text-surface-400" id="theme-primary-hex">#f5c563</span>
                 </div>
               </div>
               <div>
                 <label class="mb-1.5 block text-sm font-medium text-surface-200">Secondary Color</label>
                 <div class="flex items-center gap-3">
-                  <input type="color" id="theme-secondary" value="#f472b6" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
-                  <span class="text-xs text-surface-400" id="theme-secondary-hex">#f472b6</span>
+                  <input type="color" id="theme-secondary" value="#e07a93" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
+                  <span class="text-xs text-surface-400" id="theme-secondary-hex">#e07a93</span>
                 </div>
               </div>
             </div>
@@ -118,7 +168,7 @@ const isEdit = Boolean(editId);
                       class:list={[
                         'pattern-btn rounded-lg border px-3 py-1.5 text-xs transition-all cursor-pointer',
                         isDefault
-                          ? 'border-purple-500 ring-2 ring-purple-500/40 bg-purple-500/15 text-white font-medium shadow-lg shadow-purple-500/10'
+                          ? 'border-[#f5c563] ring-2 ring-[#f5c563]/40 bg-[#f5c563]/15 text-white font-medium shadow-lg shadow-[#f5c563]/10'
                           : 'bg-surface-800/60 border-white/10 text-surface-400 hover:border-white/20 hover:text-surface-200',
                       ]}
                       data-pattern={p.id}
@@ -147,13 +197,13 @@ const isEdit = Boolean(editId);
                       class:list={[
                         'font-btn relative rounded-xl border p-3 text-left transition-all cursor-pointer',
                         isDefault
-                          ? 'border-purple-500 ring-2 ring-purple-500/40 bg-purple-500/15 text-white font-medium shadow-lg shadow-purple-500/10'
+                          ? 'border-[#f5c563] ring-2 ring-[#f5c563]/40 bg-[#f5c563]/15 text-white font-medium shadow-lg shadow-[#f5c563]/10'
                           : 'bg-surface-800/60 border-white/10 text-surface-400 hover:border-white/20 hover:text-surface-200',
                       ]}
                       data-font={f.id}
                     >
                       <span class:list={[
-                        'font-active-check absolute top-2.5 right-2.5 h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-[10px] font-bold text-white shadow-sm shadow-purple-500/50',
+                        'font-active-check absolute top-2.5 right-2.5 h-4 w-4 items-center justify-center rounded-full bg-[#f5c563] text-[10px] font-bold text-[#0f0d15] shadow-sm shadow-[#f5c563]/50',
                         isDefault ? 'flex' : 'hidden',
                       ]}>✓</span>
                       <span class="text-2xl text-surface-200" style={`font-family: ${f.font}`}>{f.sample}</span>
@@ -180,13 +230,13 @@ const isEdit = Boolean(editId);
                       class:list={[
                         'unbox-btn relative rounded-xl border p-4 text-center transition-all cursor-pointer',
                         isDefault
-                          ? 'border-purple-500 ring-2 ring-purple-500/40 bg-purple-500/15 text-white font-medium shadow-lg shadow-purple-500/10'
+                          ? 'border-[#f5c563] ring-2 ring-[#f5c563]/40 bg-[#f5c563]/15 text-white font-medium shadow-lg shadow-[#f5c563]/10'
                           : 'bg-surface-800/60 border-white/10 text-surface-400 hover:border-white/20 hover:text-surface-200',
                       ]}
                       data-unbox={u.id}
                     >
                       <span class:list={[
-                        'unbox-active-check absolute top-2.5 right-2.5 h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-[10px] font-bold text-white shadow-sm shadow-purple-500/50',
+                        'unbox-active-check absolute top-2.5 right-2.5 h-4 w-4 items-center justify-center rounded-full bg-[#f5c563] text-[10px] font-bold text-[#0f0d15] shadow-sm shadow-[#f5c563]/50',
                         isDefault ? 'flex' : 'hidden',
                       ]}>✓</span>
                       <span class="text-2xl">{u.emoji}</span>
@@ -213,6 +263,8 @@ const isEdit = Boolean(editId);
                   { id: 'butterflies', emoji: '🦋', label: 'Butterflies' },
                   { id: 'bokeh', emoji: '💡', label: 'Bokeh' },
                   { id: 'sparklers', emoji: '🎇', label: 'Sparklers' },
+                  { id: 'snowfall', emoji: '❄️', label: 'Snowfall' },
+                  { id: 'hearts-petals', emoji: '💖', label: 'Hearts & Petals' },
                 ].map((fx) => {
                   const isDefault = fx.id === 'none';
                   return (
@@ -221,13 +273,13 @@ const isEdit = Boolean(editId);
                       class:list={[
                         'ambient-btn relative rounded-xl border p-3 text-center transition-all cursor-pointer',
                         isDefault
-                          ? 'border-purple-500 ring-2 ring-purple-500/40 bg-purple-500/15 text-white font-medium shadow-lg shadow-purple-500/10'
+                          ? 'border-[#f5c563] ring-2 ring-[#f5c563]/40 bg-[#f5c563]/15 text-white font-medium shadow-lg shadow-[#f5c563]/10'
                           : 'bg-surface-800/60 border-white/10 text-surface-400 hover:border-white/20 hover:text-surface-200',
                       ]}
                       data-ambient={fx.id}
                     >
                       <span class:list={[
-                        'ambient-active-check absolute top-2 right-2 h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-[10px] font-bold text-white shadow-sm shadow-purple-500/50',
+                        'ambient-active-check absolute top-2 right-2 h-4 w-4 items-center justify-center rounded-full bg-[#f5c563] text-[10px] font-bold text-[#0f0d15] shadow-sm shadow-[#f5c563]/50',
                         isDefault ? 'flex' : 'hidden',
                       ]}>✓</span>
                       <span class="text-xl">{fx.emoji}</span>
@@ -293,9 +345,264 @@ const isEdit = Boolean(editId);
               <input type="text" id="sender-name" placeholder="From..." class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus-ring" />
             </div>
 
+            <!-- Birthday Details (conditionally shown for birthday) -->
+            <div id="birthday-fields-panel" class="hidden rounded-2xl border border-pink-500/20 bg-pink-500/5 p-4 space-y-3">
+              <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-pink-400">
+                <span>🎂</span> Birthday Milestone
+              </div>
+              <div>
+                <label for="birthday-age" class="mb-1 block text-xs font-medium text-surface-300">
+                  Age / Milestone <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="birthday-age"
+                  placeholder="e.g. Sweet 17 / 21st / 30 Tahun"
+                  class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2 text-sm transition-all focus-ring"
+                />
+                <p class="mt-1 text-[11px] text-surface-500">Tampilkan usia atau momen spesial yang dirayakan pada kartu</p>
+              </div>
+            </div>
+
+            <!-- Anniversary Details (conditionally shown for anniversary) -->
+            <div id="anniversary-fields-panel" class="hidden rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 space-y-3">
+              <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-rose-400">
+                <span>💍</span> Anniversary Milestone
+              </div>
+              <div>
+                <label for="anniversary-duration" class="mb-1 block text-xs font-medium text-surface-300">
+                  Duration / Milestone <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="anniversary-duration"
+                  placeholder="e.g. 1st Anniversary / 5 Tahun Bersama / Perak (25th)"
+                  class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2 text-sm transition-all focus-ring"
+                />
+                <p class="mt-1 text-[11px] text-surface-500">Durasi atau tahun perayaan perjalanan cinta bersama</p>
+              </div>
+            </div>
+
+            <!-- Graduation Details (conditionally shown for graduation) -->
+            <div id="graduation-fields-panel" class="hidden rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 space-y-3">
+              <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-400">
+                <span>🎓</span> Graduation Details
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="graduation-degree" class="mb-1 block text-xs font-medium text-surface-300">
+                    Degree / Major <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="graduation-degree"
+                    placeholder="e.g. S.Kom / B.Sc in Computer Science"
+                    class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2 text-sm transition-all focus-ring"
+                  />
+                </div>
+                <div>
+                  <label for="graduation-school" class="mb-1 block text-xs font-medium text-surface-300">
+                    School / Campus <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="graduation-school"
+                    placeholder="e.g. Universitas Indonesia / ITB"
+                    class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2 text-sm transition-all focus-ring"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Invitation Details (conditionally shown for invitation) -->
+            <div id="invitation-fields-panel" class="hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 space-y-3">
+              <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+                <span>✉️</span> Event Invitation Details
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="invitation-event-type" class="mb-1 block text-xs font-medium text-surface-300">
+                    Event Type <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="invitation-event-type"
+                    placeholder="e.g. Birthday Party / Housewarming / Syukuran"
+                    class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2 text-sm transition-all focus-ring"
+                  />
+                </div>
+                <div>
+                  <label for="invitation-time" class="mb-1 block text-xs font-medium text-surface-300">
+                    Time / Schedule <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="invitation-time"
+                    placeholder="e.g. 18:30 WIB — Selesai"
+                    class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2 text-sm transition-all focus-ring"
+                  />
+                </div>
+              </div>
+              <div>
+                <label for="invitation-venue" class="mb-1 block text-xs font-medium text-surface-300">
+                  Venue Location <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="invitation-venue"
+                  placeholder="e.g. Plataran Menteng / Jl. Sunset Road No. 88"
+                  class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2 text-sm transition-all focus-ring"
+                />
+              </div>
+            </div>
+
+            <!-- Love Presets Picker (conditionally shown for love) -->
+            <div id="love-presets-panel" class="hidden rounded-2xl border border-pink-500/20 bg-pink-500/5 p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-pink-400">
+                  <span>💌</span> Romantic Templates
+                </div>
+                <span class="text-[11px] text-surface-400">Select preset or click below</span>
+              </div>
+              <div>
+                <label for="love-preset-select" class="sr-only">Romantic Template Preset</label>
+                <select id="love-preset-select" class="form-input w-full rounded-xl border bg-surface-800/50 px-3 py-2 text-xs text-surface-200 transition-all focus-ring cursor-pointer">
+                  <option value="">— Choose a romantic message template —</option>
+                  <option value="confession">💖 Confession (Maukah kamu menjadi pasanganku...)</option>
+                  <option value="appreciation">🌹 Deep Appreciation (Terima kasih telah hadir di hidupku...)</option>
+                  <option value="poetic">✨ Sweet Poetic Note (Di antara jutaan bintang...)</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  class="romantic-preset-btn text-left p-3 rounded-xl border border-pink-500/20 bg-surface-900/60 hover:border-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer"
+                  data-love-preset="confession"
+                >
+                  <div class="text-xs font-semibold text-pink-300">💖 Confession</div>
+                  <div class="text-[11px] text-surface-400 mt-1 line-clamp-2">"Maukah kamu menjadi pasanganku dan melangkah bersama selamanya?..."</div>
+                </button>
+                <button
+                  type="button"
+                  class="romantic-preset-btn text-left p-3 rounded-xl border border-pink-500/20 bg-surface-900/60 hover:border-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer"
+                  data-love-preset="appreciation"
+                >
+                  <div class="text-xs font-semibold text-pink-300">🌹 Deep Appreciation</div>
+                  <div class="text-[11px] text-surface-400 mt-1 line-clamp-2">"Terima kasih telah hadir di hidupku. Setiap detik bersamamu adalah hadiah..."</div>
+                </button>
+                <button
+                  type="button"
+                  class="romantic-preset-btn text-left p-3 rounded-xl border border-pink-500/20 bg-surface-900/60 hover:border-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer"
+                  data-love-preset="poetic"
+                >
+                  <div class="text-xs font-semibold text-pink-300">✨ Sweet Poetic Note</div>
+                  <div class="text-[11px] text-surface-400 mt-1 line-clamp-2">"Di antara jutaan bintang, hatiku akan selalu memilihmu sebagai tempat pulang..."</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Greetings Occasion Selector & Presets (conditionally shown for greetings) -->
+            <div id="greetings-fields-panel" class="hidden space-y-3">
+              <div class="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-2">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+                    <span>🌙</span> Greetings Occasion
+                  </div>
+                  <span class="text-[11px] text-surface-400">Pilih momen perayaan</span>
+                </div>
+                <select id="greetings-step4-occasion" class="form-input w-full rounded-xl border bg-surface-800/50 px-3 py-2 text-xs text-surface-200 transition-all focus-ring cursor-pointer">
+                  <option value="idul-fitri">🌙 Idul Fitri (Lebaran)</option>
+                  <option value="natal-tahun-baru">🎄 Natal & Tahun Baru</option>
+                  <option value="hari-ibu-ayah">💐 Hari Ibu & Ayah</option>
+                  <option value="general">✨ Umum & Sehari-hari</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Greetings Holiday Presets (conditionally shown for greetings) -->
+            <div id="greetings-presets-panel" class="hidden rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+                  <span>🌙</span> Holiday Message Presets
+                </div>
+                <span class="text-[11px] text-surface-400">Click to fill message</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="greetings-presets-list">
+                <!-- Populated dynamically based on occasion -->
+              </div>
+            </div>
+
+            <!-- Greetings Signature (conditionally shown for greetings) -->
+            <div id="greetings-signature-field" class="hidden">
+              <label for="greetings-signature" class="mb-1.5 block text-sm font-medium text-surface-200">
+                Family / Sender Signature <span class="text-xs font-normal text-surface-400">(Optional)</span>
+              </label>
+              <input
+                type="text"
+                id="greetings-signature"
+                placeholder="e.g. Dari Keluarga Besar Bpk. Ahmad / The Hendrawan Family"
+                class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus-ring"
+              />
+              <p class="mt-1 text-xs text-surface-500">Rendered with an elegant signature style beneath your holiday greeting</p>
+            </div>
+
             <div>
               <label for="message" class="mb-1.5 block text-sm font-medium text-surface-200">Your Message <span class="text-confetti-pink">*</span></label>
               <textarea id="message" rows="5" placeholder="Write something heartfelt..." required class="form-input w-full resize-none rounded-xl border bg-surface-800/50 px-4 py-3 text-sm transition-all focus-ring"></textarea>
+            </div>
+
+            <!-- Love Features (Interactive Confession & Passcode Lock) -->
+            <div id="love-options-panel" class="hidden space-y-4">
+              <!-- Interactive Confession Toggle -->
+              <div class="rounded-2xl border border-white/10 bg-surface-900/50 p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">💘</span>
+                    <div>
+                      <div class="text-sm font-semibold text-surface-100">Interactive Confession</div>
+                      <div class="text-xs text-surface-400">Runaway "No" button & celebratory "Yes" button with confetti</div>
+                    </div>
+                  </div>
+                  <label class="relative inline-flex cursor-pointer items-center">
+                    <input type="checkbox" id="love-confession-toggle" class="sr-only" />
+                    <div class="toggle-switch"></div>
+                  </label>
+                </div>
+                <div id="love-confession-details" class="hidden pt-3 border-t border-white/5 space-y-2">
+                  <label for="love-confession-prompt" class="block text-xs font-medium text-surface-300">Confession Target Prompt / Question</label>
+                  <input
+                    type="text"
+                    id="love-confession-prompt"
+                    placeholder="Maukah kamu jadi pacarku? 💕"
+                    value="Maukah kamu jadi pacarku? 💕"
+                    class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2 text-sm transition-all focus-ring"
+                  />
+                  <p class="text-[11px] text-pink-300/80">✨ When hovered or tapped, the "No" button playfully runs away so they can only answer YES!</p>
+                </div>
+              </div>
+
+              <!-- Passcode Lock -->
+              <div class="rounded-2xl border border-white/10 bg-surface-900/50 p-4 space-y-2">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">🔒</span>
+                  <div>
+                    <label for="love-passcode" class="text-sm font-semibold text-surface-100">Secret 4-Digit PIN Lock (Optional)</label>
+                    <p class="text-xs text-surface-400">Lock your love letter. Recipient must enter this 4-digit PIN before unboxing.</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3 pt-1">
+                  <input
+                    type="text"
+                    id="love-passcode"
+                    maxlength="4"
+                    pattern="[0-9]{4}"
+                    inputmode="numeric"
+                    placeholder="e.g. 1402"
+                    class="form-input w-36 rounded-xl border bg-surface-800/50 px-4 py-2.5 text-center text-base tracking-[0.3em] font-mono transition-all focus-ring"
+                  />
+                  <span class="text-xs text-surface-500">Leave empty for no passcode</span>
+                </div>
+              </div>
             </div>
 
             <div id="standard-event-date-field">
@@ -333,7 +640,7 @@ const isEdit = Boolean(editId);
 
               <!-- Bride -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
-                <div class="text-xs font-semibold uppercase tracking-wider text-pink-400">👰 Bride</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-[#e07a93]">👰 Bride</div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="mb-1 block text-xs font-medium text-surface-300">Full Name <span class="text-confetti-pink">*</span></label>
@@ -501,48 +808,152 @@ const isEdit = Boolean(editId);
 
             <!-- Audio Selector -->
             <div>
-              <label class="mb-2 block text-sm font-medium text-surface-200">Background Music</label>
-              <p class="mb-3 text-xs text-surface-500" id="audio-category-hint"></p>
-              <div class="space-y-2" id="audio-track-list">
-                {AUDIO_TRACKS.map((track) => (
-                  <div class="audio-track-item flex items-center gap-2 rounded-xl border border-white/5 bg-surface-800 p-2 transition-all" data-track-row={track.id}>
-                    <!-- Preview Play/Pause Button -->
-                    <button
-                      type="button"
-                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-700 text-surface-300 transition-all hover:bg-primary/20 hover:text-primary cursor-pointer"
-                      data-audio-preview={track.id}
-                      aria-label={`Preview ${track.name}`}
-                    >
-                      <svg class="audio-preview-play h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                      </svg>
-                      <svg class="audio-preview-pause hidden h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
-                      </svg>
-                    </button>
+              <div class="flex items-center justify-between mb-2">
+                <label class="block text-sm font-medium text-surface-200">Background Music</label>
+                <span class="text-xs text-surface-400">Pilih musik pengiring kartu</span>
+              </div>
 
-                    <!-- Track Info & Select Target -->
+              <!-- Audio Mode Switcher Tabs -->
+              <div class="mb-3 flex rounded-xl border border-white/10 bg-surface-900/60 p-1">
+                <button
+                  type="button"
+                  id="audio-tab-catalog"
+                  class="flex-1 rounded-lg py-2 text-xs font-semibold transition-all cursor-pointer bg-[#f5c563] text-[#0f0d15] shadow-sm"
+                >
+                  🎵 Pilih dari Katalog
+                </button>
+                <button
+                  type="button"
+                  id="audio-tab-custom"
+                  class="flex-1 rounded-lg py-2 text-xs font-medium text-surface-400 hover:text-surface-200 transition-all cursor-pointer"
+                >
+                  📤 Upload Musik Sendiri
+                </button>
+              </div>
+
+              <!-- Catalog Panel -->
+              <div id="audio-catalog-panel" class="space-y-2">
+                <p class="mb-3 text-xs text-surface-500" id="audio-category-hint"></p>
+                <div class="space-y-2" id="audio-track-list">
+                  {AUDIO_TRACKS.map((track) => (
+                    <div class="audio-track-item flex items-center gap-2 rounded-xl border border-white/5 bg-surface-800 p-2 transition-all" data-track-row={track.id}>
+                      <!-- Preview Play/Pause Button -->
+                      <button
+                        type="button"
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-700 text-surface-300 transition-all hover:bg-primary/20 hover:text-primary cursor-pointer"
+                        data-audio-preview={track.id}
+                        aria-label={`Preview ${track.name}`}
+                      >
+                        <svg class="audio-preview-play h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                        </svg>
+                        <svg class="audio-preview-pause hidden h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                        </svg>
+                      </button>
+
+                      <!-- Track Info & Select Target -->
+                      <button
+                        type="button"
+                        class="flex flex-1 items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-all hover:bg-white/5 cursor-pointer"
+                        data-audio-track={track.id}
+                      >
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-surface-200">{track.name}</span>
+                            <span class="audio-recommended-badge hidden text-[10px] font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5">★ Recommended</span>
+                          </div>
+                          <div class="text-xs text-surface-500">{track.mood} · {track.duration}s</div>
+                        </div>
+                        <!-- Selected Checkmark -->
+                        <div class="audio-check hidden h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f5c563] text-[#0f0d15] shadow-glow-sm">
+                          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                        </div>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <!-- Custom Audio Upload Panel -->
+              <div id="audio-custom-panel" class="hidden space-y-3">
+                <!-- Dropzone / Picker -->
+                <div
+                  id="custom-audio-dropzone"
+                  class="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/10 bg-surface-900/40 p-6 text-center transition-all hover:border-[#f5c563]/40 hover:bg-surface-800/60 cursor-pointer"
+                >
+                  <input
+                    type="file"
+                    id="custom-audio-input"
+                    accept=".mp3,.opus,.ogg,audio/mpeg,audio/opus,audio/ogg"
+                    class="hidden"
+                  />
+                  <div class="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-[#f5c563]/10 text-2xl text-[#f5c563]">
+                    🎵
+                  </div>
+                  <div class="text-sm font-semibold text-surface-100">Pilih atau Drag File Musik Sendiri</div>
+                  <div class="mt-1 text-xs text-surface-400">Format: MP3, Opus, Ogg · Maksimal 3MB</div>
+                  <button
+                    type="button"
+                    id="custom-audio-browse-btn"
+                    class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-surface-800 px-3 py-1.5 text-xs font-medium text-surface-200 hover:bg-surface-700 transition-all cursor-pointer"
+                  >
+                    <span>Browse File</span>
+                  </button>
+                </div>
+
+                <!-- Upload Progress Indicator -->
+                <div id="custom-audio-progress-container" class="hidden rounded-xl border border-white/10 bg-surface-900/80 p-4">
+                  <div class="flex items-center justify-between text-xs text-surface-300 mb-1.5">
+                    <span id="custom-audio-filename" class="font-medium truncate max-w-50">Mengupload audio...</span>
+                    <span id="custom-audio-pct">0%</span>
+                  </div>
+                  <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-700">
+                    <div id="custom-audio-bar" class="h-full bg-linear-to-r from-[#f5c563] to-[#e07a93] transition-all duration-200" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <!-- Uploaded Custom Audio Active Card -->
+                <div id="custom-audio-active-card" class="hidden rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <!-- Mini Preview Play/Pause Button -->
+                      <button
+                        type="button"
+                        id="custom-audio-preview-btn"
+                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-[#0f0d15] shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                        aria-label="Play uploaded audio preview"
+                      >
+                        <svg id="custom-audio-icon-play" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                        </svg>
+                        <svg id="custom-audio-icon-pause" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                        </svg>
+                      </button>
+
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Musik Kustom Aktif</span>
+                          <span class="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">R2 Cloud</span>
+                        </div>
+                        <div id="custom-audio-card-name" class="text-xs font-medium text-surface-200 truncate mt-0.5">custom-music.mp3</div>
+                        <div class="text-[10px] text-surface-400">Diputar otomatis saat kartu dibuka</div>
+                      </div>
+                    </div>
+
+                    <!-- Remove / Replace Button -->
                     <button
                       type="button"
-                      class="flex flex-1 items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-all hover:bg-white/5 cursor-pointer"
-                      data-audio-track={track.id}
+                      id="custom-audio-remove-btn"
+                      class="shrink-0 text-xs text-rose-400 hover:text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:bg-rose-500/10 transition-all cursor-pointer"
                     >
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2">
-                          <span class="text-sm font-medium text-surface-200">{track.name}</span>
-                          <span class="audio-recommended-badge hidden text-[10px] font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5">★ Recommended</span>
-                        </div>
-                        <div class="text-xs text-surface-500">{track.mood} · {track.duration}s</div>
-                      </div>
-                      <!-- Selected Checkmark -->
-                      <div class="audio-check hidden h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-glow-sm">
-                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
-                      </div>
+                      Hapus / Ganti
                     </button>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
@@ -576,7 +987,7 @@ const isEdit = Boolean(editId);
               <button
                 type="button"
                 id="publish-btn"
-                class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 via-fuchsia-500 to-pink-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition-all hover:opacity-95 hover:shadow-fuchsia-500/30 active:scale-[0.98] cursor-pointer"
+                class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#f5c563] text-[#0f0d15] px-6 py-3 text-sm font-semibold shadow-lg shadow-[#f5c563]/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
               >
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d={isEdit ? "M5 13l4 4L19 7" : "M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"} />
@@ -589,6 +1000,16 @@ const isEdit = Boolean(editId);
 
         <!-- Navigation Buttons -->
         <div class="mt-8 flex items-center justify-between">
+          <a
+            href="/dashboard"
+            id="step1-cancel-link"
+            class="inline-flex items-center gap-1.5 text-sm font-medium text-surface-400 transition-colors hover:text-[#f5c563]"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            ← Back to Dashboard
+          </a>
           <button
             type="button"
             id="prev-btn"
@@ -603,7 +1024,7 @@ const isEdit = Boolean(editId);
           <button
             type="button"
             id="next-btn"
-            class="inline-flex items-center gap-1.5 rounded-xl bg-linear-to-r from-violet-600 via-fuchsia-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition-all hover:opacity-95 hover:shadow-fuchsia-500/30 active:scale-[0.98] cursor-pointer"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-[#f5c563] text-[#0f0d15] px-5 py-2.5 text-sm font-medium shadow-lg shadow-[#f5c563]/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
           >
             Next
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -649,7 +1070,7 @@ const isEdit = Boolean(editId);
   <button
     type="button"
     id="preview-fab"
-    class="preview-fab-btn fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full bg-linear-to-r from-violet-600 via-fuchsia-500 to-pink-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition-all hover:opacity-95 hover:shadow-fuchsia-500/30 active:scale-95 cursor-pointer"
+    class="preview-fab-btn fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full bg-[#f5c563] text-[#0f0d15] px-5 py-3 text-sm font-semibold shadow-lg shadow-[#f5c563]/20 transition-all hover:brightness-110 active:scale-95 cursor-pointer"
     aria-label="Preview card"
   >
     <span class="text-lg">👁️</span>
@@ -756,8 +1177,25 @@ const isEdit = Boolean(editId);
       unboxStyle: string;
       audioTrackId: string | null;
       externalAudioUrl: string | null;
+      customAudioUrl?: string | null;
       ambientEffect: string;
       weddingData?: WeddingDataState;
+      passcode?: string;
+      interactiveConfession?: {
+        enabled: boolean;
+        prompt?: string;
+        yesText?: string;
+        noText?: string;
+      };
+      occasion?: string;
+      signature?: string;
+      ageMilestone?: string;
+      anniversaryMilestone?: string;
+      degreeMajor?: string;
+      schoolCampus?: string;
+      invitationEventType?: string;
+      invitationTime?: string;
+      invitationVenue?: string;
     };
     photos: Array<{ file?: File; previewUrl: string; publicUrl?: string }>;
     recipientName: string;
@@ -790,15 +1228,32 @@ const isEdit = Boolean(editId);
   const state: CardState = {
     category: '',
     themeConfig: {
-      primaryColor: '#c084fc',
-      secondaryColor: '#f472b6',
-      backgroundColor: '#1c1c28',
+      primaryColor: '#f5c563',
+      secondaryColor: '#e07a93',
+      backgroundColor: '#181522',
       fontFamily: 'sans',
       backgroundPattern: 'none',
       unboxStyle: 'envelope',
       audioTrackId: null,
       externalAudioUrl: null,
+      customAudioUrl: null,
       ambientEffect: 'none',
+      passcode: '',
+      interactiveConfession: {
+        enabled: false,
+        prompt: 'Maukah kamu jadi pacarku? 💕',
+        yesText: 'Iya, aku mau! 💖',
+        noText: 'Nggak mau 😜',
+      },
+      occasion: 'idul-fitri',
+      signature: '',
+      ageMilestone: '',
+      anniversaryMilestone: '',
+      degreeMajor: '',
+      schoolCampus: '',
+      invitationEventType: '',
+      invitationTime: '',
+      invitationVenue: '',
     },
     photos: [],
     recipientName: '',
@@ -864,6 +1319,7 @@ const isEdit = Boolean(editId);
       }
       if (currentStep === 4) {
         if (state.category === 'wedding') {
+          syncWeddingRecipientName();
           const wd = state.themeConfig.weddingData;
           if (!wd?.bride.fullName) {
             (window as any).showToast({ message: 'Bride\'s full name is required', type: 'warning' });
@@ -905,18 +1361,28 @@ const isEdit = Boolean(editId);
     for (let i = 1; i <= totalSteps; i++) {
       const dot = document.querySelector(`[data-step-dot="${i}"]`) as HTMLElement;
       const line = document.querySelector(`[data-step-line="${i}"]`) as HTMLElement;
+      const label = document.querySelector(`[data-step-label="${i}"]`) as HTMLElement;
       if (dot) {
         if (i < currentStep) {
-          dot.className = 'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold bg-primary text-white transition-all duration-300';
+          dot.className = 'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold bg-[#f5c563] text-[#0f0d15] transition-all duration-300';
         } else if (i === currentStep) {
-          dot.className = 'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold bg-linear-to-r from-primary to-secondary text-white shadow-lg shadow-primary/25 transition-all duration-300';
+          dot.className = 'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold bg-[#f5c563] text-[#0f0d15] shadow-lg shadow-[#f5c563]/25 ring-2 ring-[#f5c563]/40 ring-offset-2 ring-offset-[#0f0d15] transition-all duration-300';
         } else {
           dot.className = 'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold bg-surface-700 text-surface-400 transition-all duration-300';
         }
       }
+      if (label) {
+        if (i === currentStep) {
+          label.className = 'hidden text-xs font-semibold text-[#f5c563] sm:block';
+        } else if (i < currentStep) {
+          label.className = 'hidden text-xs font-medium text-[#f7f6f9] sm:block';
+        } else {
+          label.className = 'hidden text-xs font-medium text-surface-400 sm:block';
+        }
+      }
       if (line) {
         line.className = i < currentStep
-          ? 'mx-2 h-0.5 flex-1 rounded bg-primary transition-all duration-500'
+          ? 'mx-2 h-0.5 flex-1 rounded bg-[#f5c563] transition-all duration-500'
           : 'mx-2 h-0.5 flex-1 rounded bg-surface-700 transition-all duration-500';
       }
     }
@@ -924,6 +1390,8 @@ const isEdit = Boolean(editId);
     // Show/hide nav buttons
     const prevBtn = document.getElementById('prev-btn') as HTMLElement;
     const nextBtn = document.getElementById('next-btn') as HTMLElement;
+    const step1CancelLink = document.getElementById('step1-cancel-link') as HTMLElement;
+    if (step1CancelLink) step1CancelLink.style.display = currentStep === 1 ? 'inline-flex' : 'none';
     prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
     nextBtn.style.display = currentStep < totalSteps ? 'inline-flex' : 'none';
 
@@ -1000,7 +1468,7 @@ const isEdit = Boolean(editId);
     }
   }
 
-  function toggleWeddingFields() {
+  function toggleCategorySpecificFields() {
     const isWedding = state.category === 'wedding';
     const weddingFields = document.getElementById('wedding-fields');
     const recipientField = document.getElementById('standard-recipient-field');
@@ -1023,6 +1491,35 @@ const isEdit = Boolean(editId);
       eventDateField?.classList.remove('hidden');
     }
 
+    // Category-specific panels
+    const birthdayFieldsPanel = document.getElementById('birthday-fields-panel');
+    const anniversaryFieldsPanel = document.getElementById('anniversary-fields-panel');
+    const graduationFieldsPanel = document.getElementById('graduation-fields-panel');
+    const invitationFieldsPanel = document.getElementById('invitation-fields-panel');
+    const greetingsOccasionPanel = document.getElementById('greetings-occasion-panel');
+    const greetingsFieldsPanel = document.getElementById('greetings-fields-panel');
+    const lovePresetsPanel = document.getElementById('love-presets-panel');
+    const loveOptionsPanel = document.getElementById('love-options-panel');
+    const greetingsPresetsPanel = document.getElementById('greetings-presets-panel');
+    const greetingsSignatureField = document.getElementById('greetings-signature-field');
+
+    birthdayFieldsPanel?.classList.toggle('hidden', state.category !== 'birthday');
+    anniversaryFieldsPanel?.classList.toggle('hidden', state.category !== 'anniversary');
+    graduationFieldsPanel?.classList.toggle('hidden', state.category !== 'graduation');
+    invitationFieldsPanel?.classList.toggle('hidden', state.category !== 'invitation');
+    lovePresetsPanel?.classList.toggle('hidden', state.category !== 'love');
+    loveOptionsPanel?.classList.toggle('hidden', state.category !== 'love');
+    greetingsOccasionPanel?.classList.toggle('hidden', state.category !== 'greetings');
+    greetingsFieldsPanel?.classList.toggle('hidden', state.category !== 'greetings');
+    greetingsPresetsPanel?.classList.toggle('hidden', state.category !== 'greetings');
+    greetingsSignatureField?.classList.toggle('hidden', state.category !== 'greetings');
+
+    if (state.category === 'greetings') {
+      const step4Occasion = document.getElementById('greetings-step4-occasion') as HTMLSelectElement | null;
+      if (step4Occasion) step4Occasion.value = state.themeConfig.occasion || 'idul-fitri';
+      renderGreetingsPresets();
+    }
+
     updatePhotoLimitUI();
   }
 
@@ -1037,7 +1534,7 @@ const isEdit = Boolean(editId);
       btn.classList.add('border-primary/50', 'bg-primary/5');
       btn.querySelector('[data-check]')?.classList.remove('hidden');
       btn.querySelector('[data-check]')?.classList.add('flex');
-      toggleWeddingFields();
+      toggleCategorySpecificFields();
 
       // Apply smart defaults for the selected category
       const defaults = (CATEGORY_DEFAULTS as Record<string, { ambientEffect: string; audioTrackId: string }>)[state.category];
@@ -1081,14 +1578,14 @@ const isEdit = Boolean(editId);
     'hover:text-surface-200'
   ];
   const ACTIVE_THEME_CLASSES = [
-    'border-purple-500',
+    'border-[#f5c563]',
     'ring-2',
-    'ring-purple-500/40',
-    'bg-purple-500/15',
+    'ring-[#f5c563]/40',
+    'bg-[#f5c563]/15',
     'text-white',
     'font-medium',
     'shadow-lg',
-    'shadow-purple-500/10'
+    'shadow-[#f5c563]/10'
   ];
 
   function syncThemeSelectorActiveStates() {
@@ -1170,6 +1667,28 @@ const isEdit = Boolean(editId);
         }
       }
     });
+
+    // 5. Greetings Occasion
+    const currentOccasion = (state.themeConfig as any).occasion || 'idul-fitri';
+    document.querySelectorAll('[data-occasion]').forEach((btn) => {
+      const isSelected = (btn as HTMLElement).dataset.occasion === currentOccasion;
+      const check = btn.querySelector('.occasion-active-check');
+      if (isSelected) {
+        btn.classList.remove(...INACTIVE_THEME_CLASSES);
+        btn.classList.add(...ACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.remove('hidden');
+          check.classList.add('flex');
+        }
+      } else {
+        btn.classList.remove(...ACTIVE_THEME_CLASSES);
+        btn.classList.add(...INACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.add('hidden');
+          check.classList.remove('flex');
+        }
+      }
+    });
   }
 
   // Click listeners with immediate active styling, state updates & live preview re-rendering
@@ -1201,6 +1720,18 @@ const isEdit = Boolean(editId);
     btn.addEventListener('click', () => {
       (state.themeConfig as any).ambientEffect = (btn as HTMLElement).dataset.ambient || 'none';
       syncThemeSelectorActiveStates();
+      updateLivePreview();
+    });
+  });
+
+  document.querySelectorAll('[data-occasion]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const occasionId = (btn as HTMLElement).dataset.occasion || 'idul-fitri';
+      const effect = (btn as HTMLElement).dataset.effect || 'lanterns';
+      state.themeConfig.occasion = occasionId;
+      state.themeConfig.ambientEffect = effect;
+      syncThemeSelectorActiveStates();
+      renderGreetingsPresets();
       updateLivePreview();
     });
   });
@@ -1313,6 +1844,253 @@ const isEdit = Boolean(editId);
   });
 
   // ═══════════════════════════════════════════════════════
+  // Love & Confession Features — Input Listeners & Presets
+  // ═══════════════════════════════════════════════════════
+  const LOVE_PRESETS: Record<string, { prompt?: string; text: string }> = {
+    confession: {
+      prompt: 'Maukah kamu jadi pacarku? 💕',
+      text: 'Dari sekian banyak cerita indah di dunia, cerita bersamamu adalah yang paling ingin terus kutulis. Maukah kamu menjadi pasanganku dan melangkah bersama selamanya? ❤️',
+    },
+    appreciation: {
+      text: 'Terima kasih telah hadir di hidupku dan membawa begitu banyak kehangatan. Setiap detik bersamamu adalah hadiah yang selalu kusyukuri. Aku menyayangimu, lebih dari kata-kata yang bisa kuungkapkan. 🌹',
+    },
+    poetic: {
+      text: 'Di antara jutaan bintang di angkasa, hanya kamu yang selalu berhasil menerangi semestaku. Tak peduli seberapa jauh perjalanan kita, hatiku akan selalu memilihmu sebagai tempat pulang. 💫',
+    },
+  };
+
+  document.querySelectorAll('[data-love-preset]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const presetKey = (btn as HTMLElement).dataset.lovePreset || '';
+      const preset = LOVE_PRESETS[presetKey];
+      if (preset) {
+        state.message = preset.text;
+        const msgEl = document.getElementById('message') as HTMLTextAreaElement | null;
+        if (msgEl) msgEl.value = preset.text;
+
+        if (presetKey === 'confession') {
+          const toggle = document.getElementById('love-confession-toggle') as HTMLInputElement | null;
+          const details = document.getElementById('love-confession-details');
+          const promptInput = document.getElementById('love-confession-prompt') as HTMLInputElement | null;
+          if (toggle) toggle.checked = true;
+          if (details) details.classList.remove('hidden');
+          if (promptInput && preset.prompt) promptInput.value = preset.prompt;
+          if (!state.themeConfig.interactiveConfession) {
+            state.themeConfig.interactiveConfession = { enabled: true, prompt: preset.prompt || 'Maukah kamu jadi pacarku? 💕', yesText: 'Iya, Aku Mau! 💖', noText: 'Nggak Mau 😜' };
+          } else {
+            state.themeConfig.interactiveConfession.enabled = true;
+            if (preset.prompt) state.themeConfig.interactiveConfession.prompt = preset.prompt;
+          }
+        }
+
+        (window as any).showToast?.({ message: 'Romantic template applied!', type: 'success' });
+        updateLivePreview();
+      }
+    });
+  });
+
+  const loveConfessionToggle = document.getElementById('love-confession-toggle') as HTMLInputElement | null;
+  const loveConfessionDetails = document.getElementById('love-confession-details');
+  const loveConfessionPrompt = document.getElementById('love-confession-prompt') as HTMLInputElement | null;
+
+  loveConfessionToggle?.addEventListener('change', (e) => {
+    const isChecked = (e.target as HTMLInputElement).checked;
+    if (isChecked) {
+      loveConfessionDetails?.classList.remove('hidden');
+    } else {
+      loveConfessionDetails?.classList.add('hidden');
+    }
+    if (!state.themeConfig.interactiveConfession) {
+      state.themeConfig.interactiveConfession = {
+        enabled: isChecked,
+        prompt: loveConfessionPrompt?.value || 'Maukah kamu jadi pacarku? 💕',
+        yesText: 'Iya, Aku Mau! 💖',
+        noText: 'Nggak Mau 😜',
+      };
+    } else {
+      state.themeConfig.interactiveConfession.enabled = isChecked;
+    }
+    updateLivePreview();
+  });
+
+  loveConfessionPrompt?.addEventListener('input', (e) => {
+    const val = (e.target as HTMLInputElement).value;
+    if (!state.themeConfig.interactiveConfession) {
+      state.themeConfig.interactiveConfession = { enabled: true, prompt: val, yesText: 'Iya, Aku Mau! 💖', noText: 'Nggak Mau 😜' };
+    } else {
+      state.themeConfig.interactiveConfession.prompt = val;
+    }
+    updateLivePreview();
+  });
+
+  const lovePasscodeInput = document.getElementById('love-passcode') as HTMLInputElement | null;
+  lovePasscodeInput?.addEventListener('input', (e) => {
+    const target = e.target as HTMLInputElement;
+    const clean = target.value.replace(/[^0-9]/g, '').slice(0, 4);
+    target.value = clean;
+    state.themeConfig.passcode = clean;
+    updateLivePreview();
+  });
+
+  // Love Preset Dropdown
+  document.getElementById('love-preset-select')?.addEventListener('change', (e) => {
+    const val = (e.target as HTMLSelectElement).value;
+    const LOVE_TEMPLATES: Record<string, string> = {
+      confession: 'Maukah kamu menjadi pasanganku dan melangkah bersama selamanya? Setiap hari bersamamu membuat hidupku jauh lebih bermakna. 💕💍',
+      appreciation: 'Terima kasih telah hadir di hidupku. Setiap detik bersamamu adalah hadiah terindah, dan aku bersyukur memiliki kamu di setiap langkahku. 🌹❤️',
+      poetic: 'Di antara jutaan bintang di langit, hatiku akan selalu memilihmu sebagai tempat pulang yang paling menenangkan. Selamanya untukmu. ✨💖',
+    };
+    if (val && LOVE_TEMPLATES[val]) {
+      state.message = LOVE_TEMPLATES[val];
+      const msgEl = document.getElementById('message') as HTMLTextAreaElement | null;
+      if (msgEl) msgEl.value = LOVE_TEMPLATES[val];
+      (window as any).showToast?.({ message: 'Romantic template applied!', type: 'success' });
+      updateLivePreview();
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // Category-Specific Detail Listeners (Birthday, Anniversary, Graduation, Invitation)
+  // ═══════════════════════════════════════════════════════
+  // Birthday input
+  document.getElementById('birthday-age')?.addEventListener('input', (e) => {
+    state.themeConfig.ageMilestone = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+
+  // Anniversary input
+  document.getElementById('anniversary-duration')?.addEventListener('input', (e) => {
+    state.themeConfig.anniversaryMilestone = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+
+  // Graduation inputs
+  document.getElementById('graduation-degree')?.addEventListener('input', (e) => {
+    state.themeConfig.degreeMajor = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+  document.getElementById('graduation-school')?.addEventListener('input', (e) => {
+    state.themeConfig.schoolCampus = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+
+  // Invitation inputs
+  document.getElementById('invitation-event-type')?.addEventListener('input', (e) => {
+    state.themeConfig.invitationEventType = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+  document.getElementById('invitation-time')?.addEventListener('input', (e) => {
+    state.themeConfig.invitationTime = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+  document.getElementById('invitation-venue')?.addEventListener('input', (e) => {
+    state.themeConfig.invitationVenue = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+
+  // Greetings Step 4 Occasion Dropdown
+  document.getElementById('greetings-step4-occasion')?.addEventListener('change', (e) => {
+    const occasionId = (e.target as HTMLSelectElement).value;
+    state.themeConfig.occasion = occasionId;
+    const occasionDefaults: Record<string, string> = {
+      'natal-tahun-baru': 'snowfall',
+      'idul-fitri': 'lanterns',
+      'hari-ibu-ayah': 'petals',
+      'general': 'sparklers',
+    };
+    if (occasionDefaults[occasionId]) {
+      state.themeConfig.ambientEffect = occasionDefaults[occasionId];
+    }
+    syncThemeSelectorActiveStates();
+    renderGreetingsPresets();
+    updateLivePreview();
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // Greetings Features — Presets & Family Signature
+  // ═══════════════════════════════════════════════════════
+  const GREETINGS_PRESETS: Record<string, Array<{ title: string; text: string }>> = {
+    'idul-fitri': [
+      {
+        title: 'Taqabbalallahu Minna Wa Minkum 🌙',
+        text: 'Taqabbalallahu minna wa minkum, shiyamana wa shiyamakum. Selamat Hari Raya Idul Fitri. Mohon maaf lahir dan batin atas segala khilaf dan salah. Semoga hati kita kembali suci dan penuh berkah. 🌙✨',
+      },
+      {
+        title: 'Kedamaian & Kemenangan 🕌',
+        text: 'Di hari yang fitri ini, mari kita buka lembaran baru dengan saling memaafkan. Semoga Allah SWT senantiasa melimpahkan rahmat, kesehatan, dan kebahagiaan untuk kita sekeluarga. Selamat Idul Fitri! 🤲✨',
+      },
+    ],
+    'natal-tahun-baru': [
+      {
+        title: 'Damai & Sukacita Natal 🎄',
+        text: 'Semoga damai dan sukacita Natal menyertai hati dan keluarga kita. Selamat Hari Natal dan Tahun Baru! Kiranya tahun yang baru membawa harapan, kesehatan, dan berkat yang berlimpah. 🎄✨❄️',
+      },
+      {
+        title: 'Tahun Baru Penuh Harapan 🥂',
+        text: 'Merry Christmas and Happy New Year! Terima kasih telah menjadi bagian berharga dalam perjalanan kami. Mari sambut tahun baru dengan semangat baru dan kebahagiaan yang melimpah. 🥂🎁✨',
+      },
+    ],
+    'hari-ibu-ayah': [
+      {
+        title: 'Cinta Tanpa Batas 💐',
+        text: 'Terima kasih atas segala cinta, kasih sayang, dan pengorbanan tanpa batas yang tak ternilai harganya. Selamat Hari Ibu/Ayah! Semoga selalu sehat, bahagia, dan selalu dalam lindungan Tuhan. 💐❤️',
+      },
+      {
+        title: 'Pahlawan Terbaikku 🌟',
+        text: 'Untuk sosok terbaik yang selalu menjadi panutan dan tempat teraman untuk pulang. Selamat Hari Ibu/Ayah tercinta, terima kasih untuk setiap doa tulus yang selalu menyertai langkahku. 🌟🤗',
+      },
+    ],
+    'general': [
+      {
+        title: 'Doa & Harapan Hangat ✨',
+        text: 'Selamat merayakan momen istimewa ini! Semoga hari-harimu senantiasa dipenuhi tawa, cinta, kesehatan yang prima, dan kesuksesan dalam setiap langkah impianmu. ✨🎉',
+      },
+      {
+        title: 'Salam Hangat & Berkah 🌈',
+        text: 'Warmest greetings to you and your loved ones! Semoga kebahagiaan dan kedamaian senantiasa melingkupi setiap langkah perjalanan kita bersama. 🎊🌈',
+      },
+    ],
+  };
+
+  function renderGreetingsPresets() {
+    const listEl = document.getElementById('greetings-presets-list');
+    if (!listEl) return;
+    const occasion = (state.themeConfig as any).occasion || 'idul-fitri';
+    const presets = GREETINGS_PRESETS[occasion] || GREETINGS_PRESETS['general'];
+
+    listEl.innerHTML = presets.map((p, idx) => `
+      <button
+        type="button"
+        class="greetings-preset-item text-left p-3 rounded-xl border border-amber-500/20 bg-surface-900/60 hover:border-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer"
+        data-greeting-index="${idx}"
+      >
+        <div class="text-xs font-semibold text-amber-300">${p.title}</div>
+        <div class="text-[11px] text-surface-400 mt-1 line-clamp-2">${p.text}</div>
+      </button>
+    `).join('');
+
+    listEl.querySelectorAll('.greetings-preset-item').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt((btn as HTMLElement).dataset.greetingIndex || '0', 10);
+        const selected = presets[idx];
+        if (selected) {
+          state.message = selected.text;
+          const msgEl = document.getElementById('message') as HTMLTextAreaElement | null;
+          if (msgEl) msgEl.value = selected.text;
+          (window as any).showToast?.({ message: 'Greeting template applied!', type: 'success' });
+          updateLivePreview();
+        }
+      });
+    });
+  }
+
+  const greetingsSignatureInput = document.getElementById('greetings-signature') as HTMLInputElement | null;
+  greetingsSignatureInput?.addEventListener('input', (e) => {
+    state.themeConfig.signature = (e.target as HTMLInputElement).value;
+    updateLivePreview();
+  });
+
+  // ═══════════════════════════════════════════════════════
   // Wedding Fields — Input Sync Listeners
   // ═══════════════════════════════════════════════════════
   function getWD(): WeddingDataState {
@@ -1320,6 +2098,18 @@ const isEdit = Boolean(editId);
       state.themeConfig.weddingData = emptyWeddingData();
     }
     return state.themeConfig.weddingData;
+  }
+
+  function syncWeddingRecipientName() {
+    if (state.category !== 'wedding') return;
+    const wd = getWD();
+    const groomName = (wd.groom.nickname || wd.groom.fullName || '').trim();
+    const brideName = (wd.bride.nickname || wd.bride.fullName || '').trim();
+    if (groomName && brideName) {
+      state.recipientName = `${groomName} & ${brideName}`;
+    } else if (groomName || brideName) {
+      state.recipientName = groomName || brideName;
+    }
   }
 
   function wInput(id: string, cb: (val: string) => void) {
@@ -1330,12 +2120,12 @@ const isEdit = Boolean(editId);
   }
 
   // Bride
-  wInput('w-bride-name', (v) => { getWD().bride.fullName = v; });
-  wInput('w-bride-nick', (v) => { getWD().bride.nickname = v; });
+  wInput('w-bride-name', (v) => { getWD().bride.fullName = v; syncWeddingRecipientName(); });
+  wInput('w-bride-nick', (v) => { getWD().bride.nickname = v; syncWeddingRecipientName(); });
   wInput('w-bride-parents', (v) => { getWD().bride.parents = v; });
   // Groom
-  wInput('w-groom-name', (v) => { getWD().groom.fullName = v; });
-  wInput('w-groom-nick', (v) => { getWD().groom.nickname = v; });
+  wInput('w-groom-name', (v) => { getWD().groom.fullName = v; syncWeddingRecipientName(); });
+  wInput('w-groom-nick', (v) => { getWD().groom.nickname = v; syncWeddingRecipientName(); });
   wInput('w-groom-parents', (v) => { getWD().groom.parents = v; });
   // Akad
   wInput('w-akad-date', (v) => { getWD().akadEvent.date = v; state.eventDate = v; });
@@ -1479,6 +2269,10 @@ const isEdit = Boolean(editId);
     btn.addEventListener('click', () => {
       const trackId = (btn as HTMLElement).dataset.audioTrack || null;
       state.themeConfig.audioTrackId = state.themeConfig.audioTrackId === trackId ? null : trackId;
+      if (state.themeConfig.audioTrackId) {
+        state.themeConfig.customAudioUrl = null;
+        resetCustomAudioUploadUI();
+      }
       updateTrackSelectionUI();
     });
   });
@@ -1488,6 +2282,8 @@ const isEdit = Boolean(editId);
     btn.addEventListener('click', async (e) => {
       e.stopPropagation(); // Don't bubble to track-row
       const trackId = (btn as HTMLElement).dataset.audioPreview || '';
+
+      stopCustomAudioPreview();
 
       if (previewingTrackId === trackId && isPlayingSynth()) {
         // Pause current preview
@@ -1543,13 +2339,280 @@ const isEdit = Boolean(editId);
     rows.forEach((r) => list.appendChild(r));
 
     // Update hint text
-    const catLabels: Record<string, string> = { wedding: 'Wedding', birthday: 'Birthday', graduation: 'Graduation', anniversary: 'Anniversary', invitation: 'Invitation' };
+    const catLabels: Record<string, string> = { wedding: 'Wedding', birthday: 'Birthday', graduation: 'Graduation', anniversary: 'Anniversary', invitation: 'Invitation', love: 'Love & Confession', greetings: 'Greetings' };
     if (hint && catLabels[category]) {
       hint.textContent = `★ Tracks recommended for ${catLabels[category]} are shown first`;
     } else if (hint) {
       hint.textContent = '';
     }
   }
+
+  // ═══════════════════════════════════════════════════════
+  // Custom Audio Upload & In-Studio Preview Logic
+  // ═══════════════════════════════════════════════════════
+  let customAudioPlayer: HTMLAudioElement | null = null;
+  let isCustomAudioPlaying = false;
+
+  function stopCustomAudioPreview() {
+    if (customAudioPlayer && isCustomAudioPlaying) {
+      customAudioPlayer.pause();
+      isCustomAudioPlaying = false;
+      updateCustomAudioPreviewUI();
+    }
+  }
+
+  function updateCustomAudioPreviewUI() {
+    const playIcon = document.getElementById('custom-audio-icon-play');
+    const pauseIcon = document.getElementById('custom-audio-icon-pause');
+    if (isCustomAudioPlaying) {
+      playIcon?.classList.add('hidden');
+      pauseIcon?.classList.remove('hidden');
+    } else {
+      playIcon?.classList.remove('hidden');
+      pauseIcon?.classList.add('hidden');
+    }
+  }
+
+  function showCustomAudioActiveCard(url: string, name?: string) {
+    const dropzone = document.getElementById('custom-audio-dropzone');
+    const activeCard = document.getElementById('custom-audio-active-card');
+    const progressContainer = document.getElementById('custom-audio-progress-container');
+    const nameEl = document.getElementById('custom-audio-card-name');
+
+    dropzone?.classList.add('hidden');
+    progressContainer?.classList.add('hidden');
+    activeCard?.classList.remove('hidden');
+
+    if (nameEl) {
+      nameEl.textContent = name || url.split('/').pop() || 'custom-audio.mp3';
+    }
+  }
+
+  function resetCustomAudioUploadUI() {
+    const dropzone = document.getElementById('custom-audio-dropzone');
+    const activeCard = document.getElementById('custom-audio-active-card');
+    const progressContainer = document.getElementById('custom-audio-progress-container');
+    const input = document.getElementById('custom-audio-input') as HTMLInputElement | null;
+
+    stopCustomAudioPreview();
+    if (customAudioPlayer) {
+      customAudioPlayer = null;
+    }
+    if (input) input.value = '';
+
+    activeCard?.classList.add('hidden');
+    progressContainer?.classList.add('hidden');
+    dropzone?.classList.remove('hidden');
+  }
+
+  // Audio Mode Tab Switcher
+  const audioTabCatalog = document.getElementById('audio-tab-catalog');
+  const audioTabCustom = document.getElementById('audio-tab-custom');
+  const audioCatalogPanel = document.getElementById('audio-catalog-panel');
+  const audioCustomPanel = document.getElementById('audio-custom-panel');
+
+  audioTabCatalog?.addEventListener('click', () => {
+    audioTabCatalog.className = 'flex-1 rounded-lg py-2 text-xs font-semibold transition-all cursor-pointer bg-[#f5c563] text-[#0f0d15] shadow-sm';
+    if (audioTabCustom) {
+      audioTabCustom.className = 'flex-1 rounded-lg py-2 text-xs font-medium text-surface-400 hover:text-surface-200 transition-all cursor-pointer';
+    }
+    audioCatalogPanel?.classList.remove('hidden');
+    audioCustomPanel?.classList.add('hidden');
+    stopCustomAudioPreview();
+  });
+
+  audioTabCustom?.addEventListener('click', () => {
+    audioTabCustom.className = 'flex-1 rounded-lg py-2 text-xs font-semibold transition-all cursor-pointer bg-[#f5c563] text-[#0f0d15] shadow-sm';
+    if (audioTabCatalog) {
+      audioTabCatalog.className = 'flex-1 rounded-lg py-2 text-xs font-medium text-surface-400 hover:text-surface-200 transition-all cursor-pointer';
+    }
+    audioCatalogPanel?.classList.add('hidden');
+    audioCustomPanel?.classList.remove('hidden');
+
+    if (isPlayingSynth()) {
+      stopSynth();
+      previewingTrackId = null;
+      updateTrackSelectionUI();
+    }
+
+    if (state.themeConfig.customAudioUrl) {
+      showCustomAudioActiveCard(state.themeConfig.customAudioUrl);
+    }
+  });
+
+  // Custom Audio File Selection & Upload
+  const customAudioInput = document.getElementById('custom-audio-input') as HTMLInputElement | null;
+  const customAudioDropzone = document.getElementById('custom-audio-dropzone');
+  const customAudioBrowseBtn = document.getElementById('custom-audio-browse-btn');
+
+  customAudioDropzone?.addEventListener('click', (e) => {
+    if (e.target !== customAudioInput) {
+      customAudioInput?.click();
+    }
+  });
+
+  customAudioBrowseBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    customAudioInput?.click();
+  });
+
+  customAudioDropzone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    customAudioDropzone.classList.add('border-[#f5c563]', 'bg-[#f5c563]/5');
+  });
+
+  customAudioDropzone?.addEventListener('dragleave', () => {
+    customAudioDropzone.classList.remove('border-[#f5c563]', 'bg-[#f5c563]/5');
+  });
+
+  customAudioDropzone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    customAudioDropzone.classList.remove('border-[#f5c563]', 'bg-[#f5c563]/5');
+    if (e.dataTransfer?.files?.[0]) {
+      handleCustomAudioFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  customAudioInput?.addEventListener('change', () => {
+    if (customAudioInput.files?.[0]) {
+      handleCustomAudioFile(customAudioInput.files[0]);
+    }
+  });
+
+  async function handleCustomAudioFile(file: File) {
+    const MAX_AUDIO_SIZE = 3 * 1024 * 1024; // 3MB
+    const ALLOWED_AUDIO_EXTENSIONS = ['.mp3', '.ogg', '.opus'];
+
+    // 1. Client-side Size Validation
+    if (file.size > MAX_AUDIO_SIZE) {
+      (window as any).showToast?.({
+        message: 'File audio terlalu besar. Maksimal ukuran file 3MB.',
+        type: 'warning',
+      });
+      if (customAudioInput) customAudioInput.value = '';
+      return;
+    }
+
+    // 2. Client-side Format Validation
+    const fileNameLower = file.name.toLowerCase();
+    const hasValidExt = ALLOWED_AUDIO_EXTENSIONS.some((ext) => fileNameLower.endsWith(ext));
+    if (!hasValidExt) {
+      (window as any).showToast?.({
+        message: 'Format file tidak didukung. Harap upload .mp3, .opus, atau .ogg.',
+        type: 'warning',
+      });
+      if (customAudioInput) customAudioInput.value = '';
+      return;
+    }
+
+    // UI: Show uploading progress
+    const dropzone = document.getElementById('custom-audio-dropzone');
+    const progressContainer = document.getElementById('custom-audio-progress-container');
+    const filenameEl = document.getElementById('custom-audio-filename');
+    const pctEl = document.getElementById('custom-audio-pct');
+    const barEl = document.getElementById('custom-audio-bar');
+
+    dropzone?.classList.add('hidden');
+    progressContainer?.classList.remove('hidden');
+    if (filenameEl) filenameEl.textContent = file.name;
+    if (pctEl) pctEl.textContent = '0%';
+    if (barEl) barEl.style.width = '0%';
+
+    try {
+      let contentType = file.type;
+      if (!contentType || contentType === 'application/octet-stream') {
+        if (fileNameLower.endsWith('.mp3')) contentType = 'audio/mpeg';
+        else if (fileNameLower.endsWith('.opus')) contentType = 'audio/opus';
+        else if (fileNameLower.endsWith('.ogg')) contentType = 'audio/ogg';
+      }
+
+      // 3. Get Presigned Upload URL
+      const presignRes = await fetch('/api/storage/presigned-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType,
+          folder: 'audio',
+        }),
+      });
+
+      if (!presignRes.ok) {
+        const err = await presignRes.json().catch(() => ({ error: 'Gagal mendapatkan izin upload' }));
+        throw new Error(err.error || `Upload gagal (${presignRes.status})`);
+      }
+
+      const { uploadUrl, publicUrl } = await presignRes.json();
+
+      // 4. Upload direct to R2 with progress
+      await uploadToR2(uploadUrl, file, (pct) => {
+        if (pctEl) pctEl.textContent = `${pct}%`;
+        if (barEl) barEl.style.width = `${pct}%`;
+      }, contentType);
+
+      // 5. Store in state
+      state.themeConfig.customAudioUrl = publicUrl;
+      state.themeConfig.audioTrackId = null; // Prioritize custom audio over catalog
+      updateTrackSelectionUI();
+
+      showCustomAudioActiveCard(publicUrl, file.name);
+      (window as any).showToast?.({ message: '🎵 Musik kustom berhasil diupload!', type: 'success' });
+    } catch (err: any) {
+      console.error('Custom audio upload error:', err);
+      (window as any).showToast?.({ message: err.message || 'Gagal mengupload musik kustom', type: 'error' });
+      resetCustomAudioUploadUI();
+    }
+  }
+
+  // Preview Play/Pause Button for Uploaded Audio
+  const customAudioPreviewBtn = document.getElementById('custom-audio-preview-btn');
+  customAudioPreviewBtn?.addEventListener('click', () => {
+    if (!state.themeConfig.customAudioUrl) return;
+
+    if (isCustomAudioPlaying) {
+      stopCustomAudioPreview();
+      return;
+    }
+
+    // Stop catalog synth preview
+    if (isPlayingSynth()) {
+      stopSynth();
+      previewingTrackId = null;
+      updateTrackSelectionUI();
+    }
+
+    if (!customAudioPlayer || customAudioPlayer.src !== state.themeConfig.customAudioUrl) {
+      customAudioPlayer = new Audio(state.themeConfig.customAudioUrl);
+      customAudioPlayer.onended = () => {
+        isCustomAudioPlaying = false;
+        updateCustomAudioPreviewUI();
+      };
+      customAudioPlayer.onerror = () => {
+        isCustomAudioPlaying = false;
+        updateCustomAudioPreviewUI();
+        (window as any).showToast?.({ message: 'Tidak dapat memutar audio preview', type: 'warning' });
+      };
+    }
+
+    customAudioPlayer.play()
+      .then(() => {
+        isCustomAudioPlaying = true;
+        updateCustomAudioPreviewUI();
+      })
+      .catch((err) => {
+        console.error('Custom audio playback error:', err);
+        isCustomAudioPlaying = false;
+        updateCustomAudioPreviewUI();
+      });
+  });
+
+  // Remove / Replace Custom Audio
+  const customAudioRemoveBtn = document.getElementById('custom-audio-remove-btn');
+  customAudioRemoveBtn?.addEventListener('click', () => {
+    state.themeConfig.customAudioUrl = null;
+    resetCustomAudioUploadUI();
+    (window as any).showToast?.({ message: 'Musik kustom dihapus', type: 'info' });
+  });
 
   // ═══════════════════════════════════════════════════════
   // ═══════════════════════════════════════════════════════
@@ -1564,7 +2627,7 @@ const isEdit = Boolean(editId);
   }
 
   function buildPreviewHTML(): PreviewThemeData {
-    const categoryEmojis: Record<string, string> = { birthday: '🎂', anniversary: '💍', graduation: '🎓', invitation: '✉️', wedding: '💍' };
+    const categoryEmojis: Record<string, string> = { birthday: '🎂', anniversary: '💍', graduation: '🎓', invitation: '✉️', wedding: '💍', love: '💌', greetings: '🌙' };
     const emoji = categoryEmojis[state.category] || '✨';
     const fontMap: Record<string, string> = {
       sans: "'Inter', sans-serif",
@@ -1574,8 +2637,8 @@ const isEdit = Boolean(editId);
     };
     const font = fontMap[state.themeConfig.fontFamily] || fontMap.sans;
 
-    const primaryHex = (state.themeConfig.primaryColor || '#c084fc').replace('#', '');
-    const secondaryHex = (state.themeConfig.secondaryColor || '#f472b6').replace('#', '');
+    const primaryHex = (state.themeConfig.primaryColor || '#f5c563').replace('#', '');
+    const secondaryHex = (state.themeConfig.secondaryColor || '#e07a93').replace('#', '');
 
     const patternMap: Record<string, { image: string; size: string }> = {
       none: { image: 'none', size: 'auto' },
@@ -1592,7 +2655,7 @@ const isEdit = Boolean(editId);
         size: '50px 50px',
       },
       dots: {
-        image: `radial-gradient(circle, ${state.themeConfig.primaryColor}35 1.5px, transparent 1.5px)`,
+        image: `radial-gradient(circle, ${state.themeConfig.primaryColor || '#f5c563'}35 1.5px, transparent 1.5px)`,
         size: '18px 18px',
       },
       waves: {
@@ -1602,10 +2665,10 @@ const isEdit = Boolean(editId);
     };
 
     const pattern = patternMap[state.themeConfig.backgroundPattern] || patternMap.none;
-    const gradient = `linear-gradient(135deg, ${state.themeConfig.primaryColor}22, ${state.themeConfig.secondaryColor}15, #14141c)`;
+    const gradient = `linear-gradient(135deg, ${state.themeConfig.primaryColor || '#f5c563'}22, ${state.themeConfig.secondaryColor || '#e07a93'}15, #181522)`;
     const bgImage = pattern.image !== 'none' ? `${pattern.image}, ${gradient}` : gradient;
     const bgSize = pattern.image !== 'none' ? `${pattern.size}, auto` : 'auto';
-    const bgColor = '#14141c';
+    const bgColor = '#181522';
 
     const unboxInfo: Record<string, { icon: string; label: string }> = {
       envelope: { icon: '✉️', label: 'Envelope Flip' },
@@ -1623,8 +2686,8 @@ const isEdit = Boolean(editId);
       const groomName = wd.groom.nickname || wd.groom.fullName || 'Groom';
 
       html += `<div class="text-3xl mb-1">💍</div>`;
-      html += `<p class="text-[10px] uppercase tracking-widest text-surface-400" style="font-family: ${font}">The Wedding of</p>`;
-      html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">${brideName} & ${groomName}</h3>`;
+      html += `<p class="text-[10px] uppercase tracking-widest text-[#e07a93]" style="font-family: ${font}">The Wedding of</p>`;
+      html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">${brideName} & ${groomName}</h3>`;
 
       if (wd.openingGreeting) {
         html += `<p class="text-[10px] leading-relaxed text-surface-300/80 mt-2 italic whitespace-pre-line" style="font-family: ${font}">${wd.openingGreeting.slice(0, 120)}${wd.openingGreeting.length > 120 ? '...' : ''}</p>`;
@@ -1661,7 +2724,7 @@ const isEdit = Boolean(editId);
           <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium border border-white/10 bg-surface-800/90 text-surface-200 shadow-sm backdrop-blur-sm transition-all duration-300">
             <span class="text-sm">${currentUnbox.icon}</span>
             <span class="text-surface-400">Unboxing:</span>
-            <span class="font-semibold text-white">${currentUnbox.label}</span>
+            <span class="font-semibold text-[#f5c563]">${currentUnbox.label}</span>
           </span>
         </div>
       `;
@@ -1669,10 +2732,10 @@ const isEdit = Boolean(editId);
       html += `<div class="text-5xl mb-2">${emoji}</div>`;
 
       if (state.recipientName) {
-        html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">Happy ${state.category || 'celebration'}!</h3>`;
+        html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">Happy ${state.category || 'celebration'}!</h3>`;
         html += `<p class="text-sm text-surface-200" style="font-family: ${font}">Dear ${state.recipientName},</p>`;
       } else {
-        html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor}; font-family: ${font}">Happy ${state.category || 'Celebration'}!</h3>`;
+        html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">Happy ${state.category || 'Celebration'}!</h3>`;
         html += `<p class="text-sm text-surface-400" style="font-family: ${font}">Dear Someone Special,</p>`;
       }
 
@@ -1680,6 +2743,50 @@ const isEdit = Boolean(editId);
         html += `<p class="text-xs leading-relaxed text-surface-300 mt-2" style="font-family: ${font}">${state.message.slice(0, 150)}${state.message.length > 150 ? '...' : ''}</p>`;
       } else {
         html += `<p class="text-xs leading-relaxed text-surface-400 mt-2 italic" style="font-family: ${font}">Your message will appear here...</p>`;
+      }
+
+      if (state.category === 'love' && state.themeConfig.passcode) {
+        html += `<div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/15 border border-pink-500/30 text-[10px] font-semibold text-pink-300">🔒 PIN Protected (${state.themeConfig.passcode.length}-digit)</div>`;
+      }
+
+      if (state.category === 'birthday' && state.themeConfig.ageMilestone) {
+        html += `<div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/15 border border-pink-500/30 text-[10px] font-semibold text-pink-300">🎂 Milestone: ${state.themeConfig.ageMilestone}</div>`;
+      }
+
+      if (state.category === 'anniversary' && state.themeConfig.anniversaryMilestone) {
+        html += `<div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-[10px] font-semibold text-rose-300">💍 ${state.themeConfig.anniversaryMilestone}</div>`;
+      }
+
+      if (state.category === 'graduation' && (state.themeConfig.degreeMajor || state.themeConfig.schoolCampus)) {
+        html += `<div class="mt-2 space-y-0.5">`;
+        if (state.themeConfig.degreeMajor) {
+          html += `<div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-[10px] font-semibold text-blue-300">🎓 ${state.themeConfig.degreeMajor}</div>`;
+        }
+        if (state.themeConfig.schoolCampus) {
+          html += `<div class="text-[10px] text-surface-400">🏛️ ${state.themeConfig.schoolCampus}</div>`;
+        }
+        html += `</div>`;
+      }
+
+      if (state.category === 'invitation' && (state.themeConfig.invitationEventType || state.themeConfig.invitationTime || state.themeConfig.invitationVenue)) {
+        html += `<div class="mt-2.5 rounded-xl p-2.5 text-left text-xs bg-emerald-500/10 border border-emerald-500/20 space-y-1">`;
+        if (state.themeConfig.invitationEventType) html += `<div class="font-bold text-emerald-300 text-[11px]">✉️ ${state.themeConfig.invitationEventType}</div>`;
+        if (state.themeConfig.invitationTime) html += `<div class="text-[10px] text-surface-300">⏰ ${state.themeConfig.invitationTime}</div>`;
+        if (state.themeConfig.invitationVenue) html += `<div class="text-[10px] text-surface-400">📍 ${state.themeConfig.invitationVenue}</div>`;
+        html += `</div>`;
+      }
+
+      if (state.category === 'love' && state.themeConfig.interactiveConfession?.enabled) {
+        html += `<div class="mt-3 p-3 rounded-xl bg-pink-500/10 border border-pink-500/20 text-center">`;
+        html += `<div class="text-[11px] font-bold text-pink-300 mb-1">💘 ${state.themeConfig.interactiveConfession.prompt || 'Maukah kamu jadi pacarku? 💕'}</div>`;
+        html += `<div class="flex justify-center gap-2 mt-2">`;
+        html += `<span class="px-3 py-1 rounded-full bg-pink-500 text-white text-[10px] font-bold">Yes! 🥰</span>`;
+        html += `<span class="px-2.5 py-1 rounded-full bg-surface-700 text-surface-400 text-[10px]">No (Runaway) 🏃</span>`;
+        html += `</div></div>`;
+      }
+
+      if (state.category === 'greetings' && state.themeConfig.signature) {
+        html += `<div class="mt-3 pt-2 border-t border-white/10 text-right text-[11px] text-surface-400">Salam hangat: <span class="font-medium text-[#f5c563]">${state.themeConfig.signature}</span></div>`;
       }
 
       if (state.senderName) {
@@ -1736,7 +2843,15 @@ const isEdit = Boolean(editId);
     const summary = document.getElementById('preview-summary');
     if (!summary) return;
 
-    const categoryEmojis: Record<string, string> = { birthday: '🎂 Birthday', anniversary: '💍 Anniversary', graduation: '🎓 Graduation', invitation: '✉️ Invitation', wedding: '💒 Wedding' };
+    const categoryEmojis: Record<string, string> = {
+      birthday: '🎂 Birthday',
+      anniversary: '💍 Anniversary',
+      graduation: '🎓 Graduation',
+      invitation: '✉️ Invitation',
+      wedding: '💒 Wedding',
+      love: '💌 Love & Confession',
+      greetings: '🌙 Holiday & Greetings',
+    };
     const unboxSummaryMap: Record<string, string> = {
       envelope: '✉️ Envelope Flip',
       giftbox: '🎁 Gift Box',
@@ -1767,6 +2882,8 @@ const isEdit = Boolean(editId);
       butterflies: '🦋 Butterflies',
       bokeh: '💡 Bokeh',
       sparklers: '🎇 Sparklers',
+      snowfall: '❄️ Snowfall',
+      'hearts-petals': '💖 Hearts & Petals',
     };
 
     summary.innerHTML = `
@@ -1776,7 +2893,7 @@ const isEdit = Boolean(editId);
           <span class="text-sm font-medium text-surface-200">${categoryEmojis[state.category] || state.category}</span>
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Recipient</span>
+          <span class="text-sm text-surface-400">${state.category === 'wedding' ? 'Couple' : 'Recipient'}</span>
           <span class="text-sm font-medium text-surface-200">${state.recipientName}</span>
         </div>
         ${state.senderName ? `
@@ -1800,11 +2917,70 @@ const isEdit = Boolean(editId);
           <span class="text-sm text-surface-400">Ambient Effect</span>
           <span class="text-sm font-medium text-surface-200">${ambientSummaryMap[state.themeConfig.ambientEffect] || state.themeConfig.ambientEffect || 'None'}</span>
         </div>
-        ${state.themeConfig.audioTrackId ? `
+        ${state.category === 'love' && state.themeConfig.passcode ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Secret Passcode</span>
+          <span class="text-sm font-medium text-emerald-400">🔒 PIN Protected (${state.themeConfig.passcode.length}-digit)</span>
+        </div>` : ''}
+        ${state.category === 'love' && state.themeConfig.interactiveConfession?.enabled ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Interactive Confession</span>
+          <span class="text-sm font-medium text-pink-400">💘 Active (Runaway No)</span>
+        </div>` : ''}
+        ${state.category === 'greetings' && state.themeConfig.occasion ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Occasion</span>
+          <span class="text-sm font-medium text-amber-400 capitalize">${state.themeConfig.occasion.replace(/-/g, ' ')}</span>
+        </div>` : ''}
+        ${state.category === 'greetings' && state.themeConfig.signature ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Family Signature</span>
+          <span class="text-sm font-medium text-surface-200">${state.themeConfig.signature}</span>
+        </div>` : ''}
+        ${state.category === 'birthday' && state.themeConfig.ageMilestone ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Milestone</span>
+          <span class="text-sm font-medium text-pink-300">${state.themeConfig.ageMilestone}</span>
+        </div>` : ''}
+        ${state.category === 'anniversary' && state.themeConfig.anniversaryMilestone ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Anniversary Milestone</span>
+          <span class="text-sm font-medium text-rose-300">${state.themeConfig.anniversaryMilestone}</span>
+        </div>` : ''}
+        ${state.category === 'graduation' && state.themeConfig.degreeMajor ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Degree / Major</span>
+          <span class="text-sm font-medium text-blue-300">${state.themeConfig.degreeMajor}</span>
+        </div>` : ''}
+        ${state.category === 'graduation' && state.themeConfig.schoolCampus ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">School / Campus</span>
+          <span class="text-sm font-medium text-surface-200">${state.themeConfig.schoolCampus}</span>
+        </div>` : ''}
+        ${state.category === 'invitation' && state.themeConfig.invitationEventType ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Event Type</span>
+          <span class="text-sm font-medium text-emerald-300">${state.themeConfig.invitationEventType}</span>
+        </div>` : ''}
+        ${state.category === 'invitation' && state.themeConfig.invitationTime ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Schedule / Time</span>
+          <span class="text-sm font-medium text-surface-200">${state.themeConfig.invitationTime}</span>
+        </div>` : ''}
+        ${state.category === 'invitation' && state.themeConfig.invitationVenue ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Venue Location</span>
+          <span class="text-sm font-medium text-surface-200">${state.themeConfig.invitationVenue}</span>
+        </div>` : ''}
+        ${state.themeConfig.customAudioUrl ? `
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Music</span>
+          <span class="text-sm font-medium text-emerald-400">🎵 Custom Upload (MP3/Opus)</span>
+        </div>` : (state.themeConfig.audioTrackId ? `
         <div class="flex justify-between items-center">
           <span class="text-sm text-surface-400">Music</span>
           <span class="text-sm font-medium text-surface-200">🎵 ${state.themeConfig.audioTrackId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
-        </div>` : ''}
+        </div>` : '')}
         ${state.eventDate ? `
         <div class="flex justify-between items-center">
           <span class="text-sm text-surface-400">Event Date</span>
@@ -1836,6 +3012,7 @@ const isEdit = Boolean(editId);
     if (isPlayingSynth()) stopSynth();
     previewingTrackId = null;
     updateTrackSelectionUI();
+    stopCustomAudioPreview();
 
     const urlParams = new URLSearchParams(window.location.search);
     const editId = urlParams.get('edit');
@@ -1879,13 +3056,18 @@ const isEdit = Boolean(editId);
       }
 
       // 2. Validate & format fields
-      // For wedding cards, auto-set recipient_name to couple names if empty
+      // For wedding cards, always ensure recipient_name reflects the couple names (${groomName} & ${brideName})
       let recipientName = state.recipientName;
-      if (state.category === 'wedding' && !recipientName && state.themeConfig.weddingData) {
+      if (state.category === 'wedding' && state.themeConfig.weddingData) {
         const wd = state.themeConfig.weddingData;
-        const bName = wd.bride.nickname || wd.bride.fullName;
-        const gName = wd.groom.nickname || wd.groom.fullName;
-        recipientName = `${bName} & ${gName}`;
+        const gName = (wd.groom.nickname || wd.groom.fullName || '').trim();
+        const bName = (wd.bride.nickname || wd.bride.fullName || '').trim();
+        if (gName && bName) {
+          recipientName = `${gName} & ${bName}`;
+        } else if (gName || bName) {
+          recipientName = gName || bName;
+        }
+        state.recipientName = recipientName;
       }
 
       // For wedding, sync eventDate from akad date
@@ -2004,7 +3186,7 @@ const isEdit = Boolean(editId);
             b.classList.add('pointer-events-none', 'opacity-50');
           }
         });
-        toggleWeddingFields();
+        toggleCategorySpecificFields();
 
         // Add "Category locked" badge below the category grid
         const step1 = document.getElementById('step-1');
@@ -2044,6 +3226,79 @@ const isEdit = Boolean(editId);
       if (msgInput) msgInput.value = state.message;
       const dateInput = document.getElementById('event-date') as HTMLInputElement | null;
       if (dateInput) dateInput.value = state.eventDate;
+
+      // Restore Love Inputs if applicable
+      if (state.themeConfig.passcode) {
+        const pinEl = document.getElementById('love-passcode') as HTMLInputElement | null;
+        if (pinEl) pinEl.value = state.themeConfig.passcode;
+      }
+      if (state.themeConfig.interactiveConfession) {
+        const toggle = document.getElementById('love-confession-toggle') as HTMLInputElement | null;
+        const details = document.getElementById('love-confession-details');
+        const promptInput = document.getElementById('love-confession-prompt') as HTMLInputElement | null;
+        if (toggle) toggle.checked = Boolean(state.themeConfig.interactiveConfession.enabled);
+        if (details && state.themeConfig.interactiveConfession.enabled) details.classList.remove('hidden');
+        if (promptInput && state.themeConfig.interactiveConfession.prompt) promptInput.value = state.themeConfig.interactiveConfession.prompt;
+      }
+
+      // Restore Greetings Inputs if applicable
+      if (state.themeConfig.signature) {
+        const sigEl = document.getElementById('greetings-signature') as HTMLInputElement | null;
+        if (sigEl) sigEl.value = state.themeConfig.signature;
+      }
+
+      // Restore Category-Specific Inputs if applicable
+      if (state.themeConfig.ageMilestone) {
+        const ageEl = document.getElementById('birthday-age') as HTMLInputElement | null;
+        if (ageEl) ageEl.value = state.themeConfig.ageMilestone;
+      }
+      if (state.themeConfig.anniversaryMilestone) {
+        const annEl = document.getElementById('anniversary-duration') as HTMLInputElement | null;
+        if (annEl) annEl.value = state.themeConfig.anniversaryMilestone;
+      }
+      if (state.themeConfig.degreeMajor) {
+        const degEl = document.getElementById('graduation-degree') as HTMLInputElement | null;
+        if (degEl) degEl.value = state.themeConfig.degreeMajor;
+      }
+      if (state.themeConfig.schoolCampus) {
+        const schEl = document.getElementById('graduation-school') as HTMLInputElement | null;
+        if (schEl) schEl.value = state.themeConfig.schoolCampus;
+      }
+      if (state.themeConfig.invitationEventType) {
+        const evTypeEl = document.getElementById('invitation-event-type') as HTMLInputElement | null;
+        if (evTypeEl) evTypeEl.value = state.themeConfig.invitationEventType;
+      }
+      if (state.themeConfig.invitationTime) {
+        const timeEl = document.getElementById('invitation-time') as HTMLInputElement | null;
+        if (timeEl) timeEl.value = state.themeConfig.invitationTime;
+      }
+      if (state.themeConfig.invitationVenue) {
+        const venEl = document.getElementById('invitation-venue') as HTMLInputElement | null;
+        if (venEl) venEl.value = state.themeConfig.invitationVenue;
+      }
+      if (state.themeConfig.occasion) {
+        const occEl = document.getElementById('greetings-step4-occasion') as HTMLSelectElement | null;
+        if (occEl) occEl.value = state.themeConfig.occasion;
+      }
+
+      // Restore Custom Audio if applicable
+      if (state.themeConfig.customAudioUrl) {
+        showCustomAudioActiveCard(state.themeConfig.customAudioUrl);
+        const tabCatalog = document.getElementById('audio-tab-catalog');
+        const tabCustom = document.getElementById('audio-tab-custom');
+        const panelCatalog = document.getElementById('audio-catalog-panel');
+        const panelCustom = document.getElementById('audio-custom-panel');
+
+        tabCatalog?.classList.remove('bg-[#f5c563]', 'text-[#0f0d15]', 'font-semibold', 'shadow-sm');
+        tabCatalog?.classList.add('text-surface-400', 'font-medium');
+        tabCustom?.classList.add('bg-[#f5c563]', 'text-[#0f0d15]', 'font-semibold', 'shadow-sm');
+        tabCustom?.classList.remove('text-surface-400', 'font-medium');
+
+        panelCatalog?.classList.add('hidden');
+        panelCustom?.classList.remove('hidden');
+      }
+
+      toggleCategorySpecificFields();
 
       // Update Wedding Inputs if applicable
       if (state.category === 'wedding' && state.themeConfig.weddingData) {
@@ -2106,6 +3361,8 @@ const isEdit = Boolean(editId);
             greetingSelectEl.value = matchedKey || 'custom';
           }
         }
+
+        syncWeddingRecipientName();
       }
 
       updatePhotoLimitUI();
@@ -2168,6 +3425,12 @@ const isEdit = Boolean(editId);
   #w-unduh-mantu-toggle:checked + .toggle-switch::after {
     transform: translateX(1.25rem);
   }
+  #love-confession-toggle:checked + .toggle-switch {
+    background-color: #ec4899;
+  }
+  #love-confession-toggle:checked + .toggle-switch::after {
+    transform: translateX(1.25rem);
+  }
 
   /* Desktop preview column — CSS media query for reliable breakpoint */
   @media (min-width: 1020px) {
@@ -2183,11 +3446,11 @@ const isEdit = Boolean(editId);
   }
 
   /* Theme customization active item glow */
-  .pattern-btn.border-purple-500,
-  .font-btn.border-purple-500,
-  .unbox-btn.border-purple-500,
-  .ambient-btn.border-purple-500 {
-    box-shadow: 0 0 16px -2px oklch(0.7 0.15 300 / 0.35);
+  .pattern-btn.border-\[\#f5c563\],
+  .font-btn.border-\[\#f5c563\],
+  .unbox-btn.border-\[\#f5c563\],
+  .ambient-btn.border-\[\#f5c563\] {
+    box-shadow: 0 0 16px -2px rgba(245, 197, 99, 0.35);
   }
 
   /* Preview FAB subtle pulse animation */
@@ -2195,8 +3458,8 @@ const isEdit = Boolean(editId);
     animation: fab-pulse 2.5s ease-in-out infinite;
   }
   @keyframes fab-pulse {
-    0%, 100% { box-shadow: 0 4px 20px -4px oklch(0.7 0.15 300 / 0.35); }
-    50% { box-shadow: 0 6px 28px -2px oklch(0.7 0.15 300 / 0.5); }
+    0%, 100% { box-shadow: 0 4px 20px -4px rgba(245, 197, 99, 0.35); }
+    50% { box-shadow: 0 6px 28px -2px rgba(245, 197, 99, 0.5); }
   }
 
   /* Mobile preview modal frame & smooth touch scrolling */

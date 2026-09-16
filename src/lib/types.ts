@@ -2,11 +2,11 @@
    ElCelebrate — Shared TypeScript Types
    ═══════════════════════════════════════════════════════════ */
 
-export type CardCategory = 'birthday' | 'anniversary' | 'graduation' | 'invitation' | 'wedding';
+export type CardCategory = 'birthday' | 'anniversary' | 'graduation' | 'invitation' | 'wedding' | 'love' | 'greetings';
 
 export type UnboxStyle = 'envelope' | 'giftbox' | 'ribbon';
 
-export type AmbientEffectType = 'petals' | 'golden-sparkles' | 'hearts' | 'confetti-float' | 'starlight' | 'lanterns' | 'butterflies' | 'bokeh' | 'sparklers' | 'none';
+export type AmbientEffectType = 'petals' | 'golden-sparkles' | 'hearts' | 'confetti-float' | 'starlight' | 'lanterns' | 'butterflies' | 'bokeh' | 'sparklers' | 'snowfall' | 'hearts-petals' | 'none';
 
 /** Wedding-specific structured data stored inside ThemeConfig.weddingData */
 export interface WeddingEventDetail {
@@ -53,6 +53,15 @@ export interface WeddingData {
 
 export type WeddingConfig = WeddingData;
 
+export interface InteractiveConfessionConfig {
+  enabled: boolean;
+  prompt?: string;
+  yesText?: string;
+  noText?: string;
+}
+
+export type GreetingsOccasion = 'idul-fitri' | 'natal-tahun-baru' | 'hari-ibu-ayah' | 'general' | string;
+
 export interface ThemeConfig {
   primaryColor: string;
   secondaryColor: string;
@@ -62,8 +71,20 @@ export interface ThemeConfig {
   unboxStyle: UnboxStyle;
   audioTrackId: string | null;
   externalAudioUrl: string | null;
+  customAudioUrl?: string | null;
   ambientEffect?: AmbientEffectType;
   weddingData?: WeddingData;
+  passcode?: string;
+  interactiveConfession?: InteractiveConfessionConfig;
+  occasion?: GreetingsOccasion;
+  signature?: string;
+  ageMilestone?: string;
+  anniversaryMilestone?: string;
+  degreeMajor?: string;
+  schoolCampus?: string;
+  invitationEventType?: string;
+  invitationTime?: string;
+  invitationVenue?: string;
 }
 
 export interface Card {
@@ -121,6 +142,7 @@ export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   unboxStyle: 'envelope',
   audioTrackId: null,
   externalAudioUrl: null,
+  customAudioUrl: null,
 };
 
 export const CATEGORY_META: Record<CardCategory, { label: string; emoji: string; description: string }> = {
@@ -148,5 +170,15 @@ export const CATEGORY_META: Record<CardCategory, { label: string; emoji: string;
     label: 'Wedding Invitation',
     emoji: '💍',
     description: 'Luxury long-scroll invitation for your big day',
+  },
+  love: {
+    label: 'Love Letter & Confession',
+    emoji: '💌',
+    description: 'Express your deepest feelings',
+  },
+  greetings: {
+    label: 'Holiday & Greetings',
+    emoji: '🌙',
+    description: 'Send warm wishes for any occasion',
   },
 };

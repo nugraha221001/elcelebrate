@@ -61,7 +61,7 @@ cards = data || [];
   <Modal id="share-card-modal" title="Bagikan Undangan" size="md">
     <div class="space-y-4">
       <div>
-        <label class="block text-xs font-medium text-surface-400 mb-1.5">Nama Tamu</label>
+        <label id="share-recipient-label" class="block text-xs font-medium text-surface-400 mb-1.5">Nama Tamu</label>
         <input
           type="text"
           id="share-guest-name"
@@ -69,7 +69,7 @@ cards = data || [];
           class="form-input w-full rounded-xl bg-white/5 px-4 py-2.5 text-sm focus-ring"
         />
       </div>
-      <div>
+      <div id="share-salutation-container">
         <label class="block text-xs font-medium text-surface-400 mb-1.5">Sapaan</label>
         <select
           id="share-salutation"
@@ -84,7 +84,7 @@ cards = data || [];
 
       <!-- Preview Link -->
       <div>
-        <label class="block text-xs font-medium text-surface-400 mb-1.5">Tautan Undangan</label>
+        <label id="share-link-label" class="block text-xs font-medium text-surface-400 mb-1.5">Tautan Undangan</label>
         <div class="flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-3 py-2.5">
           <svg class="h-4 w-4 text-surface-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-4.122a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 10-6.364 6.364l1.757 1.757" />
@@ -213,7 +213,7 @@ cards = data || [];
 
             <div class="p-5">
               <h3 class="text-base font-semibold text-surface-100 truncate">
-                For {card.recipient_name}
+                {card.category === 'wedding' ? card.recipient_name : `For ${card.recipient_name}`}
               </h3>
               <p class="mt-1 text-sm text-surface-400">
                 {meta?.label || card.category}
@@ -283,21 +283,26 @@ cards = data || [];
                   </svg>
                 </button>
 
-                <!-- Share Button (wedding cards only) -->
-                {card.category === 'wedding' && isPublished && (
-                  <button
-                    type="button"
-                    class="share-card-trigger inline-flex items-center gap-1 rounded-lg bg-surface-700 px-2.5 py-1.5 text-xs font-medium text-surface-200 transition-colors hover:bg-emerald-500/15 hover:text-emerald-400 cursor-pointer"
-                    data-card-slug={card.slug}
-                    data-card-recipient={card.recipient_name}
-                    title="Bagikan undangan"
-                  >
-                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
-                    </svg>
-                    Share
-                  </button>
-                )}
+                <!-- Share Button (all categories) -->
+                <button
+                  type="button"
+                  class:list={[
+                    'share-card-trigger inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer',
+                    isPublished
+                      ? 'bg-surface-700 text-surface-200 hover:bg-emerald-500/15 hover:text-emerald-400'
+                      : 'bg-surface-800 text-surface-500 pointer-events-none opacity-50'
+                  ]}
+                  data-card-slug={card.slug}
+                  data-card-recipient={card.recipient_name}
+                  data-card-category={card.category}
+                  data-card-id={card.id}
+                  title={isPublished ? (card.category === 'wedding' || card.category === 'invitation' ? 'Bagikan undangan' : 'Bagikan kartu ucapan') : 'Unpublished (Draft)'}
+                >
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                  </svg>
+                  Share
+                </button>
               </div>
             </div>
           </div>
@@ -357,6 +362,7 @@ cards = data || [];
     const text = btn.querySelector('.status-text');
     const cardId = btn.dataset.cardId;
     const viewLink = document.querySelector(`.card-view-link[data-card-id="${cardId}"]`) as HTMLAnchorElement | null;
+    const shareBtn = document.querySelector(`.share-card-trigger[data-card-id="${cardId}"]`) as HTMLButtonElement | null;
 
     if (isPublished) {
       btn.className = 'status-toggle-btn inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-all hover:scale-105 cursor-pointer border shadow-xs bg-success/20 text-emerald-300 border-success/30 hover:bg-success/30';
@@ -367,6 +373,9 @@ cards = data || [];
         viewLink.className = 'card-view-link inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-surface-700 text-surface-200 hover:bg-surface-600 hover:text-white';
         viewLink.title = 'View public card';
       }
+      if (shareBtn) {
+        shareBtn.className = 'share-card-trigger inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer bg-surface-700 text-surface-200 hover:bg-emerald-500/15 hover:text-emerald-400';
+      }
     } else {
       btn.className = 'status-toggle-btn inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-all hover:scale-105 cursor-pointer border shadow-xs bg-surface-700/80 text-surface-400 border-white/10 hover:bg-surface-700';
       if (dot) dot.className = 'status-dot h-1.5 w-1.5 rounded-full transition-colors bg-surface-400';
@@ -375,6 +384,9 @@ cards = data || [];
       if (viewLink) {
         viewLink.className = 'card-view-link inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-surface-800 text-surface-500 pointer-events-none opacity-50';
         viewLink.title = 'Unpublished (Draft)';
+      }
+      if (shareBtn) {
+        shareBtn.className = 'share-card-trigger inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer bg-surface-800 text-surface-500 pointer-events-none opacity-50';
       }
     }
   }
@@ -464,6 +476,10 @@ cards = data || [];
 
   // ── Share Card Modal Logic ─────────────────────────────
   const shareModal = document.getElementById('share-card-modal');
+  const shareModalTitle = document.getElementById('share-card-modal-title');
+  const shareRecipientLabel = document.getElementById('share-recipient-label');
+  const shareSalutationContainer = document.getElementById('share-salutation-container');
+  const shareLinkLabel = document.getElementById('share-link-label');
   const shareGuestName = document.getElementById('share-guest-name') as HTMLInputElement | null;
   const shareSalutation = document.getElementById('share-salutation') as HTMLSelectElement | null;
   const sharePreviewLink = document.getElementById('share-preview-link');
@@ -473,6 +489,7 @@ cards = data || [];
   const shareWaBtn = document.getElementById('share-wa-btn') as HTMLAnchorElement | null;
 
   let activeShareSlug = '';
+  let activeShareCategory = '';
 
   function getShareUrl() {
     const name = shareGuestName?.value?.trim() || '';
@@ -484,10 +501,56 @@ cards = data || [];
     const name = shareGuestName?.value?.trim() || '';
     const salutation = shareSalutation?.value || 'Saudara/i';
     const url = getShareUrl();
-    if (name) {
-      return `Halo ${salutation} ${name}, kami mengundang Anda ke pernikahan kami. Buka undangan di: ${url}`;
+
+    switch (activeShareCategory) {
+      case 'wedding':
+        if (name) {
+          return `Halo ${salutation} ${name}, kami mengundang Anda ke pernikahan kami. Buka undangan di: ${url}`;
+        }
+        return `Kami mengundang Anda ke pernikahan kami. Buka undangan di: ${url}`;
+
+      case 'invitation':
+        if (name) {
+          return `Halo ${name}, kamu diundang ke acara kami! Buka undangan di: ${url}`;
+        }
+        return `Kamu diundang ke acara kami! Buka undangan di: ${url}`;
+
+      case 'birthday':
+        if (name) {
+          return `Selamat Ulang Tahun ${name}! 🎉 Ada kartu ucapan spesial untukmu, buka di sini: ${url}`;
+        }
+        return `Selamat Ulang Tahun! 🎉 Ada kartu ucapan spesial untukmu, buka di sini: ${url}`;
+
+      case 'anniversary':
+        if (name) {
+          return `Happy Anniversary ${name}! ❤️ Ada kartu kenangan spesial untukmu: ${url}`;
+        }
+        return `Happy Anniversary! ❤️ Ada kartu kenangan spesial untukmu: ${url}`;
+
+      case 'graduation':
+        if (name) {
+          return `Happy Graduation ${name}! 🎓 Selamat atas kelulusanmu! Buka ucapan di sini: ${url}`;
+        }
+        return `Happy Graduation! 🎓 Selamat atas kelulusanmu! Buka ucapan di sini: ${url}`;
+
+      case 'love':
+        if (name) {
+          return `Hai ${name}, ada pesan manis khusus buat kamu 💌 Buka amplopnya di: ${url}`;
+        }
+        return `Hai, ada pesan manis khusus buat kamu 💌 Buka amplopnya di: ${url}`;
+
+      case 'greetings':
+        if (name) {
+          return `Salam hangat untuk ${name} & keluarga. Buka kartu ucapan di sini: ${url}`;
+        }
+        return `Salam hangat untuk keluarga. Buka kartu ucapan di sini: ${url}`;
+
+      default:
+        if (name) {
+          return `Halo ${name}, ada kartu ucapan spesial untukmu: ${url}`;
+        }
+        return `Ada kartu ucapan spesial untukmu: ${url}`;
     }
-    return `Kami mengundang Anda ke pernikahan kami. Buka undangan di: ${url}`;
   }
 
   function updateSharePreview() {
@@ -495,15 +558,56 @@ cards = data || [];
     const waMsg = getWhatsAppMessage();
     if (sharePreviewLink) sharePreviewLink.textContent = url;
     if (shareWaPreview) shareWaPreview.textContent = waMsg;
-    if (shareWaBtn) shareWaBtn.href = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
+    if (shareWaBtn) {
+      shareWaBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
+    }
   }
 
   // Open share modal
   document.querySelectorAll('.share-card-trigger').forEach((btn) => {
     btn.addEventListener('click', () => {
-      activeShareSlug = (btn as HTMLElement).dataset.cardSlug || '';
-      if (shareGuestName) shareGuestName.value = '';
+      const targetBtn = btn as HTMLElement;
+      activeShareSlug = targetBtn.dataset.cardSlug || '';
+      activeShareCategory = targetBtn.dataset.cardCategory || '';
+      const cardRecipient = targetBtn.dataset.cardRecipient || '';
+
+      const isInvitationCategory = activeShareCategory === 'wedding' || activeShareCategory === 'invitation';
+
+      // Update Modal Title
+      if (shareModalTitle) {
+        shareModalTitle.textContent = isInvitationCategory ? 'Bagikan Undangan' : 'Bagikan Kartu Ucapan';
+      }
+
+      // Update Recipient Input Label & Salutation Visibility
+      if (shareRecipientLabel) {
+        shareRecipientLabel.textContent = isInvitationCategory ? 'Nama Tamu' : 'Nama Penerima';
+      }
+
+      if (shareSalutationContainer) {
+        if (isInvitationCategory) {
+          shareSalutationContainer.classList.remove('hidden');
+        } else {
+          shareSalutationContainer.classList.add('hidden');
+        }
+      }
+
+      if (shareLinkLabel) {
+        shareLinkLabel.textContent = isInvitationCategory ? 'Tautan Undangan' : 'Tautan Kartu';
+      }
+
+      // Input placeholder & prefill
+      if (shareGuestName) {
+        if (isInvitationCategory) {
+          shareGuestName.placeholder = 'Budi Santoso';
+          shareGuestName.value = '';
+        } else {
+          shareGuestName.placeholder = 'Nama penerima...';
+          shareGuestName.value = cardRecipient;
+        }
+      }
+
       updateSharePreview();
+
       if (shareModal) {
         shareModal.classList.remove('hidden');
         shareModal.classList.add('flex');
@@ -524,7 +628,11 @@ cards = data || [];
         shareCopyText.textContent = 'Tersalin! ✅';
         setTimeout(() => { if (shareCopyText) shareCopyText.textContent = 'Salin Tautan'; }, 2000);
       }
-      (window as any).showToast({ message: 'Tautan undangan disalin!', type: 'success', duration: 2000 });
+      const isInvitationCategory = activeShareCategory === 'wedding' || activeShareCategory === 'invitation';
+      const toastMsg = isInvitationCategory
+        ? 'Tautan undangan disalin!'
+        : 'Tautan kartu ucapan disalin!';
+      (window as any).showToast({ message: toastMsg, type: 'success', duration: 2000 });
     } catch {
       (window as any).showToast({ message: 'Gagal menyalin tautan', type: 'error' });
     }

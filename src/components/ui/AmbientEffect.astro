@@ -63,6 +63,7 @@ const { effect } = Astro.props;
       maxLife: number;
       hue: number;
       phase: number;
+      kind?: 'heart' | 'petal' | 'snowflake';
     }
 
     const W = () => canvas.width;
@@ -179,6 +180,34 @@ const { effect } = Astro.props;
           base.opacity = 0;
           base.maxLife = rand(60, 150);
           break;
+        case 'snowfall':
+          base.y = -10;
+          base.x = rand(0, W());
+          base.vy = rand(0.5, 1.3);
+          base.vx = rand(-0.25, 0.25);
+          base.size = rand(2, 4.5);
+          base.opacity = rand(0.4, 0.85);
+          base.maxLife = rand(300, 600);
+          base.kind = 'snowflake';
+          break;
+        case 'hearts-petals':
+          base.y = -10;
+          base.x = rand(0, W());
+          base.vy = rand(0.3, 0.9);
+          base.vx = rand(-0.25, 0.25);
+          base.kind = Math.random() > 0.5 ? 'heart' : 'petal';
+          if (base.kind === 'heart') {
+            base.size = rand(6, 11);
+            base.hue = rand(340, 360);
+            base.opacity = rand(0.35, 0.65);
+            base.maxLife = rand(300, 550);
+          } else {
+            base.size = rand(6, 12);
+            base.hue = rand(330, 350);
+            base.opacity = rand(0.4, 0.7);
+            base.maxLife = rand(300, 600);
+          }
+          break;
       }
       return base;
     }
@@ -215,6 +244,19 @@ const { effect } = Astro.props;
       ctx.moveTo(0, s * 3);
       ctx.bezierCurveTo(-s * 5, -s * 2, -s * 2, -s * 6, 0, -s * 2);
       ctx.bezierCurveTo(s * 2, -s * 6, s * 5, -s * 2, 0, s * 3);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawSnowflake(p: Particle) {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+      ctx.shadowBlur = 4;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
@@ -359,6 +401,18 @@ const { effect } = Astro.props;
             p.vx += rand(-0.05, 0.05);
             p.vy += rand(-0.05, 0.05);
             drawSparkle(p);
+            break;
+          case 'snowfall':
+            p.vx = Math.sin(p.life * 0.015 + p.phase) * 0.4;
+            drawSnowflake(p);
+            break;
+          case 'hearts-petals':
+            p.vx = Math.sin(p.life * 0.018 + p.phase) * 0.35;
+            if (p.kind === 'heart') {
+              drawHeart(p);
+            } else {
+              drawPetal(p);
+            }
             break;
         }
 

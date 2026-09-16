@@ -4,7 +4,7 @@ import { getR2Object } from '../../../lib/r2';
 export const prerender = false;
 
 // Allowed asset prefix paths for security
-const ALLOWED_PREFIXES = ['cards/', 'avatars/'];
+const ALLOWED_PREFIXES = ['cards/', 'avatars/', 'audio/'];
 
 export const GET: APIRoute = async ({ params }) => {
   const { path } = params;
@@ -54,11 +54,18 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     const headers = new Headers();
+    let defaultContentType = 'image/webp';
+    if (key.endsWith('.mp3')) defaultContentType = 'audio/mpeg';
+    else if (key.endsWith('.ogg')) defaultContentType = 'audio/ogg';
+    else if (key.endsWith('.opus')) defaultContentType = 'audio/opus';
+    else if (key.startsWith('audio/')) defaultContentType = 'audio/mpeg';
+
     const contentType = object.ContentType && object.ContentType !== 'binary/octet-stream'
       ? object.ContentType
-      : 'image/webp';
+      : defaultContentType;
 
     headers.set('Content-Type', contentType);
+    headers.set('Accept-Ranges', 'bytes');
     headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     if (object.ContentLength) {
       headers.set('Content-Length', object.ContentLength.toString());
