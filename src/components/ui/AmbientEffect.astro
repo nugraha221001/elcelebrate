@@ -9,14 +9,12 @@ const { effect } = Astro.props;
 ---
 
 {effect && effect !== 'none' && (
-  <div class="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-    <canvas
-      id="ambient-canvas"
-      data-effect={effect}
-      class="pointer-events-none fixed inset-0 z-0 w-full h-full max-w-full"
-      style="width:100%;height:100%;max-width:100%;"
-    ></canvas>
-  </div>
+  <canvas
+    id="ambient-canvas"
+    data-effect={effect}
+    class="pointer-events-none fixed inset-0 z-0 w-full h-full"
+    style="width:100%;height:100%;"
+  ></canvas>
 )}
 
 <script>
@@ -34,13 +32,32 @@ const { effect } = Astro.props;
     let animId = 0;
     let paused = false;
 
+    // DPR-aware resize for sharp rendering on Retina / mobile
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+
     function resize() {
       if (!canvas) return;
-      canvas.width = Math.min(window.innerWidth, document.documentElement.clientWidth || window.innerWidth);
-      canvas.height = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const vw = window.visualViewport?.width ?? window.innerWidth;
+      const vh = window.visualViewport?.height ?? window.innerHeight;
+      canvas.width = Math.round(vw * dpr);
+      canvas.height = Math.round(vh * dpr);
+      canvas.style.width = vw + 'px';
+      canvas.style.height = vh + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 120);
+    });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(resize, 120);
+      });
+    }
 
     // Battery-saving: pause when tab is hidden
     document.addEventListener('visibilitychange', () => {
@@ -59,21 +76,273 @@ const { effect } = Astro.props;
       opacity: number;
       rotation: number;
       rotSpeed: number;
+      pitch: number;
+      pitchSpeed: number;
+      roll: number;
+      rollSpeed: number;
       life: number;
       maxLife: number;
       hue: number;
       phase: number;
-      kind?: 'heart' | 'petal' | 'snowflake';
+      kind?: 'heart' | 'petal' | 'snowflake' | 'grain' | 'roseflake';
+      trail?: { x: number; y: number; alpha: number }[];
     }
 
-    const W = () => canvas.width;
-    const H = () => canvas.height;
+    const W = () => (window.visualViewport?.width ?? window.innerWidth);
+    const H = () => (window.visualViewport?.height ?? window.innerHeight);
 
     function rand(min: number, max: number) { return Math.random() * (max - min) + min; }
 
     const particles: Particle[] = [];
-    // Light particle count: max 20-30 particles for 60 FPS performance
-    const MAX = effect === 'starlight' || effect === 'bokeh' ? 30 : 20;
+    const MAX = effect === 'starlight' || effect === 'bokeh' || effect === 'fireflies' ? 30 : 22;
+
+    // ── Offscreen Sprite Cache (60 FPS Mobile GPU Acceleration) ──
+
+    function createOffscreen(w: number, h: number): { cvs: HTMLCanvasElement; c: CanvasRenderingContext2D } {
+      const cvs = document.createElement('canvas');
+      cvs.width = w;
+      cvs.height = h;
+      const c = cvs.getContext('2d')!;
+      return { cvs, c };
+    }
+
+    function createJasmineSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      const cx = 32, cy = 32;
+      const petalCount = 8;
+      const petalRadius = 26;
+
+      // Radial gradient: ivory white `#fdfdfd` to gentle pale lime/amber center `#eef6d8`
+      const radialGrad = c.createRadialGradient(cx, cy, 2, cx, cy, petalRadius);
+      radialGrad.addColorStop(0, '#eef6d8');
+      radialGrad.addColorStop(0.22, '#f6faec');
+      radialGrad.addColorStop(0.58, '#fdfdfd');
+      radialGrad.addColorStop(1, '#ffffff');
+
+      // Genuine 8 star-arranged pointed petals drawn via organic Bézier curves
+      for (let i = 0; i < petalCount; i++) {
+        c.save();
+        c.translate(cx, cy);
+        c.rotate((i * Math.PI * 2) / petalCount);
+
+        c.beginPath();
+        c.moveTo(0, 2);
+        c.bezierCurveTo(-5.5, 9, -7, 18, 0, petalRadius);
+        c.bezierCurveTo(7, 18, 5.5, 9, 0, 2);
+        c.closePath();
+
+        c.fillStyle = radialGrad;
+        c.fill();
+
+        // Subtle organic petal spine crease
+        c.beginPath();
+        c.moveTo(0, 3);
+        c.lineTo(0, petalRadius - 3);
+        c.strokeStyle = 'rgba(215, 232, 185, 0.45)';
+        c.lineWidth = 0.7;
+        c.stroke();
+
+        c.restore();
+      }
+
+      // Authentic floral center / calyx stamen
+      c.beginPath();
+      c.arc(cx, cy, 4, 0, Math.PI * 2);
+      c.fillStyle = '#dbeab2';
+      c.fill();
+
+      c.beginPath();
+      c.arc(cx, cy, 2, 0, Math.PI * 2);
+      c.fillStyle = '#c5dc86';
+      c.fill();
+
+      c.beginPath();
+      c.arc(cx, cy, 0.9, 0, Math.PI * 2);
+      c.fillStyle = '#eab308';
+      c.fill();
+
+      return cvs;
+    }
+
+    function createRiceGrainSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      c.save();
+      c.translate(32, 32);
+
+      // Authentic slender pointed cylinder rice grain
+      c.beginPath();
+      c.moveTo(0, -22);
+      c.bezierCurveTo(5.5, -16, 7.5, -6, 7.5, 2);
+      c.bezierCurveTo(7.5, 12, 5.5, 18, 0, 24);
+      c.bezierCurveTo(-5.5, 18, -7.5, 12, -7.5, 2);
+      c.bezierCurveTo(-7.5, -6, -5.5, -16, 0, -22);
+      c.closePath();
+
+      // Golden amber gradient across grain width
+      const grad = c.createLinearGradient(-7.5, 0, 7.5, 0);
+      grad.addColorStop(0, '#d97706');    // warm amber shadow
+      grad.addColorStop(0.25, '#f59e0b');
+      grad.addColorStop(0.6, '#fbbf24');  // golden yellow core
+      grad.addColorStop(0.85, '#fef08a'); // champagne highlight flank
+      grad.addColorStop(1, '#b45309');    // deep contour
+      c.fillStyle = grad;
+      c.fill();
+
+      // Glossy specular gleam highlight
+      c.beginPath();
+      c.moveTo(-2.5, -15);
+      c.bezierCurveTo(-4, -6, -4, 4, -2, 13);
+      c.strokeStyle = 'rgba(255, 255, 255, 0.88)';
+      c.lineWidth = 1.6;
+      c.lineCap = 'round';
+      c.stroke();
+
+      // Glint highlight dot
+      c.beginPath();
+      c.arc(-2.8, -9, 1.1, 0, Math.PI * 2);
+      c.fillStyle = '#ffffff';
+      c.fill();
+
+      c.restore();
+      return cvs;
+    }
+
+    function createRosePetalSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      c.save();
+      c.translate(32, 32);
+
+      // Curved organic rose petal with indented top
+      c.beginPath();
+      c.moveTo(0, 24);
+      c.bezierCurveTo(-14, 20, -24, 7, -22, -8);
+      c.bezierCurveTo(-20, -20, -10, -26, -3, -21);
+      c.bezierCurveTo(-1, -19, 0, -17, 0, -16);
+      c.bezierCurveTo(0, -17, 1, -19, 3, -21);
+      c.bezierCurveTo(10, -26, 20, -20, 22, -8);
+      c.bezierCurveTo(24, 7, 14, 20, 0, 24);
+      c.closePath();
+
+      // Velvety two-tone crimson/pink shading
+      const grad = c.createRadialGradient(0, 12, 4, 0, -6, 30);
+      grad.addColorStop(0, '#881337');    // deep velvety crimson base
+      grad.addColorStop(0.35, '#be123c');
+      grad.addColorStop(0.68, '#e11d48');
+      grad.addColorStop(0.88, '#fb7185'); // luminous petal pink
+      grad.addColorStop(1, '#fda4af');    // delicate blush rim
+      c.fillStyle = grad;
+      c.fill();
+
+      // Curled top petal rim highlight
+      c.beginPath();
+      c.moveTo(-16, -14);
+      c.bezierCurveTo(-10, -22, -3, -19, 0, -16);
+      c.bezierCurveTo(3, -19, 10, -22, 16, -14);
+      c.strokeStyle = 'rgba(255, 228, 230, 0.45)';
+      c.lineWidth = 1.3;
+      c.stroke();
+
+      // Velvety crease line
+      c.beginPath();
+      c.moveTo(0, -15);
+      c.bezierCurveTo(-2, 0, -3, 10, 0, 22);
+      c.strokeStyle = 'rgba(136, 19, 55, 0.35)';
+      c.lineWidth = 0.9;
+      c.stroke();
+
+      c.restore();
+      return cvs;
+    }
+
+    function createRoseFlakeSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      c.save();
+      c.translate(32, 32);
+
+      c.beginPath();
+      c.moveTo(-12, 14);
+      c.bezierCurveTo(-18, 4, -14, -12, -2, -18);
+      c.bezierCurveTo(8, -20, 18, -10, 16, 2);
+      c.bezierCurveTo(14, 14, 2, 18, -12, 14);
+      c.closePath();
+
+      const grad = c.createLinearGradient(-12, -18, 16, 18);
+      grad.addColorStop(0, '#fda4af');
+      grad.addColorStop(0.4, '#f43f5e');
+      grad.addColorStop(0.85, '#be123c');
+      grad.addColorStop(1, '#881337');
+      c.fillStyle = grad;
+      c.fill();
+
+      c.beginPath();
+      c.moveTo(-8, -12);
+      c.bezierCurveTo(0, -16, 10, -8, 12, 0);
+      c.strokeStyle = 'rgba(255, 241, 242, 0.5)';
+      c.lineWidth = 1.1;
+      c.stroke();
+
+      c.restore();
+      return cvs;
+    }
+
+    function createEmberBloomSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      const grad = c.createRadialGradient(32, 32, 0, 32, 32, 30);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.18, 'rgba(254, 240, 138, 0.95)'); // champagne gold core
+      grad.addColorStop(0.42, 'rgba(245, 158, 11, 0.55)');  // warm amber glow
+      grad.addColorStop(0.72, 'rgba(217, 119, 6, 0.18)');  // soft ember halo
+      grad.addColorStop(1, 'rgba(180, 83, 9, 0)');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(32, 32, 30, 0, Math.PI * 2);
+      c.fill();
+      return cvs;
+    }
+
+    function createFireflyBloomSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      const grad = c.createRadialGradient(32, 32, 0, 32, 32, 30);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.2, 'rgba(254, 249, 195, 0.92)'); // bright warm core
+      grad.addColorStop(0.45, 'rgba(163, 230, 53, 0.55)'); // lime bioluminescence
+      grad.addColorStop(0.72, 'rgba(101, 163, 13, 0.18)'); // soft green halo
+      grad.addColorStop(1, 'rgba(77, 124, 15, 0)');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(32, 32, 30, 0, Math.PI * 2);
+      c.fill();
+      return cvs;
+    }
+
+    function createHeartSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      c.save();
+      c.translate(32, 32);
+      c.beginPath();
+      const s = 4.2;
+      c.moveTo(0, s * 3);
+      c.bezierCurveTo(-s * 5, -s * 2, -s * 2, -s * 6, 0, -s * 2);
+      c.bezierCurveTo(s * 2, -s * 6, s * 5, -s * 2, 0, s * 3);
+      const grad = c.createLinearGradient(0, -18, 0, 18);
+      grad.addColorStop(0, '#fb7185');
+      grad.addColorStop(1, '#e11d48');
+      c.fillStyle = grad;
+      c.fill();
+      c.restore();
+      return cvs;
+    }
+
+    // Lazy sprite cache dictionary
+    const spriteCache: Record<string, HTMLCanvasElement> = {};
+    function getSprite(key: string, creator: () => HTMLCanvasElement): HTMLCanvasElement {
+      if (!spriteCache[key]) {
+        spriteCache[key] = creator();
+      }
+      return spriteCache[key];
+    }
+
+    // ── Spawner ─────────────────────────────────────────
 
     function spawn(): Particle {
       const base: Particle = {
@@ -82,6 +351,10 @@ const { effect } = Astro.props;
         size: 4, opacity: 1,
         rotation: rand(0, Math.PI * 2),
         rotSpeed: rand(-0.02, 0.02),
+        pitch: rand(0, Math.PI * 2),
+        pitchSpeed: rand(0.015, 0.035) * (Math.random() > 0.5 ? 1 : -1),
+        roll: rand(0, Math.PI * 2),
+        rollSpeed: rand(0.012, 0.028) * (Math.random() > 0.5 ? 1 : -1),
         life: 0,
         maxLife: rand(200, 400),
         hue: 0,
@@ -92,12 +365,13 @@ const { effect } = Astro.props;
         case 'petals':
           base.y = -10;
           base.x = rand(0, W());
-          base.vy = rand(0.3, 1.0);
-          base.vx = rand(-0.3, 0.3);
-          base.size = rand(6, 12);
-          base.hue = rand(330, 350);
-          base.opacity = rand(0.4, 0.7);
-          base.maxLife = rand(300, 600);
+          base.vy = rand(0.35, 0.85);
+          base.vx = rand(-0.25, 0.25);
+          base.size = rand(10, 18);
+          base.opacity = rand(0.65, 0.9);
+          base.maxLife = rand(320, 620);
+          base.pitchSpeed = rand(0.018, 0.038) * (Math.random() > 0.5 ? 1 : -1);
+          base.rollSpeed = rand(0.015, 0.03) * (Math.random() > 0.5 ? 1 : -1);
           break;
         case 'golden-sparkles':
           base.x = rand(0, W());
@@ -112,12 +386,12 @@ const { effect } = Astro.props;
         case 'hearts':
           base.y = -10;
           base.x = rand(0, W());
-          base.vy = rand(0.3, 0.8);
+          base.vy = rand(0.35, 0.85);
           base.vx = rand(-0.2, 0.2);
-          base.size = rand(6, 11);
-          base.hue = rand(340, 360);
-          base.opacity = rand(0.3, 0.6);
+          base.size = rand(8, 14);
+          base.opacity = rand(0.6, 0.85);
           base.maxLife = rand(300, 550);
+          base.pitchSpeed = rand(0.012, 0.025);
           break;
         case 'confetti-float':
           base.y = -10;
@@ -126,8 +400,10 @@ const { effect } = Astro.props;
           base.vx = rand(-0.5, 0.5);
           base.size = rand(4, 8);
           base.hue = rand(0, 360);
-          base.opacity = rand(0.5, 0.8);
+          base.opacity = rand(0.6, 0.9);
           base.rotSpeed = rand(-0.05, 0.05);
+          base.pitchSpeed = rand(0.03, 0.07);
+          base.rollSpeed = rand(0.02, 0.05);
           base.maxLife = rand(250, 500);
           break;
         case 'starlight':
@@ -193,60 +469,99 @@ const { effect } = Astro.props;
         case 'hearts-petals':
           base.y = -10;
           base.x = rand(0, W());
-          base.vy = rand(0.3, 0.9);
+          base.vy = rand(0.35, 0.85);
           base.vx = rand(-0.25, 0.25);
           base.kind = Math.random() > 0.5 ? 'heart' : 'petal';
-          if (base.kind === 'heart') {
-            base.size = rand(6, 11);
-            base.hue = rand(340, 360);
-            base.opacity = rand(0.35, 0.65);
-            base.maxLife = rand(300, 550);
+          base.size = rand(9, 16);
+          base.opacity = rand(0.65, 0.9);
+          base.maxLife = rand(300, 600);
+          base.pitchSpeed = rand(0.018, 0.038) * (Math.random() > 0.5 ? 1 : -1);
+          base.rollSpeed = rand(0.015, 0.03) * (Math.random() > 0.5 ? 1 : -1);
+          break;
+        // ── Cultural modes with Bézier geometry ────────
+        case 'jasmine':
+          base.y = -10;
+          base.x = rand(0, W());
+          base.vy = rand(0.35, 0.85);
+          base.vx = rand(-0.25, 0.25);
+          base.size = rand(11, 19);
+          base.opacity = rand(0.65, 0.95);
+          base.maxLife = rand(350, 650);
+          base.pitchSpeed = rand(0.015, 0.035) * (Math.random() > 0.5 ? 1 : -1);
+          base.rollSpeed = rand(0.012, 0.028) * (Math.random() > 0.5 ? 1 : -1);
+          base.rotSpeed = rand(-0.012, 0.012);
+          break;
+        case 'beras-kuning':
+          base.y = -10;
+          base.x = rand(0, W());
+          base.kind = Math.random() > 0.35 ? 'grain' : 'roseflake';
+          if (base.kind === 'grain') {
+            base.size = rand(5, 8);
+            base.vy = rand(0.45, 1.1);
+            base.vx = rand(-0.2, 0.2);
+            base.pitchSpeed = rand(0.025, 0.055) * (Math.random() > 0.5 ? 1 : -1);
+            base.rollSpeed = rand(0.02, 0.04) * (Math.random() > 0.5 ? 1 : -1);
+            base.opacity = rand(0.7, 0.95);
+            base.maxLife = rand(220, 420);
           } else {
-            base.size = rand(6, 12);
-            base.hue = rand(330, 350);
-            base.opacity = rand(0.4, 0.7);
-            base.maxLife = rand(300, 600);
+            base.size = rand(7, 12);
+            base.vy = rand(0.35, 0.8);
+            base.vx = rand(-0.25, 0.25);
+            base.pitchSpeed = rand(0.018, 0.038) * (Math.random() > 0.5 ? 1 : -1);
+            base.rollSpeed = rand(0.015, 0.03) * (Math.random() > 0.5 ? 1 : -1);
+            base.opacity = rand(0.6, 0.85);
+            base.maxLife = rand(300, 550);
           }
+          break;
+        case 'keraton-glow':
+          base.x = rand(0, W());
+          base.y = H() + 10;
+          base.vy = rand(-0.35, -0.12);
+          base.vx = rand(-0.08, 0.08);
+          base.size = rand(6, 14);
+          base.opacity = 0;
+          base.maxLife = rand(320, 600);
+          base.trail = [];
+          break;
+        case 'fireflies':
+          base.x = rand(0, W());
+          base.y = rand(0, H());
+          base.vx = rand(-0.15, 0.15);
+          base.vy = rand(-0.15, 0.15);
+          base.size = rand(5, 10);
+          base.opacity = 0;
+          base.maxLife = rand(250, 500);
+          base.phase = rand(0, Math.PI * 2);
           break;
       }
       return base;
     }
 
-    // Pre-populate
+    // Pre-populate particles
     for (let i = 0; i < MAX; i++) {
       const p = spawn();
       p.life = rand(0, p.maxLife * 0.7);
       particles.push(p);
     }
 
-    // ── Draw helpers ─────────────────────────────────
+    // ── 3D Flight Physics Stamper ───────────────────────
 
-    function drawPetal(p: Particle) {
+    function draw3DSprite(p: Particle, sprite: HTMLCanvasElement, extraAlpha = 1) {
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rotation);
-      ctx.globalAlpha = p.opacity;
-      ctx.fillStyle = `hsl(${p.hue}, 70%, 75%)`;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, p.size * 0.4, p.size, 0, 0, Math.PI * 2);
-      ctx.fill();
+
+      // Simulated 3D Tumbling: horizontal & vertical scale via cos(pitch) and sin(roll)
+      const scaleX = Math.cos(p.pitch);
+      const scaleY = Math.sin(p.roll);
+      ctx.scale(scaleX, scaleY);
+
+      ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity * extraAlpha));
+      ctx.drawImage(sprite, -p.size, -p.size, p.size * 2, p.size * 2);
       ctx.restore();
     }
 
-    function drawHeart(p: Particle) {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rotation);
-      ctx.globalAlpha = p.opacity;
-      ctx.fillStyle = `hsl(${p.hue}, 75%, 65%)`;
-      const s = p.size * 0.15;
-      ctx.beginPath();
-      ctx.moveTo(0, s * 3);
-      ctx.bezierCurveTo(-s * 5, -s * 2, -s * 2, -s * 6, 0, -s * 2);
-      ctx.bezierCurveTo(s * 2, -s * 6, s * 5, -s * 2, 0, s * 3);
-      ctx.fill();
-      ctx.restore();
-    }
+    // ── Vector Fallback Helpers ──────────────────────────
 
     function drawSnowflake(p: Particle) {
       ctx.save();
@@ -260,17 +575,6 @@ const { effect } = Astro.props;
       ctx.fill();
       ctx.restore();
     }
-
-    function drawConfettiPiece(p: Particle) {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rotation);
-      ctx.globalAlpha = p.opacity;
-      ctx.fillStyle = `hsl(${p.hue}, 80%, 65%)`;
-      ctx.fillRect(-p.size * 0.5, -p.size * 0.25, p.size, p.size * 0.5);
-      ctx.restore();
-    }
-
 
     function drawBokeh(p: Particle) {
       ctx.globalAlpha = p.opacity * 0.15;
@@ -335,54 +639,71 @@ const { effect } = Astro.props;
 
     // ── Animation loop ─────────────────────────────────
 
+    let frameCount = 0;
+
     function loop() {
       if (paused) { animId = 0; return; }
       animId = requestAnimationFrame(loop);
       ctx.clearRect(0, 0, W(), H());
+      frameCount++;
+
+      // Gentle horizontal wind oscillation (sinusoidal breeze)
+      const breeze = Math.sin(frameCount * 0.008) * 0.35 + Math.sin(frameCount * 0.003) * 0.2;
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.life++;
-        p.x += p.vx;
+        p.x += p.vx + breeze * 0.45;
         p.y += p.vy;
         p.rotation += p.rotSpeed;
+        p.pitch += p.pitchSpeed;
+        p.roll += p.rollSpeed;
 
         // Lifecycle opacity envelope
         const progress = p.life / p.maxLife;
-        if (effect === 'golden-sparkles' || effect === 'starlight' || effect === 'sparklers' || effect === 'bokeh') {
-          // Fade in, hold, fade out
+        if (effect === 'golden-sparkles' || effect === 'starlight' || effect === 'sparklers' || effect === 'bokeh' || effect === 'keraton-glow' || effect === 'fireflies') {
           if (progress < 0.2) {
-            p.opacity = (progress / 0.2) * 0.7;
+            p.opacity = (progress / 0.2) * 0.85;
           } else if (progress > 0.75) {
-            p.opacity = ((1 - progress) / 0.25) * 0.7;
+            p.opacity = ((1 - progress) / 0.25) * 0.85;
           }
         } else {
-          // Fade out in last 25%
           if (progress > 0.75) {
             p.opacity *= 0.98;
           }
         }
 
-        // Effect-specific movement modifiers
+        // Effect-specific movement & high-fidelity rendering
         switch (effect) {
-          case 'petals':
-            p.vx = Math.sin(p.life * 0.015 + p.phase) * 0.5;
-            drawPetal(p);
+          case 'petals': {
+            p.vx = Math.sin(p.life * 0.015 + p.phase) * 0.45;
+            const sprite = getSprite('rosePetal', createRosePetalSprite);
+            draw3DSprite(p, sprite);
             break;
+          }
           case 'golden-sparkles':
             p.vx += rand(-0.02, 0.02);
             drawSparkle(p);
             break;
-          case 'hearts':
+          case 'hearts': {
             p.vx = Math.sin(p.life * 0.02 + p.phase) * 0.3;
-            drawHeart(p);
+            const sprite = getSprite('heart', createHeartSprite);
+            draw3DSprite(p, sprite);
             break;
-          case 'confetti-float':
+          }
+          case 'confetti-float': {
             p.vx = Math.sin(p.life * 0.02 + p.phase) * 0.6;
-            drawConfettiPiece(p);
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.scale(Math.cos(p.pitch), Math.sin(p.roll));
+            ctx.globalAlpha = p.opacity;
+            ctx.fillStyle = `hsl(${p.hue}, 80%, 65%)`;
+            ctx.fillRect(-p.size * 0.5, -p.size * 0.25, p.size, p.size * 0.5);
+            ctx.restore();
             break;
+          }
           case 'starlight':
-            // Twinkle in place
             p.opacity = Math.abs(Math.sin(p.life * 0.04 + p.phase)) * 0.6;
             drawSparkle(p);
             break;
@@ -406,18 +727,91 @@ const { effect } = Astro.props;
             p.vx = Math.sin(p.life * 0.015 + p.phase) * 0.4;
             drawSnowflake(p);
             break;
-          case 'hearts-petals':
+          case 'hearts-petals': {
             p.vx = Math.sin(p.life * 0.018 + p.phase) * 0.35;
             if (p.kind === 'heart') {
-              drawHeart(p);
+              const sprite = getSprite('heart', createHeartSprite);
+              draw3DSprite(p, sprite);
             } else {
-              drawPetal(p);
+              const sprite = getSprite('rosePetal', createRosePetalSprite);
+              draw3DSprite(p, sprite);
             }
             break;
+          }
+          // ── New cultural modes ──────────────────────
+          case 'jasmine': {
+            p.vx = Math.sin(p.life * 0.012 + p.phase) * 0.4;
+            const sprite = getSprite('jasmine', createJasmineSprite);
+            draw3DSprite(p, sprite);
+            break;
+          }
+          case 'beras-kuning': {
+            p.vx = Math.sin(p.life * 0.015 + p.phase) * 0.3;
+            if (p.kind === 'grain') {
+              const sprite = getSprite('riceGrain', createRiceGrainSprite);
+              draw3DSprite(p, sprite);
+            } else {
+              const sprite = getSprite('roseFlake', createRoseFlakeSprite);
+              draw3DSprite(p, sprite);
+            }
+            break;
+          }
+          case 'keraton-glow': {
+            p.vx = Math.sin(p.life * 0.006 + p.phase) * 0.12;
+            const sprite = getSprite('emberBloom', createEmberBloomSprite);
+
+            // Record ember trail history
+            if (!p.trail) p.trail = [];
+            if (p.life % 2 === 0) {
+              p.trail.unshift({ x: p.x, y: p.y, alpha: p.opacity });
+              if (p.trail.length > 5) p.trail.pop();
+            }
+
+            // Draw warm ember trails
+            for (let t = 0; t < p.trail.length; t++) {
+              const tr = p.trail[t];
+              const decay = 1 - (t + 1) / (p.trail.length + 1);
+              const trailSize = p.size * decay * 0.75;
+              if (trailSize > 0.5) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, Math.min(1, tr.alpha * decay * 0.4));
+                ctx.drawImage(sprite, tr.x - trailSize, tr.y - trailSize, trailSize * 2, trailSize * 2);
+                ctx.restore();
+              }
+            }
+
+            // Main ember with organic flickering pulses
+            const flicker = 0.82 + 0.18 * Math.sin(p.life * 0.08 + p.phase) * Math.cos(p.life * 0.05);
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity * flicker));
+            ctx.drawImage(sprite, p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
+            ctx.restore();
+            break;
+          }
+          case 'fireflies': {
+            // Organic wandering physics
+            p.vx += Math.sin(p.life * 0.04 + p.phase) * 0.04 + rand(-0.02, 0.02);
+            p.vy += Math.cos(p.life * 0.03 + p.phase * 1.5) * 0.04 + rand(-0.02, 0.02);
+            p.vx = Math.max(-0.55, Math.min(0.55, p.vx));
+            p.vy = Math.max(-0.55, Math.min(0.55, p.vy));
+
+            const sprite = getSprite('fireflyBloom', createFireflyBloomSprite);
+
+            // Organic flickering pulses / bioluminescent breathing
+            const pulse = Math.pow(Math.max(0, Math.sin(p.life * 0.045 + p.phase)), 3);
+            const flyAlpha = Math.max(0, Math.min(1, (0.15 + 0.85 * pulse) * p.opacity));
+            const flySize = p.size * (0.85 + 0.35 * pulse);
+
+            ctx.save();
+            ctx.globalAlpha = flyAlpha;
+            ctx.drawImage(sprite, p.x - flySize, p.y - flySize, flySize * 2, flySize * 2);
+            ctx.restore();
+            break;
+          }
         }
 
-        // Recycle dead particles
-        if (p.life >= p.maxLife || p.y > H() + 20 || p.y < -20 || p.x > W() + 20 || p.x < -20) {
+        // Recycle dead or offscreen particles
+        if (p.life >= p.maxLife || p.y > H() + 30 || p.y < -30 || p.x > W() + 30 || p.x < -30) {
           particles[i] = spawn();
         }
       }

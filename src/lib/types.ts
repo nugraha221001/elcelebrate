@@ -6,7 +6,7 @@ export type CardCategory = 'birthday' | 'anniversary' | 'graduation' | 'invitati
 
 export type UnboxStyle = 'envelope' | 'giftbox' | 'ribbon';
 
-export type AmbientEffectType = 'petals' | 'golden-sparkles' | 'hearts' | 'confetti-float' | 'starlight' | 'lanterns' | 'butterflies' | 'bokeh' | 'sparklers' | 'snowfall' | 'hearts-petals' | 'none';
+export type AmbientEffectType = 'petals' | 'golden-sparkles' | 'hearts' | 'confetti-float' | 'starlight' | 'lanterns' | 'butterflies' | 'bokeh' | 'sparklers' | 'snowfall' | 'hearts-petals' | 'jasmine' | 'beras-kuning' | 'keraton-glow' | 'fireflies' | 'none';
 
 /** Wedding-specific structured data stored inside ThemeConfig.weddingData */
 export interface WeddingEventDetail {
@@ -67,7 +67,7 @@ export interface ThemeConfig {
   secondaryColor: string;
   backgroundColor: string;
   fontFamily: 'serif' | 'sans' | 'handwritten' | 'display';
-  backgroundPattern: 'none' | 'confetti' | 'hearts' | 'stars' | 'dots' | 'waves';
+  backgroundPattern: 'none' | 'kawung' | 'truntum' | 'megamendung' | 'songket' | 'pucukrebung' | 'parang' | 'tenun' | 'damask' | 'arabesque' | 'constellation';
   unboxStyle: UnboxStyle;
   audioTrackId: string | null;
   externalAudioUrl: string | null;
