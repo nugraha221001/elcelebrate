@@ -1,0 +1,274 @@
+---
+export const prerender = false;
+
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+
+const user = Astro.locals.user;
+const lastUpdated = '17 September 2026';
+---
+
+<BaseLayout
+  title="Syarat dan Ketentuan Layanan"
+  description="Syarat dan Ketentuan Layanan ElCelebrate: Ketentuan penggunaan platform kartu ucapan digital, hak cipta media, penafian amplop digital, dan ketersediaan layanan."
+>
+  <Navbar user={user} />
+
+  <main class="relative min-h-screen py-12 md:py-20 overflow-hidden">
+    <!-- Ambient background glows -->
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute -top-32 right-1/4 h-96 w-96 translate-x-1/2 rounded-full bg-secondary/10 blur-[130px]"></div>
+      <div class="absolute top-1/3 left-10 h-96 w-96 rounded-full bg-primary/10 blur-[140px]"></div>
+      <div class="absolute bottom-20 right-1/3 h-80 w-80 rounded-full bg-accent/8 blur-[120px]"></div>
+    </div>
+
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb & Header -->
+      <div class="mb-10 text-center md:text-left">
+        <div class="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-secondary mb-4 backdrop-blur-md">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+          Pedoman Penggunaan Platform
+        </div>
+        <h1 class="font-display text-3xl font-extrabold tracking-tight text-[#f7f6f9] sm:text-4xl md:text-5xl">
+          Syarat & <span class="bg-linear-to-r from-amber-300 via-pink-400 to-purple-400 bg-clip-text text-transparent">Ketentuan Layanan</span>
+        </h1>
+        <p class="mt-3 text-base text-[#a59fad] sm:text-lg max-w-2xl">
+          Harap baca syarat dan ketentuan ini secara seksama sebelum membuat, menerbitkan, atau berinteraksi dengan kartu ucapan digital di ElCelebrate.
+        </p>
+        <div class="mt-4 flex items-center justify-center md:justify-start gap-2 text-xs text-[#a59fad]">
+          <span class="inline-block h-2 w-2 rounded-full bg-emerald-400"></span>
+          <span>Berlaku efektif sejak: <strong class="text-[#f7f6f9]">{lastUpdated}</strong></span>
+        </div>
+      </div>
+
+      <!-- Quick Navigation Bar (Table of Contents) -->
+      <div class="mb-12 rounded-2xl bg-[#181522]/70 p-4 sm:p-6 backdrop-blur-xl border border-white/10 shadow-card">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-surface-300 mb-3 flex items-center gap-2">
+          <svg class="h-4 w-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+          Daftar Isi Ketentuan
+        </h2>
+        <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+          <a href="#penerimaan" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">1. Penerimaan Ketentuan</a>
+          <a href="#penggunaan" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">2. Penggunaan yang Diperbolehkan</a>
+          <a href="#hak-cipta" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">3. Jaminan Konten & Hak Cipta</a>
+          <a href="#amplop-disclaimer" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">4. Penafian Amplop Digital</a>
+          <a href="#ketersediaan" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">5. Ketersediaan Layanan</a>
+          <a href="#pembelian-digital" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">6. Ketentuan Pembelian Digital</a>
+          <a href="#hukum" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">7. Hukum yang Berlaku</a>
+        </div>
+      </div>
+
+      <!-- Legal Content Blocks -->
+      <div class="space-y-8 text-sm sm:text-base leading-relaxed text-[#f7f6f9]">
+
+        <!-- Section 1: Penerimaan Ketentuan -->
+        <section id="penerimaan" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary/20 text-secondary border border-secondary/30 font-bold">1</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Penerimaan Syarat & Ketentuan</h2>
+          </div>
+          <div class="space-y-3 text-[#a59fad]">
+            <p>
+              Dengan membuat akun, mengakses situs web, atau menggunakan fitur apa pun di <strong class="text-[#f7f6f9]">ElCelebrate</strong>, Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui untuk terikat secara hukum oleh Syarat dan Ketentuan ini serta <a href="/privacy" class="text-primary hover:underline font-medium">Kebijakan Privasi</a> kami.
+            </p>
+            <p>
+              Jika Anda tidak menyetujui salah satu bagian dari ketentuan ini, Anda tidak diperkenankan untuk mengakses atau menggunakan layanan ElCelebrate.
+            </p>
+          </div>
+        </section>
+
+        <!-- Section 2: Penggunaan yang Diperbolehkan -->
+        <section id="penggunaan" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">2</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Penggunaan yang Diperbolehkan (Acceptable Use)</h2>
+          </div>
+          <div class="space-y-3 text-[#a59fad]">
+            <p>
+              ElCelebrate dirancang untuk merayakan momen berharga dan menyebarkan kebahagiaan. Dalam menggunakan platform ini, Anda setuju untuk TIDAK:
+            </p>
+            <ul class="list-disc list-inside space-y-2 text-sm sm:text-base ml-1">
+              <li>
+                Mengunggah atau mempublikasikan konten yang mengandung pornografi, kekerasan eksplisit, ujaran kebencian, diskriminasi SARA, penghinaan, atau pencemaran nama baik.
+              </li>
+              <li>
+                Menggunakan kartu ucapan untuk skema penipuan (phishing, money game, undian fiktif) atau menyalahgunakan fitur amplop digital untuk memfasilitasi transaksi ilegal.
+              </li>
+              <li>
+                Mencoba mengakses sistem basis data, server Cloudflare/Supabase, atau akun pengguna lain tanpa otorisasi yang sah.
+              </li>
+              <li>
+                Mengunggah materi yang mengandung virus komputer, malware, script berbahaya, atau melakukan serangan denial-of-service (DDoS).
+              </li>
+              <li>
+                Mengirimkan spam melalui formulir buku tamu atau pesan ucapan publik.
+              </li>
+            </ul>
+            <p class="text-sm pt-1">
+              ElCelebrate berhak menangguhkan atau menghapus kartu ucapan atau akun mana pun yang terbukti melanggar ketentuan di atas tanpa pemberitahuan sebelumnya.
+            </p>
+          </div>
+        </section>
+
+        <!-- Section 3: Jaminan Konten Pengguna & Hak Cipta -->
+        <section id="hak-cipta" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">3</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Jaminan Konten Pengguna & Kepatuhan Hak Cipta</h2>
+          </div>
+          <div class="space-y-4 text-[#a59fad]">
+            <p>
+              Sebagai kreator kartu, Anda memegang tanggung jawab penuh atas seluruh media, audio, foto, teks, dan aset yang Anda unggah ke platform kami:
+            </p>
+
+            <div class="grid gap-4 md:grid-cols-2">
+              <div class="rounded-xl bg-white/5 p-4 border border-white/5">
+                <h3 class="text-[#f7f6f9] font-semibold mb-2 flex items-center gap-2">
+                  <span>🎵</span> Musik & Audio Latar Belakang
+                </h3>
+                <p class="text-sm">
+                  Anda menjamin bahwa file audio atau musik yang Anda sematkan pada kartu ucapan telah memiliki lisensi yang sah, merupakan karya orisinal, atau digunakan dalam batas penggunaan wajar (fair use) untuk keperluan perayaan pribadi non-komersial.
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-white/5 p-4 border border-white/5">
+                <h3 class="text-[#f7f6f9] font-semibold mb-2 flex items-center gap-2">
+                  <span>🖼️</span> Foto, Galeri & Ilustrasi
+                </h3>
+                <p class="text-sm">
+                  Anda menyatakan memiliki hak atau izin dari pihak-pihak yang fotonya dimuat dalam kartu Anda. ElCelebrate tidak mengklaim kepemilikan atas konten visual yang Anda unggah.
+                </p>
+              </div>
+            </div>
+
+            <div class="rounded-xl border border-rose-500/20 bg-rose-500/5 p-4 text-rose-300 text-sm">
+              <strong class="font-semibold block mb-1">Ganti Rugi Pelanggaran Hak Cipta:</strong>
+              Anda setuju untuk membebaskan dan mengganti rugi ElCelebrate dari segala tuntutan hukum, denda, atau klaim pelanggaran hak kekayaan intelektual pihak ketiga yang timbul akibat konten yang Anda unggah.
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 4: Penafian Tanggung Jawab Amplop Digital -->
+        <section id="amplop-disclaimer" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">4</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Penafian Tanggung Jawab Amplop Digital (Cash Gifts Disclaimer)</h2>
+          </div>
+          <div class="space-y-4 text-[#a59fad]">
+            <p>
+              Fitur Amplop Digital pada ElCelebrate disediakan murni sebagai media penampil informasi rekening/e-wallet untuk memudahkan para tamu memberikan hadiah secara mandiri.
+            </p>
+
+            <div class="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-[#f5c563] space-y-2">
+              <h3 class="font-bold text-base text-[#f5c563]">Pernyataan Penting Mengenai Transaksi Finansial:</h3>
+              <ul class="list-disc list-inside space-y-1.5 text-xs sm:text-sm">
+                <li>
+                  <strong class="text-white">Bukan Penyedia Jasa Pembayaran:</strong> ElCelebrate BUKAN merupakan bank, gerbang pembayaran (payment gateway), atau penyedia jasa escrow/penampung dana pihak ketiga.
+                </li>
+                <li>
+                  <strong class="text-white">Transfer Langsung Antar-Pihak:</strong> Seluruh transaksi hadiah amplop digital dilakukan secara langsung dari rekening/e-wallet pengirim ke rekening/e-wallet penerima tanpa perantara sistem keuangan ElCelebrate.
+                </li>
+                <li>
+                  <strong class="text-white">Bebas dari Biaya Komisi Pemotongan:</strong> ElCelebrate tidak mengambil potongan atau komisi sepersen pun dari dana hadiah yang dikirimkan.
+                </li>
+                <li>
+                  <strong class="text-white">Bebas Tanggung Jawab Sengketa:</strong> ElCelebrate tidak bertanggung jawab atas kesalahan transfer nomor rekening, ketidaksesuaian nama pemilik bank, kegagalan transaksi perbankan, penipuan identitas oleh pembuat kartu, atau perselisihan finansial apa pun antara tamu dan pemilik kartu.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 5: Ketersediaan Layanan -->
+        <section id="ketersediaan" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold">5</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Ketersediaan Layanan & Batasan Jaminan</h2>
+          </div>
+          <div class="space-y-3 text-[#a59fad]">
+            <p>
+              Layanan ElCelebrate disediakan atas dasar <strong class="text-[#f7f6f9]">"sebagaimana adanya" (as-is)</strong> dan <strong class="text-[#f7f6f9]">"sebagaimana tersedia" (as-available)</strong>:
+            </p>
+            <ul class="list-disc list-inside space-y-2 text-sm sm:text-base ml-1">
+              <li>
+                Meskipun kami berupaya keras mempertahankan uptime 99.9% menggunakan infrastruktur global Cloudflare dan Supabase, kami tidak menjamin bahwa platform akan beroperasi tanpa jeda (downtime), gangguan teknis sesaat, atau pemeliharaan sistem terjadwal.
+              </li>
+              <li>
+                Kami tidak bertanggung jawab atas kegagalan akses yang diakibatkan oleh gangguan koneksi internet pengguna, pemblokiran penyedia internet lokal, atau kondisi kahar (force majeure).
+              </li>
+              <li>
+                Kami berhak memodifikasi, memperbarui antarmuka, atau menghentikan fitur tertentu sewaktu-waktu demi penyempurnaan kualitas layanan.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section 6: Pembelian Digital & Kebijakan Pengembalian Dana -->
+        <section id="pembelian-digital" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-pink-500/20 text-pink-400 border border-pink-500/30 font-bold">6</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Ketentuan Pembelian Digital & Kebijakan Refund</h2>
+          </div>
+          <div class="space-y-3 text-[#a59fad]">
+            <p>
+              Sebagian besar fitur perayaan inti di ElCelebrate dapat dinikmati secara gratis. Untuk fitur berbayar atau langganan premium (jika tersedia di masa mendatang):
+            </p>
+            <ul class="list-disc list-inside space-y-2 text-sm sm:text-base ml-1">
+              <li>
+                <strong class="text-[#f7f6f9]">Aktivasi Instan:</strong> Produk digital dan kuota kartu premium akan langsung aktif segera setelah konfirmasi pembayaran berhasil diverifikasi.
+              </li>
+              <li>
+                <strong class="text-[#f7f6f9]">Kebijakan Pengembalian Dana (Refund):</strong> Karena sifat produk digital yang langsung dapat dikonsumsi dan diunduh, pembelian bersifat final dan tidak dapat dikembalikan (non-refundable), kecuali terjadi kegagalan sistem terbukti di mana fitur tidak dapat diaktifkan dalam waktu 24 jam setelah pembayaran berhasil.
+              </li>
+              <li>
+                <strong class="text-[#f7f6f9]">Harga dan Pajak:</strong> Harga yang tertera sudah termasuk biaya pemrosesan transaksi yang berlaku kecuali disebutkan sebaliknya.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section 7: Hukum yang Berlaku -->
+        <section id="hukum" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/20 text-primary border border-primary/30 font-bold">7</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Hukum yang Berlaku & Penyelesaian Sengketa</h2>
+          </div>
+          <div class="space-y-4 text-[#a59fad]">
+            <p>
+              Syarat dan Ketentuan ini diatur dan ditafsirkan sesuai dengan hukum yang berlaku di <strong class="text-[#f7f6f9]">Negara Kesatuan Republik Indonesia</strong>.
+            </p>
+            <p>
+              Segala perselisihan yang timbul sehubungan dengan penafsiran atau pelaksanaan Syarat dan Ketentuan ini akan diselesaikan secara musyawarah untuk mufakat terlebih dahulu. Apabila tidak tercapai mufakat dalam waktu 30 (tiga puluh) hari kalender, sengketa akan diselesaikan melalui yurisdiksi pengadilan negeri yang berwenang di Indonesia.
+            </p>
+
+            <div class="rounded-xl bg-white/5 p-4 sm:p-6 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h3 class="text-base font-semibold text-[#f7f6f9]">Butuh Klarifikasi Lebih Lanjut?</h3>
+                <p class="text-xs sm:text-sm text-[#a59fad] mt-1">
+                  Hubungi tim operasional kami jika Anda memiliki pertanyaan seputar syarat layanan ini.
+                </p>
+              </div>
+              <a
+                href="mailto:support@elcelebrate.com"
+                class="inline-flex items-center gap-2 rounded-xl bg-secondary text-[#0f0d15] px-4 py-2 text-sm font-semibold shadow-lg shadow-secondary/20 transition-all duration-200 hover:brightness-110 active:scale-95 shrink-0"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                Hubungi Support
+              </a>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

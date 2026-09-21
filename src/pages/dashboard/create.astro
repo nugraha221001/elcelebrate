@@ -149,6 +149,44 @@ const isEdit = Boolean(editId);
               </div>
             </div>
 
+            <!-- Quick Palettes -->
+            <div>
+              <div class="mb-2 flex items-center justify-between">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-surface-300">
+                  🎨 Quick Palettes
+                </label>
+                <span class="text-[11px] text-surface-400">Curated color pairings</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" id="palette-swatches-grid">
+                {[
+                  { name: 'Midnight Gold', primary: '#f5c563', secondary: '#e07a93' },
+                  { name: 'Romantic Rose', primary: '#e07a93', secondary: '#f4a261' },
+                  { name: 'Emerald Luxury', primary: '#2a9d8f', secondary: '#e76f51' },
+                  { name: 'Ocean Twilight', primary: '#4a90e2', secondary: '#9b51e0' },
+                  { name: 'Classic Gold', primary: '#d4af37', secondary: '#2b2523' },
+                ].map((palette) => (
+                  <button
+                    type="button"
+                    class="palette-swatch-btn group relative flex flex-col gap-1.5 rounded-xl border border-white/10 bg-surface-800/60 p-2.5 text-left transition-all duration-200 hover:border-white/30 hover:bg-surface-800 hover:shadow-md cursor-pointer active:scale-95"
+                    data-primary={palette.primary}
+                    data-secondary={palette.secondary}
+                    title={`${palette.name} (${palette.primary} / ${palette.secondary})`}
+                  >
+                    <!-- Dual Color Pill Preview Chip -->
+                    <div class="flex h-5 w-full overflow-hidden rounded-lg border border-white/10 shadow-inner">
+                      <span class="w-1/2 h-full" style={`background-color: ${palette.primary};`}></span>
+                      <span class="w-1/2 h-full" style={`background-color: ${palette.secondary};`}></span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-medium text-surface-200 truncate group-hover:text-white">
+                        {palette.name}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <!-- Background Pattern -->
             <div>
               <label class="mb-2 block text-sm font-medium text-surface-200">Background Pattern</label>
@@ -1567,6 +1605,26 @@ const isEdit = Boolean(editId);
     const hex = document.getElementById('theme-secondary-hex');
     if (hex) hex.textContent = state.themeConfig.secondaryColor;
     updateLivePreview();
+  });
+
+  // Quick Palette Swatches
+  document.querySelectorAll('.palette-swatch-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetPrimary = (btn as HTMLElement).dataset.primary;
+      const targetSecondary = (btn as HTMLElement).dataset.secondary;
+
+      if (targetPrimary && primaryInput) {
+        primaryInput.value = targetPrimary;
+        primaryInput.dispatchEvent(new Event('input', { bubbles: true }));
+        primaryInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      if (targetSecondary && secondaryInput) {
+        secondaryInput.value = targetSecondary;
+        secondaryInput.dispatchEvent(new Event('input', { bubbles: true }));
+        secondaryInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
   });
 
   // ── Step 2 Theme Selectors Active State Management ─────────────────

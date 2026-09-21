@@ -1,0 +1,298 @@
+---
+export const prerender = false;
+
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+
+const user = Astro.locals.user;
+const lastUpdated = '17 September 2026';
+---
+
+<BaseLayout
+  title="Kebijakan Privasi"
+  description="Kebijakan Privasi ElCelebrate: Pelajari bagaimana kami mengumpulkan, melindungi, dan mengelola data akun, media R2, amplop digital, dan ucapan RSVP Anda."
+>
+  <Navbar user={user} />
+
+  <main class="relative min-h-screen py-12 md:py-20 overflow-hidden">
+    <!-- Ambient background glows -->
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute -top-32 left-1/4 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]"></div>
+      <div class="absolute top-1/3 right-10 h-96 w-96 rounded-full bg-secondary/10 blur-[140px]"></div>
+      <div class="absolute bottom-20 left-1/3 h-80 w-80 rounded-full bg-accent/8 blur-[120px]"></div>
+    </div>
+
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb & Header -->
+      <div class="mb-10 text-center md:text-left">
+        <div class="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-primary mb-4 backdrop-blur-md">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+          Transparansi & Perlindungan Data
+        </div>
+        <h1 class="font-display text-3xl font-extrabold tracking-tight text-[#f7f6f9] sm:text-4xl md:text-5xl">
+          Kebijakan <span class="bg-linear-to-r from-amber-300 via-pink-400 to-purple-400 bg-clip-text text-transparent">Privasi</span>
+        </h1>
+        <p class="mt-3 text-base text-[#a59fad] sm:text-lg max-w-2xl">
+          ElCelebrate berkomitmen penuh melindungi privasi pengguna dan para tamu perayaan Anda. Ketahui bagaimana data Anda dikelola secara aman dan transparan.
+        </p>
+        <div class="mt-4 flex items-center justify-center md:justify-start gap-2 text-xs text-[#a59fad]">
+          <span class="inline-block h-2 w-2 rounded-full bg-emerald-400"></span>
+          <span>Berlaku efektif sejak: <strong class="text-[#f7f6f9]">{lastUpdated}</strong></span>
+        </div>
+      </div>
+
+      <!-- Quick Navigation Bar (Table of Contents) -->
+      <div class="mb-12 rounded-2xl bg-[#181522]/70 p-4 sm:p-6 backdrop-blur-xl border border-white/10 shadow-card">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-surface-300 mb-3 flex items-center gap-2">
+          <svg class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+          Daftar Isi Kebijakan
+        </h2>
+        <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+          <a href="#pengantar" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">1. Pengantar</a>
+          <a href="#pengumpulan-data" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">2. Data yang Dikumpulkan</a>
+          <a href="#keamanan-rls" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">3. Keamanan & RLS Policies</a>
+          <a href="#amplop-rsvp" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">4. Amplop Digital & RSVP</a>
+          <a href="#penghapusan-data" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">5. Jaminan Penghapusan Data</a>
+          <a href="#cookies" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">6. Kebijakan Cookies</a>
+          <a href="#kontak" class="rounded-lg bg-white/5 px-3 py-1.5 text-[#a59fad] transition-all duration-200 hover:bg-white/10 hover:text-[#f7f6f9]">7. Kontak & Bantuan</a>
+        </div>
+      </div>
+
+      <!-- Legal Content Blocks -->
+      <div class="space-y-8 text-sm sm:text-base leading-relaxed text-[#f7f6f9]">
+
+        <!-- Section 1: Pengantar -->
+        <section id="pengantar" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/20 text-primary border border-primary/30 font-bold">1</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Pendahuluan & Komitmen Privasi</h2>
+          </div>
+          <div class="space-y-3 text-[#a59fad]">
+            <p>
+              Selamat datang di <strong class="text-[#f7f6f9]">ElCelebrate</strong> ("kami", "layanan", atau "platform"). Kami menghargai kepercayaan yang Anda berikan kepada kami dalam membagikan momen-momen paling membahagiakan dalam hidup Anda—mulai dari ulang tahun, pernikahan, anniversary, hingga kelulusan.
+            </p>
+            <p>
+              Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, menyimpan, memproses, dan melindungi informasi pribadi Anda saat mengakses dan menggunakan situs web ElCelebrate serta seluruh layanan pembuatan dan pembagian kartu ucapan digital interaktif kami.
+            </p>
+            <div class="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-[#f5c563] text-sm">
+              <strong class="font-semibold block mb-1">Prinsip Privasi Utama:</strong>
+              Kami tidak pernah menjual data pribadi Anda kepada pihak ketiga atau pengiklan mana pun. Semua data yang kami kumpulkan semata-mata digunakan untuk menjalankan fungsionalitas platform perayaan Anda.
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 2: Data yang Kami Kumpulkan -->
+        <section id="pengumpulan-data" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-pink-500/20 text-pink-400 border border-pink-500/30 font-bold">2</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Data yang Kami Kumpulkan</h2>
+          </div>
+          <div class="space-y-4 text-[#a59fad]">
+            <p>
+              Kami mengumpulkan informasi yang Anda berikan secara langsung saat berinteraksi dengan layanan kami:
+            </p>
+
+            <div class="grid gap-4 md:grid-cols-2">
+              <div class="rounded-xl bg-white/5 p-4 border border-white/5">
+                <div class="flex items-center gap-2 text-[#f7f6f9] font-semibold mb-2">
+                  <span class="text-primary">🔑</span>
+                  <h3>Autentikasi Akun (Supabase Auth)</h3>
+                </div>
+                <p class="text-sm">
+                  Ketika Anda mendaftar atau masuk, kami menyimpan alamat email, kata sandi terenkripsi, nama tampilan, serta tautan avatar profil melalui layanan autentikasi terverifikasi Supabase Auth. Jika menggunakan login pihak ketiga (seperti Google OAuth), kami hanya menerima informasi profil publik dasar yang Anda izinkan.
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-white/5 p-4 border border-white/5">
+                <div class="flex items-center gap-2 text-[#f7f6f9] font-semibold mb-2">
+                  <span class="text-primary">📸</span>
+                  <h3>Media Unggahan (Cloudflare R2)</h3>
+                </div>
+                <p class="text-sm">
+                  Foto kenangan, sampul kartu ucapan, dan file audio musik latar yang Anda unggah disimpan secara aman pada penyimpanan objek berkinerja tinggi Cloudflare R2 dengan perlindungan URL terisolasi dan kompresi visual otomatis sebelum disajikan.
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-white/5 p-4 border border-white/5">
+                <div class="flex items-center gap-2 text-[#f7f6f9] font-semibold mb-2">
+                  <span class="text-primary">🎁</span>
+                  <h3>Informasi Rekening Amplop Digital</h3>
+                </div>
+                <p class="text-sm">
+                  Jika Anda mengaktifkan fitur Amplop Digital, Anda dapat memasukkan nama bank, nomor rekening penerima, nama pemegang rekening, atau kode QRIS e-wallet. Informasi ini hanya ditampilkan pada halaman kartu Anda agar tamu dapat mengirimkan tanda kasih secara langsung.
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-white/5 p-4 border border-white/5">
+                <div class="flex items-center gap-2 text-[#f7f6f9] font-semibold mb-2">
+                  <span class="text-primary">💬</span>
+                  <h3>Ucapan & Konfirmasi Kehadiran (RSVP)</h3>
+                </div>
+                <p class="text-sm">
+                  Pesan doa, nama pengirim, status kehadiran (Hadir/Tidak Hadir), dan jumlah tamu yang dikirimkan oleh penerima kartu akan tersimpan dalam basis data kami untuk ditampilkan pada buku tamu digital kartu tersebut.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Keamanan & Row Level Security (RLS) -->
+        <section id="keamanan-rls" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">3</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Keamanan Data & Row Level Security (RLS)</h2>
+          </div>
+          <div class="space-y-3 text-[#a59fad]">
+            <p>
+              Keamanan data pribadi Anda merupakan prioritas fundamental kami. Arsitektur ElCelebrate dirancang dengan standar keamanan modern:
+            </p>
+            <ul class="list-disc list-inside space-y-2 text-sm sm:text-base ml-1">
+              <li>
+                <strong class="text-[#f7f6f9]">Isolasi Row Level Security (RLS) Supabase:</strong> Setiap data kartu ucapan, pengaturan amplop digital, dan daftar penerima dilindungi oleh kebijakan RLS ketat di tingkat basis data PostgreSQL. Hanya akun pengguna yang memiliki kartu tersebut (<code class="text-xs bg-white/10 px-1.5 py-0.5 rounded text-[#f5c563]">auth.uid() = user_id</code>) yang diizinkan mengubah atau menghapus data kartu.
+              </li>
+              <li>
+                <strong class="text-[#f7f6f9]">Enkripsi Transportasi Data (HTTPS/TLS):</strong> Seluruh komunikasi data antara peramban (browser) Anda dengan server kami terenkripsi dengan protokol Transport Layer Security (TLS 1.3) modern.
+              </li>
+              <li>
+                <strong class="text-[#f7f6f9]">Integritas Autentikasi JWT:</strong> Akses sesi dikelola melalui token JWT (JSON Web Tokens) bertanda tangan kriptografis dengan masa kedaluwarsa yang terkelola secara ketat.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section 4: Amplop Digital & RSVP Publik -->
+        <section id="amplop-rsvp" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">4</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Amplop Digital & Keterbukaan Data RSVP</h2>
+          </div>
+          <div class="space-y-3 text-[#a59fad]">
+            <p>
+              Harap perhatikan sifat keterbukaan dari fitur-fitur interaktif berikut saat Anda menggunakannya:
+            </p>
+            <div class="space-y-3">
+              <div class="border-l-2 border-primary pl-4">
+                <h3 class="font-semibold text-[#f7f6f9]">Visibilitas Informasi Amplop Digital</h3>
+                <p class="text-sm mt-1">
+                  Nomor rekening bank atau nomor e-wallet yang Anda cantumkan pada kartu ucapan dapat dilihat oleh siapa pun yang memiliki tautan akses kartu tersebut. ElCelebrate tidak memproses transaksi keuangan secara langsung dan tidak meminta PIN, kata sandi, atau kode OTP perbankan Anda.
+                </p>
+              </div>
+              <div class="border-l-2 border-secondary pl-4">
+                <h3 class="font-semibold text-[#f7f6f9]">Ucapan dan Doa Tamu (Buku Tamu Publik)</h3>
+                <p class="text-sm mt-1">
+                  Ucapan selamat dan doa yang dikirimkan tamu pada kartu ucapan bersifat terbuka untuk dilihat oleh pengunjung kartu tersebut. Pemilik kartu memiliki hak melalui dasbor untuk mengelola dan memoderasi pesan ucapan yang masuk.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 5: Jaminan Penghapusan Data -->
+        <section id="penghapusan-data" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold">5</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Jaminan Penghapusan Data (Data Deletion Guarantees)</h2>
+          </div>
+          <div class="space-y-3 text-[#a59fad]">
+            <p>
+              Kami percaya bahwa Anda adalah pemilik sejati atas data dan kenangan Anda. Kami memberikan jaminan penuh:
+            </p>
+            <ul class="list-disc list-inside space-y-2 text-sm sm:text-base ml-1">
+              <li>
+                <strong class="text-[#f7f6f9]">Penghapusan Kartu:</strong> Saat Anda menghapus kartu dari dasbor, seluruh catatan kartu, data amplop digital, dan ucapan RSVP yang tertaut akan segera dihapus dari basis data aktif kami.
+              </li>
+              <li>
+                <strong class="text-[#f7f6f9]">Pembersihan Media R2:</strong> File foto dan aset musik yang dikaitkan dengan kartu yang dihapus akan dijadwalkan untuk dipurging (dihapus permanen) dari sistem penyimpanan Cloudflare R2 kami.
+              </li>
+              <li>
+                <strong class="text-[#f7f6f9]">Penghapusan Akun Menyeluruh:</strong> Anda dapat mengajukan permohonan penutupan akun permanen sewaktu-waktu dengan menghubungi kami. Kami akan menghapus profil Anda beserta seluruh kartu yang pernah Anda buat.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section 6: Cookies Esensial -->
+        <section id="cookies" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">6</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Penggunaan Cookie & Penyimpanan Sesi</h2>
+          </div>
+          <div class="space-y-3 text-[#a59fad]">
+            <p>
+              ElCelebrate hanya menggunakan <strong class="text-[#f7f6f9]">Cookie Esensial (Teknis)</strong> yang mutlak dibutuhkan agar sistem dapat berfungsi:
+            </p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs sm:text-sm border-collapse mt-2">
+                <thead>
+                  <tr class="border-b border-white/10 text-[#f7f6f9]">
+                    <th class="py-2 pr-4 font-semibold">Jenis Cookie / Storage</th>
+                    <th class="py-2 pr-4 font-semibold">Tujuan Penggunaan</th>
+                    <th class="py-2 font-semibold">Masa Berlaku</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5 text-[#a59fad]">
+                  <tr>
+                    <td class="py-2.5 pr-4 font-mono text-xs text-primary">sb-*-auth-token</td>
+                    <td class="py-2.5 pr-4">Menyimpan sesi login Supabase Auth yang terenkripsi agar Anda tetap masuk saat berpindah halaman.</td>
+                    <td class="py-2.5">Sesi / 1 Minggu</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 pr-4 font-mono text-xs text-primary">SESSION (Cloudflare KV)</td>
+                    <td class="py-2.5 pr-4">Mempertahankan status keamanan sesi request server Cloudflare SSR.</td>
+                    <td class="py-2.5">Sesi aktif</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 pr-4 font-mono text-xs text-primary">audio-state / local UI</td>
+                    <td class="py-2.5 pr-4">Menyimpan preferensi mute/unmute musik kartu saat tamu membuka kartu.</td>
+                    <td class="py-2.5">Penyimpanan Lokal (Browser)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-xs text-[#a59fad]/80 pt-2">
+              Kami <strong>TIDAK</strong> menyematkan cookie pelacak iklan pihak ketiga (third-party ad trackers), pixel retargeting komersial, maupun skrip pemantauan lintas situs tanpa persetujuan Anda.
+            </p>
+          </div>
+        </section>
+
+        <!-- Section 7: Kontak & Perubahan Kebijakan -->
+        <section id="kontak" class="scroll-mt-24 rounded-2xl bg-[#181522]/70 p-6 sm:p-8 backdrop-blur-xl border border-white/10 shadow-card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold">7</div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-[#f7f6f9]">Perubahan Kebijakan & Kontak Perlindungan Data</h2>
+          </div>
+          <div class="space-y-4 text-[#a59fad]">
+            <p>
+              Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu untuk mencerminkan pembaruan fitur atau penyesuaian regulasi hukum yang berlaku di Republik Indonesia. Setiap pembaruan akan ditandai dengan perubahan tanggal "Berlaku efektif" di bagian atas halaman ini.
+            </p>
+            <div class="rounded-xl bg-white/5 p-4 sm:p-6 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h3 class="text-base font-semibold text-[#f7f6f9]">Pertanyaan seputar Privasi Anda?</h3>
+                <p class="text-xs sm:text-sm text-[#a59fad] mt-1">
+                  Tim kami siap menjawab pertanyaan atau memproses permintaan penghapusan data Anda.
+                </p>
+              </div>
+              <a
+                href="mailto:privacy@elcelebrate.com"
+                class="inline-flex items-center gap-2 rounded-xl bg-primary text-[#0f0d15] px-4 py-2 text-sm font-semibold shadow-lg shadow-primary/20 transition-all duration-200 hover:brightness-110 active:scale-95 shrink-0"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                Hubungi Tim Privasi
+              </a>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
