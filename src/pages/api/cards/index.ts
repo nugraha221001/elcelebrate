@@ -76,7 +76,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
     });
   }
 
-  const maxPhotos = category === 'wedding' ? 10 : 4;
+  const maxPhotos = category === 'wedding' ? 11 : 4;
   if (Array.isArray(media_urls) && media_urls.length > maxPhotos) {
     return new Response(JSON.stringify({ error: `Maximum ${maxPhotos} photos allowed` }), {
       status: 400,

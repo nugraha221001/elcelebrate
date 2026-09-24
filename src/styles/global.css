@@ -93,6 +93,7 @@
   --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --ease-dramatic: cubic-bezier(0.7, 0, 0.3, 1);
+  --ease-luxury: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* ── Animation Durations ───────────────────────────────────── */
   --duration-fast: 150ms;
@@ -584,5 +585,415 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%23f5c563' fill-opacity='0.06'/%3E%3Ccircle cx='60' cy='15' r='1' fill='%23f5c563' fill-opacity='0.05'/%3E%3Ccircle cx='45' cy='50' r='1.5' fill='%23f5c563' fill-opacity='0.06'/%3E%3Ccircle cx='10' cy='65' r='1' fill='%23f5c563' fill-opacity='0.05'/%3E%3Ccircle cx='70' cy='60' r='1.2' fill='%23f5c563' fill-opacity='0.05'/%3E%3Cline x1='20' y1='20' x2='60' y2='15' stroke='%23f5c563' stroke-opacity='0.05' stroke-width='0.5'/%3E%3Cline x1='60' y1='15' x2='45' y2='50' stroke='%23f5c563' stroke-opacity='0.05' stroke-width='0.5'/%3E%3Cline x1='45' y1='50' x2='10' y2='65' stroke='%23f5c563' stroke-opacity='0.04' stroke-width='0.5'/%3E%3C/svg%3E");
   background-size: 80px 80px;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Indonesian Luxury Wedding: Cinematic Unboxing & 3D Staging
+   ══════════════════════════════════════════════════════════════ */
+
+/* Gate Split Door Thickness via Physical Inner Shadows */
+.cover-gate {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+.cover-gate-left:not(.shadow-none) {
+  box-shadow: inset -22px 0 38px -10px rgba(0, 0, 0, 0.88),
+              inset -2px 0 5px 0 rgba(245, 197, 99, 0.35);
+}
+
+.cover-gate-right:not(.shadow-none) {
+  box-shadow: inset 22px 0 38px -10px rgba(0, 0, 0, 0.88),
+              inset 2px 0 5px 0 rgba(245, 197, 99, 0.35);
+}
+
+/* Center Seam Gold Glow Line */
+.cover-seam-glow {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(245, 197, 99, 0.35) 15%,
+    rgba(254, 240, 138, 0.9) 50%,
+    rgba(245, 197, 99, 0.35) 85%,
+    transparent 100%
+  );
+  opacity: 0.65;
+  transition: opacity 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cover-seam-glow.seam-pulse-active {
+  animation: seam-gold-pulse 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes seam-gold-pulse {
+  0% {
+    opacity: 0.6;
+    transform: translateX(-50%) scaleY(0.7);
+    box-shadow: 0 0 10px 2px rgba(245, 197, 99, 0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scaleY(1);
+    box-shadow: 0 0 32px 8px rgba(245, 197, 99, 1),
+                0 0 65px 18px rgba(245, 197, 99, 0.6);
+  }
+  100% {
+    opacity: 0.85;
+    transform: translateX(-50%) scaleY(1);
+    box-shadow: 0 0 22px 5px rgba(245, 197, 99, 0.85);
+  }
+}
+
+/* Button Micro-Feedback (Phase 1) */
+.cover-btn-pressed {
+  transform: scale(0.95) !important;
+  filter: brightness(1.2) !important;
+  box-shadow: 0 0 35px rgba(245, 197, 99, 0.8),
+              0 4px 15px rgba(0, 0, 0, 0.4) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.2s ease,
+              box-shadow 0.2s ease !important;
+}
+
+.wax-seal-pressed {
+  transform: scale(0.93) !important;
+  filter: brightness(1.25) !important;
+  box-shadow: 0 0 40px rgba(245, 197, 99, 0.9),
+              0 6px 20px rgba(0, 0, 0, 0.5) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.2s ease,
+              box-shadow 0.2s ease !important;
+}
+
+/* Wax Seal 3D Perspective & Realistic Flap */
+.wax-envelope-perspective {
+  perspective: 1200px;
+}
+
+.wax-seal-flap {
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wax-seal-flap.flap-opened {
+  transform: rotateX(-180deg);
+}
+
+.wax-seal-medallion {
+  background: radial-gradient(circle at 35% 35%, #ffd700, #d4af37 45%, #b8860b 80%, #7a580b 100%);
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(212, 175, 55, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  border: 3px solid rgba(255, 215, 0, 0.5);
+  will-change: transform, opacity;
+}
+
+/* Breathing Glow Pulse for Wax Seal Medallion */
+@keyframes wax-seal-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.5),
+                0 4px 14px rgba(212, 175, 55, 0.35),
+                inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 12px 30px -2px rgba(0, 0, 0, 0.55),
+                0 0 24px 6px rgba(245, 197, 99, 0.65),
+                inset 0 2px 5px rgba(255, 255, 255, 0.8);
+    transform: scale(1.03);
+  }
+}
+
+.wax-seal-pulse {
+  animation: wax-seal-glow-pulse 3s ease-in-out infinite;
+}
+
+.wax-seal-pulse:hover {
+  animation-play-state: paused;
+}
+
+.wax-seal-broken {
+  transform: scale(1.4) rotate(28deg) !important;
+  opacity: 0 !important;
+  filter: blur(4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.55s ease-out,
+              filter 0.55s ease-out,
+              box-shadow 0.55s ease-out !important;
+}
+
+/* Curtain Lift Backdrop Blur Dissolve */
+.curtain-lift-mode {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: backdrop-filter 1.5s cubic-bezier(0.16, 1, 0.3, 1),
+              -webkit-backdrop-filter 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.curtain-lift-dissolve {
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+}
+
+/* Phase 3: Hero Photo Settle & Staggered Typography */
+.hero-couple-photo.hero-photo-init {
+  transform: scale3d(1.08, 1.08, 1);
+}
+
+.hero-couple-photo.hero-photo-settling {
+  transform: scale3d(1, 1, 1);
+  transition: transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-stagger-text {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.hero-stagger-text.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Cinematic Wedding Scroll Transitions (GPU-Accelerated 60 FPS)
+   ══════════════════════════════════════════════════════════════ */
+.wedding-reveal {
+  will-change: opacity, transform;
+}
+
+/* 1. Couple Profile Section (#mempelai) */
+.wedding-reveal.reveal-portrait {
+  will-change: opacity, transform;
+}
+
+.wedding-reveal.reveal-portrait.portrait-bride {
+  opacity: 0;
+  transform: translate3d(-20px, 30px, 0);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wedding-reveal.reveal-portrait.portrait-bride.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.wedding-reveal.reveal-portrait.portrait-groom {
+  opacity: 0;
+  transform: translate3d(20px, 30px, 0);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 120ms,
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 120ms;
+}
+
+.wedding-reveal.reveal-portrait.portrait-groom.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes emblem-gold-pulse {
+  0% {
+    transform: scale(0.85);
+    filter: drop-shadow(0 0 0 rgba(245, 197, 99, 0));
+  }
+  45% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 18px rgba(245, 197, 99, 0.8));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(245, 197, 99, 0.3));
+  }
+}
+
+.wedding-reveal.reveal-portrait.portrait-sep {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 220ms,
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 220ms;
+  will-change: opacity, transform, filter;
+}
+
+.wedding-reveal.reveal-portrait.portrait-sep.is-revealed {
+  opacity: 1;
+  transform: scale(1);
+  animation: emblem-gold-pulse 1.3s cubic-bezier(0.16, 1, 0.3, 1) 220ms forwards;
+}
+
+/* 2. Event Schedule Cards (#acara) */
+.wedding-reveal.reveal-card {
+  opacity: 0;
+  transform: translate3d(0, 36px, 0);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  will-change: opacity, transform, box-shadow;
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.9s ease;
+}
+
+.wedding-reveal.reveal-card.reveal-card-akad {
+  transition-delay: 0ms;
+}
+
+.wedding-reveal.reveal-card.reveal-card-resepsi {
+  transition-delay: 150ms;
+}
+
+.wedding-reveal.reveal-card.reveal-card-unduh {
+  transition-delay: 300ms;
+}
+
+.wedding-reveal.reveal-card.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.45),
+              0 0 35px -5px rgba(245, 197, 99, 0.2),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* 3. 8-Photo Gallery Grid (#galeri) */
+.wedding-reveal.reveal-gallery-item {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0) scale(0.97);
+  will-change: opacity, transform;
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wedding-reveal.reveal-gallery-item.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* 4. Digital Envelope & Wishes (#amplop, #doa) */
+.wedding-reveal.reveal-blur-card {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  filter: blur(4px);
+  will-change: opacity, transform, filter;
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wedding-reveal.reveal-blur-card.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0px);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Customizable Corner Ornaments (Indonesian Luxury Standard)
+   ══════════════════════════════════════════════════════════════ */
+@keyframes corner-sway {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes corner-glow {
+  0%, 100% {
+    opacity: 0.7;
+    filter: drop-shadow(0 2px 8px rgba(245, 197, 99, 0.25));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 4px 16px rgba(245, 197, 99, 0.55));
+  }
+}
+
+.corner-ornament {
+  position: fixed;
+  pointer-events: none;
+  z-index: 10;
+  width: 95px;
+  height: 95px;
+  will-change: transform, opacity;
+  animation: corner-sway 6s ease-in-out infinite, corner-glow 5s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+  .corner-ornament {
+    width: 145px;
+    height: 145px;
+  }
+}
+
+.corner-ornament-tl {
+  top: 0;
+  left: 0;
+  transform-origin: 0% 0%;
+}
+
+.corner-ornament-tr {
+  top: 0;
+  right: 0;
+  transform-origin: 100% 0%;
+  animation-delay: 0.8s, 1s;
+}
+
+.corner-ornament-bl {
+  bottom: 0;
+  left: 0;
+  transform-origin: 0% 100%;
+  animation-delay: 1.5s, 0.5s;
+}
+
+.corner-ornament-br {
+  bottom: 0;
+  right: 0;
+  transform-origin: 100% 100%;
+  animation-delay: 2.2s, 1.8s;
+}
+
+/* Phone Preview Framing */
+.preview-corner-ornament {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+  width: 54px;
+  height: 54px;
+  will-change: transform, opacity;
+  animation: corner-sway 6s ease-in-out infinite, corner-glow 5s ease-in-out infinite;
+}
+
+.preview-corner-ornament-tl {
+  top: 0;
+  left: 0;
+  transform-origin: 0% 0%;
+}
+
+.preview-corner-ornament-tr {
+  top: 0;
+  right: 0;
+  transform-origin: 100% 0%;
+  animation-delay: 0.8s, 1s;
+}
+
+.preview-corner-ornament-bl {
+  bottom: 0;
+  left: 0;
+  transform-origin: 0% 100%;
+  animation-delay: 1.5s, 0.5s;
+}
+
+.preview-corner-ornament-br {
+  bottom: 0;
+  right: 0;
+  transform-origin: 100% 100%;
+  animation-delay: 2.2s, 1.8s;
+}
+
 
 

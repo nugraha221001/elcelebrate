@@ -52,12 +52,12 @@ const isEdit = Boolean(editId);
           <div class="mb-4">
             <a
               href="/dashboard"
-              class="inline-flex items-center gap-1.5 text-xs font-medium text-surface-400 transition-colors hover:text-[#f5c563]"
+              class="inline-flex items-center gap-2 text-xs font-medium text-surface-400 transition-colors hover:text-[#f5c563]"
             >
               <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
               </svg>
-              ← Back to Dashboard
+              <span>Back to Dashboard</span>
             </a>
           </div>
           <h2 class="text-xl font-bold text-surface-50">Choose a Category</h2>
@@ -326,7 +326,8 @@ const isEdit = Boolean(editId);
             <!-- Unbox Style -->
             <div>
               <label class="mb-2 block text-sm font-medium text-surface-200">Unboxing Animation</label>
-              <div class="grid grid-cols-3 gap-3">
+              <!-- Standard Unboxing Style -->
+              <div id="standard-unbox-container" class="grid grid-cols-3 gap-3">
                 {[
                   { id: 'envelope', emoji: '✉️', label: 'Envelope Flip' },
                   { id: 'giftbox', emoji: '🎁', label: 'Gift Box' },
@@ -350,6 +351,37 @@ const isEdit = Boolean(editId);
                       ]}>✓</span>
                       <span class="text-2xl">{u.emoji}</span>
                       <div class="mt-1 text-xs">{u.label}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <!-- Wedding Luxury Unboxing Style -->
+              <div id="wedding-unbox-container" class="hidden grid-cols-3 gap-3">
+                {[
+                  { id: 'gate-split', emoji: '🏛️', label: 'Royal Gate Split', desc: 'Splits laterally' },
+                  { id: 'curtain-lift', emoji: '✨', label: 'Curtain Lift', desc: 'Upward silk glide' },
+                  { id: 'wax-seal', emoji: '💌', label: 'Wax Seal', desc: 'Breaking seal flap' },
+                ].map((u) => {
+                  const isDefault = u.id === 'gate-split';
+                  return (
+                    <button
+                      type="button"
+                      class:list={[
+                        'wedding-unbox-btn relative rounded-xl border p-4 text-center transition-all cursor-pointer',
+                        isDefault
+                          ? 'border-[#f5c563] ring-2 ring-[#f5c563]/40 bg-[#f5c563]/15 text-white font-medium shadow-lg shadow-[#f5c563]/10'
+                          : 'bg-surface-800/60 border-white/10 text-surface-400 hover:border-white/20 hover:text-surface-200',
+                      ]}
+                      data-unbox-wedding={u.id}
+                    >
+                      <span class:list={[
+                        'wedding-unbox-active-check absolute top-2.5 right-2.5 h-4 w-4 items-center justify-center rounded-full bg-[#f5c563] text-[10px] font-bold text-[#0f0d15] shadow-sm shadow-[#f5c563]/50',
+                        isDefault ? 'flex' : 'hidden',
+                      ]}>✓</span>
+                      <span class="text-2xl">{u.emoji}</span>
+                      <div class="mt-1 text-xs font-semibold">{u.label}</div>
+                      <div class="mt-0.5 text-[10px] text-surface-400 leading-tight">{u.desc}</div>
                     </button>
                   );
                 })}
@@ -402,6 +434,78 @@ const isEdit = Boolean(editId);
                 })}
               </div>
             </div>
+
+            <!-- Corner Ornaments (Indonesian & Luxury Motifs) -->
+            <div id="corner-ornaments-container">
+              <label class="mb-2 block text-sm font-medium text-surface-200">Corner Ornaments</label>
+              <p class="mb-3 text-xs text-surface-500">Traditional Indonesian motifs & luxury accents framing all four corners</p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="corner-ornaments-grid">
+                {[
+                  {
+                    id: 'none',
+                    emoji: '✕',
+                    label: 'None',
+                    desc: 'No corner ornament',
+                  },
+                  {
+                    id: 'botanical',
+                    emoji: '🌿',
+                    label: 'Botanical Leafy',
+                    desc: 'Organic drifting branch with gentle breeze sway',
+                  },
+                  {
+                    id: 'keraton',
+                    emoji: '🏛️',
+                    label: 'Keraton Floral',
+                    desc: 'Royal Javanese & Jepara carved scrollwork',
+                  },
+                  {
+                    id: 'melati',
+                    emoji: '🤍',
+                    label: 'Ronce Melati',
+                    desc: 'Sacred wedding jasmine & betel garland',
+                  },
+                  {
+                    id: 'pucukrebung',
+                    emoji: '🎋',
+                    label: 'Pucuk Rebung',
+                    desc: 'Traditional Minang chevron brocade',
+                  },
+                  {
+                    id: 'artdeco',
+                    emoji: '⚜️',
+                    label: 'Art Deco Gatsby',
+                    desc: 'Symmetrical geometric luxury Gatsby lines',
+                  },
+                ].map((co) => {
+                  const isDefault = co.id === 'none';
+                  return (
+                    <button
+                      type="button"
+                      class:list={[
+                        'corner-btn relative rounded-xl border p-3 text-left transition-all cursor-pointer group',
+                        isDefault
+                          ? 'border-[#f5c563] ring-2 ring-[#f5c563]/40 bg-[#f5c563]/15 text-white font-medium shadow-lg shadow-[#f5c563]/10'
+                          : 'bg-surface-800/60 border-white/10 text-surface-400 hover:border-white/20 hover:text-surface-200',
+                      ]}
+                      data-corner-ornament={co.id}
+                    >
+                      <span class:list={[
+                        'corner-active-check absolute top-2 right-2 h-4 w-4 items-center justify-center rounded-full bg-[#f5c563] text-[10px] font-bold text-[#0f0d15] shadow-sm shadow-[#f5c563]/50',
+                        isDefault ? 'flex' : 'hidden',
+                      ]}>✓</span>
+                      <div class="flex items-start gap-2.5">
+                        <span class="text-xl shrink-0 mt-0.5">{co.emoji}</span>
+                        <div>
+                          <div class="text-xs font-semibold text-surface-200 leading-snug">{co.label}</div>
+                          <div class="text-[10px] text-surface-400 leading-tight mt-0.5 line-clamp-2">{co.desc}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -410,7 +514,8 @@ const isEdit = Boolean(editId);
           <h2 class="text-xl font-bold text-surface-50">Add Photos</h2>
           <p class="mt-2 text-sm text-surface-400" id="photo-upload-hint">Upload up to 4 photos (auto-compressed to WebP, max 200KB each)</p>
 
-          <div class="mt-6">
+          <!-- Standard Photos Container -->
+          <div id="standard-photos-container" class="mt-6">
             <!-- Drop Zone -->
             <div
               id="drop-zone"
@@ -436,6 +541,94 @@ const isEdit = Boolean(editId);
                   <div id="upload-progress" class="h-full rounded-full bg-linear-to-r from-primary to-secondary transition-all duration-300" style="width: 0%"></div>
                 </div>
                 <span id="upload-text" class="text-xs text-surface-400">Processing...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wedding Structured 11-Slot Photos (4 Sections) -->
+          <div id="wedding-photos-container" class="mt-6 hidden space-y-5">
+            <!-- Slot 1: Foto Utama / Prewedding Sampul -->
+            <div class="rounded-2xl border border-amber-500/25 bg-surface-900/60 p-4 sm:p-5">
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold">1</span>
+                    <h3 class="text-sm font-semibold text-surface-100">Foto Utama / Prewedding Sampul</h3>
+                  </div>
+                  <p class="mt-1 text-xs text-surface-400">Foto terbaik berdua. Tampil di layar cover pembuka dan tajuk utama Walimatul 'Urs.</p>
+                </div>
+                <span class="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-medium text-amber-300 border border-amber-500/20 shrink-0">Cover</span>
+              </div>
+              <div id="w-slot-cover-box" class="mt-3">
+                <!-- Injected by renderWeddingSlots() -->
+              </div>
+              <input type="file" id="w-cover-file-input" accept="image/*" class="hidden" />
+            </div>
+
+            <!-- Two-Column: Slot 2 (Bride) & Slot 3 (Groom) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Slot 2: Foto Mempelai Wanita -->
+              <div class="rounded-2xl border border-[#e07a93]/25 bg-surface-900/60 p-4 sm:p-5">
+                <div class="flex items-start justify-between gap-2 mb-2">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="flex h-5 w-5 items-center justify-center rounded-full bg-[#e07a93]/20 text-[#e07a93] text-xs font-bold">2</span>
+                      <h3 class="text-sm font-semibold text-surface-100">Foto Mempelai Wanita</h3>
+                    </div>
+                    <p class="mt-1 text-xs text-surface-400">Foto portrait mempelai wanita untuk kartu profil mempelai putri.</p>
+                  </div>
+                  <span class="text-sm">👰</span>
+                </div>
+                <div id="w-slot-bride-box" class="mt-3">
+                  <!-- Injected by renderWeddingSlots() -->
+                </div>
+                <input type="file" id="w-bride-file-input" accept="image/*" class="hidden" />
+              </div>
+
+              <!-- Slot 3: Foto Mempelai Pria -->
+              <div class="rounded-2xl border border-blue-400/25 bg-surface-900/60 p-4 sm:p-5">
+                <div class="flex items-start justify-between gap-2 mb-2">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-400/20 text-blue-300 text-xs font-bold">3</span>
+                      <h3 class="text-sm font-semibold text-surface-100">Foto Mempelai Pria</h3>
+                    </div>
+                    <p class="mt-1 text-xs text-surface-400">Foto portrait mempelai pria untuk kartu profil mempelai putra.</p>
+                  </div>
+                  <span class="text-sm">🤵</span>
+                </div>
+                <div id="w-slot-groom-box" class="mt-3">
+                  <!-- Injected by renderWeddingSlots() -->
+                </div>
+                <input type="file" id="w-groom-file-input" accept="image/*" class="hidden" />
+              </div>
+            </div>
+
+            <!-- Slot 4-11: Galeri Foto Prewedding (Maksimal 8 Foto) -->
+            <div class="rounded-2xl border border-white/10 bg-surface-900/60 p-4 sm:p-5">
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-surface-200 text-xs font-bold">4-11</span>
+                    <h3 class="text-sm font-semibold text-surface-100">Galeri Foto Prewedding (Maksimal 8 Foto)</h3>
+                  </div>
+                  <p class="mt-1 text-xs text-surface-400">Foto momen kenangan untuk seksi Galeri Foto, efek mist, dan popup lightbox.</p>
+                </div>
+                <span id="w-gallery-count-badge" class="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-medium text-surface-300 border border-white/10 shrink-0">0 / 8 Foto</span>
+              </div>
+              <div id="w-slot-gallery-box" class="mt-3">
+                <!-- Dropzone + grid injected by renderWeddingSlots() -->
+              </div>
+              <input type="file" id="w-gallery-file-input" accept="image/*" multiple class="hidden" />
+            </div>
+
+            <!-- Shared Wedding Upload Progress -->
+            <div id="w-upload-status" class="hidden">
+              <div class="flex items-center gap-3">
+                <div class="h-2 flex-1 overflow-hidden rounded-full bg-surface-700">
+                  <div id="w-upload-progress" class="h-full rounded-full bg-linear-to-r from-primary to-secondary transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <span id="w-upload-text" class="text-xs text-surface-400">Processing...</span>
               </div>
             </div>
           </div>
@@ -730,6 +923,23 @@ const isEdit = Boolean(editId);
                 <span class="text-lg">💍</span> Wedding Details
               </div>
 
+              <!-- Tajuk Acara / Header Title -->
+              <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-2">
+                <div class="flex items-center justify-between">
+                  <label for="w-header-title" class="block text-xs font-semibold uppercase tracking-wider text-amber-300">
+                    👑 Tajuk Acara / Header Title
+                  </label>
+                  <span class="text-[11px] text-surface-400">Tampil di layar cover pembuka & tajuk utama</span>
+                </div>
+                <input
+                  type="text"
+                  id="w-header-title"
+                  placeholder="Walimatul 'Urs"
+                  value="Walimatul 'Urs"
+                  class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring"
+                />
+              </div>
+
               <!-- Opening Greeting / Salam Pembuka -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
                 <div class="text-xs font-semibold uppercase tracking-wider text-violet-400">🙏 Salam Pembuka / Opening Greeting</div>
@@ -955,6 +1165,7 @@ const isEdit = Boolean(editId);
                         type="button"
                         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-700 text-surface-300 transition-all hover:bg-primary/20 hover:text-primary cursor-pointer"
                         data-audio-preview={track.id}
+                        data-audio-url={`/audio/${track.filename}`}
                         aria-label={`Preview ${track.name}`}
                       >
                         <svg class="audio-preview-play h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1116,12 +1327,12 @@ const isEdit = Boolean(editId);
           <a
             href="/dashboard"
             id="step1-cancel-link"
-            class="inline-flex items-center gap-1.5 text-sm font-medium text-surface-400 transition-colors hover:text-[#f5c563]"
+            class="inline-flex items-center gap-2 text-sm font-medium text-surface-400 transition-colors hover:text-[#f5c563]"
           >
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
-            ← Back to Dashboard
+            <span>Back to Dashboard</span>
           </a>
           <button
             type="button"
@@ -1254,7 +1465,8 @@ const isEdit = Boolean(editId);
 <script>
   import { startSynth, stopSynth, isPlayingSynth } from '../../lib/synth-audio';
   import { compressImage, uploadToR2 } from '../../lib/image-compress';
-  import { CATEGORY_DEFAULTS, RECOMMENDED_TRACKS } from '../../lib/audio-tracks';
+  import { CATEGORY_DEFAULTS, RECOMMENDED_TRACKS, AUDIO_TRACKS, LEGACY_TRACK_MAP } from '../../lib/audio-tracks';
+  import { renderCornerOrnamentsHtml } from '../../lib/corner-ornaments';
 
   // ═══════════════════════════════════════════════════════
   // Creator Studio — Wizard State Machine
@@ -1292,6 +1504,7 @@ const isEdit = Boolean(editId);
       externalAudioUrl: string | null;
       customAudioUrl?: string | null;
       ambientEffect: string;
+      cornerOrnament?: string;
       weddingData?: WeddingDataState;
       passcode?: string;
       interactiveConfession?: {
@@ -1309,6 +1522,8 @@ const isEdit = Boolean(editId);
       invitationEventType?: string;
       invitationTime?: string;
       invitationVenue?: string;
+      unboxingStyle?: string;
+      weddingHeaderTitle?: string;
     };
     photos: Array<{ file?: File; previewUrl: string; publicUrl?: string }>;
     recipientName: string;
@@ -1316,6 +1531,26 @@ const isEdit = Boolean(editId);
     message: string;
     eventDate: string;
   }
+
+  interface WeddingPhotoSlot {
+    file?: File;
+    previewUrl: string;
+    publicUrl?: string;
+  }
+
+  interface WeddingSlotsState {
+    cover: WeddingPhotoSlot | null;
+    bride: WeddingPhotoSlot | null;
+    groom: WeddingPhotoSlot | null;
+    gallery: WeddingPhotoSlot[];
+  }
+
+  const weddingSlots: WeddingSlotsState = {
+    cover: null,
+    bride: null,
+    groom: null,
+    gallery: [],
+  };
 
   function emptyWeddingData(): WeddingDataState {
     return {
@@ -1347,10 +1582,13 @@ const isEdit = Boolean(editId);
       fontFamily: 'sans',
       backgroundPattern: 'none',
       unboxStyle: 'envelope',
+      unboxingStyle: 'gate-split',
+      weddingHeaderTitle: "Walimatul 'Urs",
       audioTrackId: null,
       externalAudioUrl: null,
       customAudioUrl: null,
       ambientEffect: 'none',
+      cornerOrnament: 'none',
       passcode: '',
       interactiveConfession: {
         enabled: false,
@@ -1423,6 +1661,10 @@ const isEdit = Boolean(editId);
   // ═══════════════════════════════════════════════════════
   function goToStep(step: number) {
     if (step < 1 || step > totalSteps) return;
+
+    // Stop in-studio audio previews on navigation
+    stopCatalogAudioPreview();
+    stopCustomAudioPreview();
 
     // Validation
     if (step > currentStep) {
@@ -1574,10 +1816,12 @@ const isEdit = Boolean(editId);
   // Step 1: Category Selection
   // ═══════════════════════════════════════════════════════
   function updatePhotoLimitUI() {
-    const maxPhotos = state.category === 'wedding' ? 10 : 4;
+    const maxPhotos = state.category === 'wedding' ? 11 : 4;
     const hintEl = document.getElementById('photo-upload-hint');
     if (hintEl) {
-      hintEl.textContent = `Upload up to ${maxPhotos} photos (auto-compressed to WebP, max 200KB each)`;
+      hintEl.textContent = state.category === 'wedding'
+        ? 'Kelola 11 slot foto prewedding dan kartu profil dengan helper panduan di bawah ini'
+        : `Upload up to ${maxPhotos} photos (auto-compressed to WebP, max 200KB each)`;
     }
   }
 
@@ -1587,12 +1831,29 @@ const isEdit = Boolean(editId);
     const recipientField = document.getElementById('standard-recipient-field');
     const senderField = document.getElementById('standard-sender-field');
     const eventDateField = document.getElementById('standard-event-date-field');
+    const standardUnbox = document.getElementById('standard-unbox-container');
+    const weddingUnbox = document.getElementById('wedding-unbox-container');
+    const standardPhotos = document.getElementById('standard-photos-container');
+    const weddingPhotos = document.getElementById('wedding-photos-container');
 
     if (isWedding) {
       weddingFields?.classList.remove('hidden');
       recipientField?.classList.add('hidden');
       senderField?.classList.add('hidden');
       eventDateField?.classList.add('hidden');
+      standardUnbox?.classList.add('hidden');
+      standardUnbox?.classList.remove('grid');
+      weddingUnbox?.classList.remove('hidden');
+      weddingUnbox?.classList.add('grid');
+      standardPhotos?.classList.add('hidden');
+      weddingPhotos?.classList.remove('hidden');
+
+      if (!state.themeConfig.unboxingStyle) {
+        state.themeConfig.unboxingStyle = 'gate-split';
+      }
+      syncThemeSelectorActiveStates();
+      renderWeddingSlots();
+
       // Initialize weddingData if not yet set
       if (!state.themeConfig.weddingData) {
         state.themeConfig.weddingData = emptyWeddingData();
@@ -1602,6 +1863,12 @@ const isEdit = Boolean(editId);
       recipientField?.classList.remove('hidden');
       senderField?.classList.remove('hidden');
       eventDateField?.classList.remove('hidden');
+      weddingUnbox?.classList.add('hidden');
+      weddingUnbox?.classList.remove('grid');
+      standardUnbox?.classList.remove('hidden');
+      standardUnbox?.classList.add('grid');
+      weddingPhotos?.classList.add('hidden');
+      standardPhotos?.classList.remove('hidden');
     }
 
     // Category-specific panels
@@ -1649,15 +1916,28 @@ const isEdit = Boolean(editId);
       btn.querySelector('[data-check]')?.classList.add('flex');
       toggleCategorySpecificFields();
 
+      // Stop running previews when switching category
+      stopCatalogAudioPreview();
+      stopCustomAudioPreview();
+
       // Apply smart defaults for the selected category
       const defaults = (CATEGORY_DEFAULTS as Record<string, { ambientEffect: string; audioTrackId: string }>)[state.category];
       if (defaults) {
         state.themeConfig.ambientEffect = defaults.ambientEffect;
         state.themeConfig.audioTrackId = defaults.audioTrackId;
-        syncThemeSelectorActiveStates();
-        updateTrackSelectionUI();
-        sortAndBadgeAudioTracks();
+        state.themeConfig.customAudioUrl = null;
+        resetCustomAudioUploadUI();
       }
+
+      if (state.category === 'wedding') {
+        if (!state.themeConfig.cornerOrnament || state.themeConfig.cornerOrnament === 'none') {
+          state.themeConfig.cornerOrnament = 'botanical';
+        }
+      }
+
+      syncThemeSelectorActiveStates();
+      updateTrackSelectionUI();
+      sortAndBadgeAudioTracks();
 
       updateLivePreview();
     });
@@ -1779,6 +2059,28 @@ const isEdit = Boolean(editId);
       }
     });
 
+    // 3b. Wedding Unbox Style
+    const currentWeddingUnbox = state.themeConfig.unboxingStyle || 'gate-split';
+    document.querySelectorAll('[data-unbox-wedding]').forEach((btn) => {
+      const isSelected = (btn as HTMLElement).dataset.unboxWedding === currentWeddingUnbox;
+      const check = btn.querySelector('.wedding-unbox-active-check');
+      if (isSelected) {
+        btn.classList.remove(...INACTIVE_THEME_CLASSES);
+        btn.classList.add(...ACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.remove('hidden');
+          check.classList.add('flex');
+        }
+      } else {
+        btn.classList.remove(...ACTIVE_THEME_CLASSES);
+        btn.classList.add(...INACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.add('hidden');
+          check.classList.remove('flex');
+        }
+      }
+    });
+
     // 4. Ambient Effect
     const currentAmbient = (state.themeConfig as any).ambientEffect || 'none';
     document.querySelectorAll('[data-ambient]').forEach((btn) => {
@@ -1822,6 +2124,28 @@ const isEdit = Boolean(editId);
         }
       }
     });
+
+    // 6. Corner Ornaments
+    const currentCorner = state.themeConfig.cornerOrnament || (state.category === 'wedding' ? 'botanical' : 'none');
+    document.querySelectorAll('[data-corner-ornament]').forEach((btn) => {
+      const isSelected = (btn as HTMLElement).dataset.cornerOrnament === currentCorner;
+      const check = btn.querySelector('.corner-active-check');
+      if (isSelected) {
+        btn.classList.remove(...INACTIVE_THEME_CLASSES);
+        btn.classList.add(...ACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.remove('hidden');
+          check.classList.add('flex');
+        }
+      } else {
+        btn.classList.remove(...ACTIVE_THEME_CLASSES);
+        btn.classList.add(...INACTIVE_THEME_CLASSES);
+        if (check) {
+          check.classList.add('hidden');
+          check.classList.remove('flex');
+        }
+      }
+    });
   }
 
   // Click listeners with immediate active styling, state updates & live preview re-rendering
@@ -1849,6 +2173,14 @@ const isEdit = Boolean(editId);
     });
   });
 
+  document.querySelectorAll('[data-unbox-wedding]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.themeConfig.unboxingStyle = (btn as HTMLElement).dataset.unboxWedding || 'gate-split';
+      syncThemeSelectorActiveStates();
+      updateLivePreview();
+    });
+  });
+
   document.querySelectorAll('[data-ambient]').forEach((btn) => {
     btn.addEventListener('click', () => {
       (state.themeConfig as any).ambientEffect = (btn as HTMLElement).dataset.ambient || 'none';
@@ -1869,8 +2201,309 @@ const isEdit = Boolean(editId);
     });
   });
 
+  document.querySelectorAll('[data-corner-ornament]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.themeConfig.cornerOrnament = (btn as HTMLElement).dataset.cornerOrnament || 'none';
+      syncThemeSelectorActiveStates();
+      updateLivePreview();
+    });
+  });
+
   // ═══════════════════════════════════════════════════════
-  // Step 3: Media Upload
+  // Wedding Structured Photo Slots (11 Slots across 4 Sections)
+  // ═══════════════════════════════════════════════════════
+  async function handleSingleSlotFile(file: File, slot: 'cover' | 'bride' | 'groom') {
+    const statusEl = document.getElementById('w-upload-status');
+    const progressEl = document.getElementById('w-upload-progress');
+    const textEl = document.getElementById('w-upload-text');
+    if (statusEl) statusEl.classList.remove('hidden');
+    if (textEl) textEl.textContent = 'Memproses foto...';
+    if (progressEl) progressEl.style.width = '50%';
+
+    try {
+      const result = await compressImage(file);
+      if (weddingSlots[slot]?.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(weddingSlots[slot]!.previewUrl);
+      }
+      weddingSlots[slot] = { file: result.file, previewUrl: result.previewUrl };
+      if (progressEl) progressEl.style.width = '100%';
+    } catch (err: any) {
+      (window as any).showToast?.({ message: err.message || 'Kompresi foto gagal', type: 'error' });
+    } finally {
+      if (statusEl) statusEl.classList.add('hidden');
+      renderWeddingSlots();
+      updateLivePreview();
+    }
+  }
+
+  async function handleWeddingGalleryFiles(files: FileList) {
+    const remaining = 8 - weddingSlots.gallery.length;
+    if (remaining <= 0) {
+      (window as any).showToast?.({ message: 'Maksimal 8 foto untuk galeri prewedding', type: 'warning' });
+      return;
+    }
+    const toProcess = Array.from(files).slice(0, remaining);
+    const statusEl = document.getElementById('w-upload-status');
+    const progressEl = document.getElementById('w-upload-progress');
+    const textEl = document.getElementById('w-upload-text');
+    if (statusEl) statusEl.classList.remove('hidden');
+
+    for (let i = 0; i < toProcess.length; i++) {
+      if (textEl) textEl.textContent = `Memproses galeri ${i + 1}/${toProcess.length}...`;
+      if (progressEl) progressEl.style.width = `${((i + 1) / toProcess.length) * 100}%`;
+      try {
+        const result = await compressImage(toProcess[i]);
+        weddingSlots.gallery.push({ file: result.file, previewUrl: result.previewUrl });
+      } catch (err: any) {
+        (window as any).showToast?.({ message: err.message || 'Kompresi foto gagal', type: 'error' });
+      }
+    }
+    if (statusEl) statusEl.classList.add('hidden');
+    renderWeddingSlots();
+    updateLivePreview();
+  }
+
+  function renderWeddingSlots() {
+    // 1. Slot 1: Cover
+    const coverBox = document.getElementById('w-slot-cover-box');
+    const coverInput = document.getElementById('w-cover-file-input') as HTMLInputElement | null;
+    if (coverBox) {
+      if (weddingSlots.cover) {
+        coverBox.innerHTML = `
+          <div class="relative flex items-center gap-4 rounded-xl border border-amber-500/30 bg-surface-800/80 p-3">
+            <img src="${weddingSlots.cover.previewUrl}" alt="Sampul Prewedding" class="h-24 w-20 rounded-lg object-cover border border-amber-400/30 shadow-md shrink-0" />
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-surface-100 truncate">Foto Sampul Terpasang</div>
+              <p class="text-[11px] text-surface-400 mt-0.5">Tampil pada amplop cover dan hero section</p>
+              <div class="flex items-center gap-2 mt-2">
+                <button type="button" id="btn-change-cover" class="rounded-lg bg-surface-700 hover:bg-surface-600 px-2.5 py-1 text-xs text-surface-200 cursor-pointer transition-colors">
+                  Ganti Foto
+                </button>
+                <button type="button" id="btn-remove-cover" class="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 px-2.5 py-1 text-xs cursor-pointer transition-colors">
+                  Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById('btn-change-cover')?.addEventListener('click', () => coverInput?.click());
+        document.getElementById('btn-remove-cover')?.addEventListener('click', () => {
+          if (weddingSlots.cover?.previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(weddingSlots.cover.previewUrl);
+          }
+          weddingSlots.cover = null;
+          renderWeddingSlots();
+          updateLivePreview();
+        });
+      } else {
+        coverBox.innerHTML = `
+          <div id="drop-cover-area" class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-amber-500/25 bg-amber-500/5 p-6 hover:bg-amber-500/10 hover:border-amber-500/50 cursor-pointer transition-all">
+            <span class="text-2xl mb-1">📸</span>
+            <span class="text-xs font-semibold text-amber-200">Klik / Tarik Foto Sampul ke Sini</span>
+            <span class="text-[11px] text-surface-400 mt-0.5">PNG, JPG, WebP — Foto lanskap atau potret berdua</span>
+          </div>
+        `;
+        const dropArea = document.getElementById('drop-cover-area');
+        dropArea?.addEventListener('click', () => coverInput?.click());
+        dropArea?.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('border-amber-400'); });
+        dropArea?.addEventListener('dragleave', () => dropArea.classList.remove('border-amber-400'));
+        dropArea?.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropArea.classList.remove('border-amber-400');
+          if (e.dataTransfer?.files?.[0]) handleSingleSlotFile(e.dataTransfer.files[0], 'cover');
+        });
+      }
+    }
+
+    // 2. Slot 2: Bride
+    const brideBox = document.getElementById('w-slot-bride-box');
+    const brideInput = document.getElementById('w-bride-file-input') as HTMLInputElement | null;
+    if (brideBox) {
+      if (weddingSlots.bride) {
+        brideBox.innerHTML = `
+          <div class="relative flex items-center gap-3 rounded-xl border border-[#e07a93]/30 bg-surface-800/80 p-3">
+            <img src="${weddingSlots.bride.previewUrl}" alt="Mempelai Wanita" class="h-20 w-20 rounded-full object-cover border-2 border-[#e07a93]/40 shadow-md shrink-0" />
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[#e07a93] truncate">Foto Putri Terpasang</div>
+              <div class="flex items-center gap-2 mt-2">
+                <button type="button" id="btn-change-bride" class="rounded-lg bg-surface-700 hover:bg-surface-600 px-2 py-1 text-xs text-surface-200 cursor-pointer transition-colors">
+                  Ganti
+                </button>
+                <button type="button" id="btn-remove-bride" class="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 px-2 py-1 text-xs cursor-pointer transition-colors">
+                  Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById('btn-change-bride')?.addEventListener('click', () => brideInput?.click());
+        document.getElementById('btn-remove-bride')?.addEventListener('click', () => {
+          if (weddingSlots.bride?.previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(weddingSlots.bride.previewUrl);
+          }
+          weddingSlots.bride = null;
+          renderWeddingSlots();
+          updateLivePreview();
+        });
+      } else {
+        brideBox.innerHTML = `
+          <div id="drop-bride-area" class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#e07a93]/25 bg-[#e07a93]/5 p-5 hover:bg-[#e07a93]/10 hover:border-[#e07a93]/50 cursor-pointer transition-all">
+            <span class="text-xl mb-1">👰</span>
+            <span class="text-xs font-medium text-[#e07a93]">Pilih Foto Mempelai Wanita</span>
+            <span class="text-[10px] text-surface-400 mt-0.5">Portrait foto sendiri</span>
+          </div>
+        `;
+        const dropArea = document.getElementById('drop-bride-area');
+        dropArea?.addEventListener('click', () => brideInput?.click());
+        dropArea?.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('border-[#e07a93]'); });
+        dropArea?.addEventListener('dragleave', () => dropArea.classList.remove('border-[#e07a93]'));
+        dropArea?.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropArea.classList.remove('border-[#e07a93]');
+          if (e.dataTransfer?.files?.[0]) handleSingleSlotFile(e.dataTransfer.files[0], 'bride');
+        });
+      }
+    }
+
+    // 3. Slot 3: Groom
+    const groomBox = document.getElementById('w-slot-groom-box');
+    const groomInput = document.getElementById('w-groom-file-input') as HTMLInputElement | null;
+    if (groomBox) {
+      if (weddingSlots.groom) {
+        groomBox.innerHTML = `
+          <div class="relative flex items-center gap-3 rounded-xl border border-blue-400/30 bg-surface-800/80 p-3">
+            <img src="${weddingSlots.groom.previewUrl}" alt="Mempelai Pria" class="h-20 w-20 rounded-full object-cover border-2 border-blue-400/40 shadow-md shrink-0" />
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-blue-300 truncate">Foto Putra Terpasang</div>
+              <div class="flex items-center gap-2 mt-2">
+                <button type="button" id="btn-change-groom" class="rounded-lg bg-surface-700 hover:bg-surface-600 px-2 py-1 text-xs text-surface-200 cursor-pointer transition-colors">
+                  Ganti
+                </button>
+                <button type="button" id="btn-remove-groom" class="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 px-2 py-1 text-xs cursor-pointer transition-colors">
+                  Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById('btn-change-groom')?.addEventListener('click', () => groomInput?.click());
+        document.getElementById('btn-remove-groom')?.addEventListener('click', () => {
+          if (weddingSlots.groom?.previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(weddingSlots.groom.previewUrl);
+          }
+          weddingSlots.groom = null;
+          renderWeddingSlots();
+          updateLivePreview();
+        });
+      } else {
+        groomBox.innerHTML = `
+          <div id="drop-groom-area" class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-blue-400/25 bg-blue-400/5 p-5 hover:bg-blue-400/10 hover:border-blue-400/50 cursor-pointer transition-all">
+            <span class="text-xl mb-1">🤵</span>
+            <span class="text-xs font-medium text-blue-300">Pilih Foto Mempelai Pria</span>
+            <span class="text-[10px] text-surface-400 mt-0.5">Portrait foto sendiri</span>
+          </div>
+        `;
+        const dropArea = document.getElementById('drop-groom-area');
+        dropArea?.addEventListener('click', () => groomInput?.click());
+        dropArea?.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('border-blue-400'); });
+        dropArea?.addEventListener('dragleave', () => dropArea.classList.remove('border-blue-400'));
+        dropArea?.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropArea.classList.remove('border-blue-400');
+          if (e.dataTransfer?.files?.[0]) handleSingleSlotFile(e.dataTransfer.files[0], 'groom');
+        });
+      }
+    }
+
+    // 4. Slot 4-11: Gallery (Max 8 photos)
+    const galleryBox = document.getElementById('w-slot-gallery-box');
+    const galleryCountBadge = document.getElementById('w-gallery-count-badge');
+    const galleryInput = document.getElementById('w-gallery-file-input') as HTMLInputElement | null;
+    if (galleryCountBadge) {
+      galleryCountBadge.textContent = `${weddingSlots.gallery.length} / 8 Foto`;
+    }
+    if (galleryBox) {
+      const canAddMore = weddingSlots.gallery.length < 8;
+      let html = '';
+      if (canAddMore) {
+        html += `
+          <div id="drop-gallery-area" class="mb-3 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/15 bg-surface-800/40 p-4 hover:border-white/30 hover:bg-surface-800/70 cursor-pointer transition-all">
+            <span class="text-lg">🖼️</span>
+            <span class="text-xs font-medium text-surface-200 mt-1">Tambah Foto ke Galeri (${8 - weddingSlots.gallery.length} slot tersisa)</span>
+            <span class="text-[10px] text-surface-500">Klik atau drag foto ke sini</span>
+          </div>
+        `;
+      }
+      if (weddingSlots.gallery.length > 0) {
+        html += `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">`;
+        weddingSlots.gallery.forEach((p, idx) => {
+          html += `
+            <div class="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-surface-800 shadow-sm">
+              <img src="${p.previewUrl}" alt="Galeri ${idx + 1}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              <span class="absolute top-1.5 left-1.5 rounded-full bg-black/60 px-1.5 py-0.5 text-[9px] text-white/80 font-mono">#${idx + 1}</span>
+              <button
+                type="button"
+                class="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-500 cursor-pointer"
+                data-remove-wedding-gallery="${idx}"
+                title="Hapus foto ini"
+              >
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+      galleryBox.innerHTML = html;
+
+      if (canAddMore) {
+        const dropGalleryArea = document.getElementById('drop-gallery-area');
+        dropGalleryArea?.addEventListener('click', () => galleryInput?.click());
+        dropGalleryArea?.addEventListener('dragover', (e) => { e.preventDefault(); dropGalleryArea.classList.add('border-primary/50'); });
+        dropGalleryArea?.addEventListener('dragleave', () => dropGalleryArea.classList.remove('border-primary/50'));
+        dropGalleryArea?.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropGalleryArea.classList.remove('border-primary/50');
+          if (e.dataTransfer?.files) handleWeddingGalleryFiles(e.dataTransfer.files);
+        });
+      }
+
+      galleryBox.querySelectorAll('[data-remove-wedding-gallery]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt((btn as HTMLElement).dataset.removeWeddingGallery || '0');
+          if (weddingSlots.gallery[idx]?.previewUrl?.startsWith('blob:')) {
+            URL.revokeObjectURL(weddingSlots.gallery[idx].previewUrl);
+          }
+          weddingSlots.gallery.splice(idx, 1);
+          renderWeddingSlots();
+          updateLivePreview();
+        });
+      });
+    }
+  }
+
+  // Wedding File Input Change Listeners
+  document.getElementById('w-cover-file-input')?.addEventListener('change', (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) handleSingleSlotFile(file, 'cover');
+  });
+  document.getElementById('w-bride-file-input')?.addEventListener('change', (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) handleSingleSlotFile(file, 'bride');
+  });
+  document.getElementById('w-groom-file-input')?.addEventListener('change', (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) handleSingleSlotFile(file, 'groom');
+  });
+  document.getElementById('w-gallery-file-input')?.addEventListener('change', (e) => {
+    const files = (e.target as HTMLInputElement).files;
+    if (files) handleWeddingGalleryFiles(files);
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // Step 3: Media Upload (Standard)
   // ═══════════════════════════════════════════════════════
   const dropZone = document.getElementById('drop-zone');
   const fileInput = document.getElementById('file-input') as HTMLInputElement | null;
@@ -2252,6 +2885,11 @@ const isEdit = Boolean(editId);
     });
   }
 
+  // Header Title
+  wInput('w-header-title', (v) => {
+    state.themeConfig.weddingHeaderTitle = v.trim() || "Walimatul 'Urs";
+  });
+
   // Bride
   wInput('w-bride-name', (v) => { getWD().bride.fullName = v; syncWeddingRecipientName(); });
   wInput('w-bride-nick', (v) => { getWD().bride.nickname = v; syncWeddingRecipientName(); });
@@ -2363,6 +3001,19 @@ const isEdit = Boolean(editId);
   // Audio Track Selection & In-Studio Preview
   // ═══════════════════════════════════════════════════════
   let previewingTrackId: string | null = null;
+  let catalogAudioPlayer: HTMLAudioElement | null = null;
+
+  function stopCatalogAudioPreview() {
+    if (catalogAudioPlayer) {
+      catalogAudioPlayer.pause();
+      catalogAudioPlayer.currentTime = 0;
+    }
+    if (isPlayingSynth()) {
+      stopSynth();
+    }
+    previewingTrackId = null;
+    updateTrackSelectionUI();
+  }
 
   function updateTrackSelectionUI() {
     document.querySelectorAll('[data-track-row]').forEach((row) => {
@@ -2415,27 +3066,51 @@ const isEdit = Boolean(editId);
     btn.addEventListener('click', async (e) => {
       e.stopPropagation(); // Don't bubble to track-row
       const trackId = (btn as HTMLElement).dataset.audioPreview || '';
+      const trackUrl = (btn as HTMLElement).dataset.audioUrl || `/audio/${trackId}.opus`;
 
       stopCustomAudioPreview();
 
-      if (previewingTrackId === trackId && isPlayingSynth()) {
-        // Pause current preview
-        stopSynth();
-        previewingTrackId = null;
-        updateTrackSelectionUI();
+      if (previewingTrackId === trackId) {
+        // Toggle pause/stop current preview
+        stopCatalogAudioPreview();
         return;
       }
 
       // Stop any running preview first
-      if (isPlayingSynth()) stopSynth();
+      stopCatalogAudioPreview();
 
       // Start new preview
       previewingTrackId = trackId;
       updateTrackSelectionUI();
-      const started = await startSynth(trackId, 0.3);
-      if (!started) {
+
+      if (!catalogAudioPlayer) {
+        catalogAudioPlayer = new Audio();
+      }
+
+      catalogAudioPlayer.src = trackUrl;
+      catalogAudioPlayer.volume = 0.4;
+      catalogAudioPlayer.onended = () => {
         previewingTrackId = null;
         updateTrackSelectionUI();
+      };
+      catalogAudioPlayer.onerror = async () => {
+        // Fallback to Web Audio synth if Opus fails to load
+        const started = await startSynth(trackId, 0.3);
+        if (!started) {
+          previewingTrackId = null;
+          updateTrackSelectionUI();
+        }
+      };
+
+      try {
+        await catalogAudioPlayer.play();
+      } catch {
+        // Autoplay restrictions or network error -> fallback to synth
+        const started = await startSynth(trackId, 0.3);
+        if (!started) {
+          previewingTrackId = null;
+          updateTrackSelectionUI();
+        }
       }
     });
   });
@@ -2707,12 +3382,8 @@ const isEdit = Boolean(editId);
       return;
     }
 
-    // Stop catalog synth preview
-    if (isPlayingSynth()) {
-      stopSynth();
-      previewingTrackId = null;
-      updateTrackSelectionUI();
-    }
+    // Stop catalog audio/synth preview
+    stopCatalogAudioPreview();
 
     if (!customAudioPlayer || customAudioPlayer.src !== state.themeConfig.customAudioUrl) {
       customAudioPlayer = new Audio(state.themeConfig.customAudioUrl);
@@ -2830,7 +3501,15 @@ const isEdit = Boolean(editId);
     };
     const currentUnbox = unboxInfo[state.themeConfig.unboxStyle] || unboxInfo.envelope;
 
-    let html = `<div class="text-center space-y-3" style="font-family: ${font}">`;
+    const activeCornerMotif = state.themeConfig.cornerOrnament || (state.category === 'wedding' ? 'botanical' : 'none');
+    const cornerOverlayHtml = renderCornerOrnamentsHtml(
+      activeCornerMotif,
+      state.themeConfig.primaryColor,
+      state.themeConfig.secondaryColor,
+      true
+    );
+
+    let html = `${cornerOverlayHtml}<div class="text-center space-y-3 relative z-1" style="font-family: ${font}">`;
 
     // ── Wedding-specific preview ──
     if (state.category === 'wedding' && state.themeConfig.weddingData) {
@@ -2838,8 +3517,12 @@ const isEdit = Boolean(editId);
       const brideName = wd.bride.nickname || wd.bride.fullName || 'Bride';
       const groomName = wd.groom.nickname || wd.groom.fullName || 'Groom';
 
-      html += `<div class="text-3xl mb-1">💍</div>`;
-      html += `<p class="text-[10px] uppercase tracking-widest text-[#e07a93]" style="font-family: ${font}">The Wedding of</p>`;
+      if (weddingSlots.cover) {
+        html += `<div class="mx-auto my-1 h-20 w-16 overflow-hidden rounded-t-full border border-amber-300/40 shadow-md"><img src="${weddingSlots.cover.previewUrl}" alt="Sampul" class="h-full w-full object-cover"/></div>`;
+      } else {
+        html += `<div class="text-3xl mb-1">💍</div>`;
+      }
+      html += `<p class="text-[10px] uppercase tracking-widest text-[#e07a93]" style="font-family: ${font}">${state.themeConfig.weddingHeaderTitle || "Walimatul 'Urs"}</p>`;
       html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">${brideName} & ${groomName}</h3>`;
 
       if (wd.openingGreeting) {
@@ -3047,6 +3730,14 @@ const isEdit = Boolean(editId);
       'keraton-glow': '🕯️ Keraton Glow',
       fireflies: '✨ Fireflies',
     };
+    const cornerSummaryMap: Record<string, string> = {
+      none: 'None',
+      botanical: '🌿 Botanical Leafy',
+      keraton: '🏛️ Keraton Floral',
+      melati: '🤍 Ronce Melati',
+      pucukrebung: '🎋 Pucuk Rebung',
+      artdeco: '⚜️ Art Deco Gatsby',
+    };
 
     summary.innerHTML = `
       <div class="space-y-3">
@@ -3078,6 +3769,10 @@ const isEdit = Boolean(editId);
         <div class="flex justify-between items-center">
           <span class="text-sm text-surface-400">Ambient Effect</span>
           <span class="text-sm font-medium text-surface-200">${ambientSummaryMap[state.themeConfig.ambientEffect] || state.themeConfig.ambientEffect || 'None'}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-surface-400">Corner Ornaments</span>
+          <span class="text-sm font-medium text-surface-200">${cornerSummaryMap[state.themeConfig.cornerOrnament || (state.category === 'wedding' ? 'botanical' : 'none')] || 'None'}</span>
         </div>
         ${state.category === 'love' && state.themeConfig.passcode ? `
         <div class="flex justify-between items-center">
@@ -3141,7 +3836,7 @@ const isEdit = Boolean(editId);
         </div>` : (state.themeConfig.audioTrackId ? `
         <div class="flex justify-between items-center">
           <span class="text-sm text-surface-400">Music</span>
-          <span class="text-sm font-medium text-surface-200">🎵 ${state.themeConfig.audioTrackId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+          <span class="text-sm font-medium text-surface-200">🎵 ${AUDIO_TRACKS.find(t => t.id === state.themeConfig.audioTrackId)?.name || state.themeConfig.audioTrackId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
         </div>` : '')}
         ${state.eventDate ? `
         <div class="flex justify-between items-center">
@@ -3189,31 +3884,74 @@ const isEdit = Boolean(editId);
     try {
       // 1. Upload photos to R2 (if any new files)
       const mediaUrls: string[] = [];
-      for (const photo of state.photos) {
-        if (photo.publicUrl) {
-          mediaUrls.push(photo.publicUrl);
-          continue;
-        }
-        if (photo.file) {
-          // Get presigned URL
+
+      const uploadSlotItem = async (slotItem: WeddingPhotoSlot | null): Promise<string> => {
+        if (!slotItem) return '';
+        if (slotItem.publicUrl) return slotItem.publicUrl;
+        if (slotItem.file) {
           const presignRes = await fetch('/api/storage/presigned-url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              filename: photo.file.name,
+              filename: slotItem.file.name,
               contentType: 'image/webp',
             }),
           });
-
           if (!presignRes.ok) {
             const errData = await presignRes.json().catch(() => ({ error: 'Failed to get upload URL' }));
-            throw new Error(errData.error || `Failed to get upload authorization (${presignRes.status})`);
+            throw new Error(errData.error || `Upload authorization failed (${presignRes.status})`);
           }
           const { uploadUrl, publicUrl } = await presignRes.json();
+          await uploadToR2(uploadUrl, slotItem.file);
+          slotItem.publicUrl = publicUrl;
+          return publicUrl;
+        }
+        return '';
+      };
 
-          // Upload directly to R2
-          await uploadToR2(uploadUrl, photo.file);
-          mediaUrls.push(publicUrl);
+      if (state.category === 'wedding') {
+        const coverUrl = await uploadSlotItem(weddingSlots.cover);
+        const brideUrl = await uploadSlotItem(weddingSlots.bride);
+        const groomUrl = await uploadSlotItem(weddingSlots.groom);
+        const galleryUrls: string[] = [];
+        for (const g of weddingSlots.gallery) {
+          const gUrl = await uploadSlotItem(g);
+          if (gUrl) galleryUrls.push(gUrl);
+        }
+
+        mediaUrls[0] = coverUrl;
+        mediaUrls[1] = brideUrl;
+        mediaUrls[2] = groomUrl;
+        for (let i = 0; i < galleryUrls.length; i++) {
+          mediaUrls[3 + i] = galleryUrls[i];
+        }
+
+        while (mediaUrls.length > 0 && !mediaUrls[mediaUrls.length - 1]) {
+          mediaUrls.pop();
+        }
+      } else {
+        for (const photo of state.photos) {
+          if (photo.publicUrl) {
+            mediaUrls.push(photo.publicUrl);
+            continue;
+          }
+          if (photo.file) {
+            const presignRes = await fetch('/api/storage/presigned-url', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                filename: photo.file.name,
+                contentType: 'image/webp',
+              }),
+            });
+            if (!presignRes.ok) {
+              const errData = await presignRes.json().catch(() => ({ error: 'Failed to get upload URL' }));
+              throw new Error(errData.error || `Failed to get upload authorization (${presignRes.status})`);
+            }
+            const { uploadUrl, publicUrl } = await presignRes.json();
+            await uploadToR2(uploadUrl, photo.file);
+            mediaUrls.push(publicUrl);
+          }
         }
       }
 
@@ -3322,6 +4060,9 @@ const isEdit = Boolean(editId);
           ...state.themeConfig,
           ...card.theme_config,
         };
+        if (state.themeConfig.audioTrackId && LEGACY_TRACK_MAP[state.themeConfig.audioTrackId]) {
+          state.themeConfig.audioTrackId = LEGACY_TRACK_MAP[state.themeConfig.audioTrackId];
+        }
       }
 
       if (Array.isArray(card.media_urls)) {
@@ -3462,6 +4203,13 @@ const isEdit = Boolean(editId);
 
       toggleCategorySpecificFields();
 
+      // Restore Corner Ornament
+      if ((card.theme_config as any)?.cornerOrnament) {
+        state.themeConfig.cornerOrnament = (card.theme_config as any).cornerOrnament;
+      } else if (state.category === 'wedding') {
+        state.themeConfig.cornerOrnament = 'botanical';
+      }
+
       // Update Wedding Inputs if applicable
       if (state.category === 'wedding' && state.themeConfig.weddingData) {
         const wd = state.themeConfig.weddingData;
@@ -3469,6 +4217,13 @@ const isEdit = Boolean(editId);
           const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null;
           if (el && val !== undefined) el.value = val;
         };
+        setVal('w-header-title', (card.theme_config as any)?.weddingHeaderTitle || "Walimatul 'Urs");
+        state.themeConfig.weddingHeaderTitle = (card.theme_config as any)?.weddingHeaderTitle || "Walimatul 'Urs";
+
+        if ((card.theme_config as any)?.unboxingStyle) {
+          state.themeConfig.unboxingStyle = (card.theme_config as any).unboxingStyle;
+        }
+
         setVal('w-bride-name', wd.bride?.fullName);
         setVal('w-bride-nick', wd.bride?.nickname);
         setVal('w-bride-parents', wd.bride?.parents);
@@ -3524,11 +4279,20 @@ const isEdit = Boolean(editId);
           }
         }
 
+        // Restore wedding photo slots
+        if (Array.isArray(card.media_urls)) {
+          weddingSlots.cover = card.media_urls[0] ? { previewUrl: card.media_urls[0], publicUrl: card.media_urls[0] } : null;
+          weddingSlots.bride = card.media_urls[1] ? { previewUrl: card.media_urls[1], publicUrl: card.media_urls[1] } : null;
+          weddingSlots.groom = card.media_urls[2] ? { previewUrl: card.media_urls[2], publicUrl: card.media_urls[2] } : null;
+          weddingSlots.gallery = card.media_urls.slice(3, 11).filter(Boolean).map((u: string) => ({ previewUrl: u, publicUrl: u }));
+        }
+
         syncWeddingRecipientName();
       }
 
       updatePhotoLimitUI();
       renderPhotoGrid();
+      renderWeddingSlots();
       syncThemeSelectorActiveStates();
       updateTrackSelectionUI();
       sortAndBadgeAudioTracks();

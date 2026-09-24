@@ -4,18 +4,17 @@ This directory hosts curated local background audio loops for ElCelebrate digita
 
 ## Expected Audio Tracks
 
-The application catalog in `src/lib/audio-tracks.ts` maps to the following 8 filenames:
+The application catalog in `src/lib/audio-tracks.ts` maps to the following 7 category-curated tracks:
 
-| Filename | Track Name | Mood | Categories |
-| :--- | :--- | :--- | :--- |
-| `warm-piano.opus` | Warm Piano | Gentle & heartfelt | birthday, anniversary |
-| `gentle-strings.opus` | Gentle Strings | Elegant & emotional | anniversary, graduation |
-| `upbeat-celebration.opus` | Upbeat Celebration | Joyful & energetic | birthday, graduation, invitation |
-| `soft-acoustic.opus` | Soft Acoustic | Warm & intimate | birthday, anniversary |
-| `dreamy-bells.opus` | Dreamy Bells | Magical & whimsical | birthday, invitation |
-| `jazzy-lounge.opus` | Jazzy Lounge | Sophisticated & smooth | anniversary, invitation |
-| `cinematic-warmth.opus` | Cinematic Warmth | Grand & inspiring | graduation, anniversary |
-| `tropical-vibes.opus` | Tropical Vibes | Fun & breezy | birthday, invitation |
+| Filename | Track ID | Track Name | Mood | Default Category |
+| :--- | :--- | :--- | :--- | :--- |
+| `wedding.opus` | `wedding` | Sacred Romance | Sacred & Romantic | `wedding` |
+| `birthday.opus` | `birthday` | Birthday Joy | Joyful & Festive | `birthday` |
+| `anniversary.opus` | `anniversary` | Sweet Milestone | Warm & Nostalgic | `anniversary` |
+| `graduation.opus` | `graduation` | Triumphant Horizon | Inspiring & Grand | `graduation` |
+| `invitation.opus` | `invitation` | Celebration Vibe | Upbeat & Welcoming | `invitation` |
+| `love.opus` | `love` | Heartfelt Melody | Intimate & Tender | `love` |
+| `greetings.opus` | `greetings` | Warm Wishes | Peaceful & Cordial | `greetings` |
 
 ## File Specifications & Encoding Guidelines
 

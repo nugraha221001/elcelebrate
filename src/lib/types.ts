@@ -8,6 +8,8 @@ export type UnboxStyle = 'envelope' | 'giftbox' | 'ribbon';
 
 export type AmbientEffectType = 'petals' | 'golden-sparkles' | 'hearts' | 'confetti-float' | 'starlight' | 'lanterns' | 'butterflies' | 'bokeh' | 'sparklers' | 'snowfall' | 'hearts-petals' | 'jasmine' | 'beras-kuning' | 'keraton-glow' | 'fireflies' | 'none';
 
+export type CornerOrnamentType = 'none' | 'botanical' | 'keraton' | 'melati' | 'pucukrebung' | 'artdeco';
+
 /** Wedding-specific structured data stored inside ThemeConfig.weddingData */
 export interface WeddingEventDetail {
   date: string;       // ISO date string (YYYY-MM-DD)
@@ -73,6 +75,9 @@ export interface ThemeConfig {
   externalAudioUrl: string | null;
   customAudioUrl?: string | null;
   ambientEffect?: AmbientEffectType;
+  cornerOrnament?: CornerOrnamentType;
+  unboxingStyle?: 'gate-split' | 'curtain-lift' | 'wax-seal' | string;
+  weddingHeaderTitle?: string;
   weddingData?: WeddingData;
   passcode?: string;
   interactiveConfession?: InteractiveConfessionConfig;
@@ -143,6 +148,7 @@ export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   audioTrackId: null,
   externalAudioUrl: null,
   customAudioUrl: null,
+  cornerOrnament: 'none',
 };
 
 export const CATEGORY_META: Record<CardCategory, { label: string; emoji: string; description: string }> = {

@@ -377,6 +377,15 @@ const PRESETS: Record<string, TrackPreset> = {
   },
 };
 
+// Aliases for 7 category-curated Opus tracks
+PRESETS['wedding'] = PRESETS['gentle-strings'] || PRESETS['warm-piano'];
+PRESETS['birthday'] = PRESETS['upbeat-celebration'];
+PRESETS['anniversary'] = PRESETS['warm-piano'];
+PRESETS['graduation'] = PRESETS['cinematic-warmth'];
+PRESETS['invitation'] = PRESETS['tropical-vibes'];
+PRESETS['love'] = PRESETS['soft-acoustic'];
+PRESETS['greetings'] = PRESETS['dreamy-bells'];
+
 // ═════════════════════════════════════════════════════════════
 // Synth Engine Singleton State
 // ═════════════════════════════════════════════════════════════
@@ -642,8 +651,8 @@ export async function startSynth(trackId?: string, volume?: number): Promise<boo
     }
   }
 
-  // Pick preset by track ID or fallback to warm-piano
-  const selectedKey = trackId && PRESETS[trackId] ? trackId : 'warm-piano';
+  // Pick preset by track ID or fallback to wedding / warm-piano
+  const selectedKey = trackId && PRESETS[trackId] ? trackId : (PRESETS['wedding'] ? 'wedding' : 'warm-piano');
   activePreset = PRESETS[selectedKey];
   currentTrackId = selectedKey;
 

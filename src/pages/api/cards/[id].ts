@@ -76,8 +76,30 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
     });
   }
 
-  // Sanitize media_urls to internal proxy URLs if provided
-  if (updatePayload.media_urls && Array.isArray(updatePayload.media_urls)) {
+  // Validate and sanitize media_urls if provided
+  if (updatePayload.media_urls !== undefined) {
+    if (!Array.isArray(updatePayload.media_urls)) {
+      return new Response(JSON.stringify({ error: 'media_urls must be an array' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { data: existingCardInfo } = await locals.supabase
+      .from('cards')
+      .select('category')
+      .eq('id', id)
+      .eq('user_id', locals.user.id)
+      .single();
+
+    const maxPhotos = existingCardInfo?.category === 'wedding' ? 11 : 4;
+    if (updatePayload.media_urls.length > maxPhotos) {
+      return new Response(JSON.stringify({ error: `Maximum ${maxPhotos} photos allowed` }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     updatePayload.media_urls = updatePayload.media_urls.map(resolveMediaUrl);
   }
 

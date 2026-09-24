@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../components/layout/BaseLayout.astro';
 import AmbientEffect from '../../components/ui/AmbientEffect.astro';
+import CornerOrnaments from '../../components/ui/CornerOrnaments.astro';
 import type { Card, Wish, ThemeConfig } from '../../lib/types';
 import { CATEGORY_META } from '../../lib/types';
 import { getTrackById, getTrackUrl } from '../../lib/audio-tracks';
@@ -36,9 +37,11 @@ const theme = typedCard.theme_config as ThemeConfig;
 const meta = CATEGORY_META[typedCard.category as keyof typeof CATEGORY_META];
 const customAudioUrl = theme.customAudioUrl ? resolveMediaUrl(theme.customAudioUrl) : null;
 const audioTrack = theme.audioTrackId ? getTrackById(theme.audioTrackId) : null;
-const audioUrl = customAudioUrl || (audioTrack ? getTrackUrl(audioTrack.filename) : (theme.externalAudioUrl || null));
-const trackId = customAudioUrl ? 'custom' : (theme.audioTrackId || (audioTrack ? audioTrack.id : 'warm-piano'));
-const hasAudio = Boolean(customAudioUrl || theme.audioTrackId || theme.externalAudioUrl || audioTrack);
+const defaultTrack = getTrackById(typedCard.category) || null;
+const resolvedTrack = audioTrack || defaultTrack;
+const audioUrl = customAudioUrl || (resolvedTrack ? getTrackUrl(resolvedTrack.filename) : (theme.externalAudioUrl || `/audio/${typedCard.category}.opus`));
+const trackId = customAudioUrl ? 'custom' : (resolvedTrack ? resolvedTrack.id : typedCard.category);
+const hasAudio = Boolean(customAudioUrl || audioUrl || theme.externalAudioUrl || resolvedTrack);
 
 const fontMap: Record<string, string> = {
   sans: "'Inter', sans-serif",
@@ -54,6 +57,9 @@ const weddingData = theme.weddingData || null;
 const recipientParam = Astro.url.searchParams.get('to');
 const recipientName = recipientParam || typedCard.recipient_name;
 const guestName = recipientParam || 'Tamu Undangan';
+const unboxingStyle = (theme as any).unboxingStyle || theme.unboxStyle || 'gate-split';
+const weddingHeaderTitle = (theme as any).weddingHeaderTitle || "Walimatul 'Urs";
+const cornerOrnament = (theme as any).cornerOrnament || (isWedding ? 'botanical' : 'none');
 
 // Pattern SVGs
 const primaryHex = theme.primaryColor.slice(1);
@@ -144,12 +150,72 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     <!-- WEDDING LUXURY LONG-SCROLL LAYOUT                        -->
     <!-- ═══════════════════════════════════════════════════════════ -->
 
-    <!-- Wedding Cover (scroll-locked, 100dvh gatekeeper) -->
+    <!-- Wedding Cover (scroll-locked, 100dvh gatekeeper with grand cinematic unboxing) -->
     <div
       id="wedding-cover"
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden h-dvh"
-      style={`background: linear-gradient(180deg, ${theme.backgroundColor}, ${theme.primaryColor}15, ${theme.secondaryColor}10, ${theme.backgroundColor}); font-family: ${fontFamily}; transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);`}
+      data-unboxing-style={unboxingStyle}
+      class={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden h-dvh ${unboxingStyle === 'curtain-lift' ? 'curtain-lift-mode' : ''}`}
+      style={`font-family: ${fontFamily};`}
     >
+      <!-- Center Seam Gold Glow Line (Visual Depth & Seam Detailing - Gate Split Only) -->
+      {unboxingStyle !== 'wax-seal' && (
+        <div
+          id="cover-seam-glow"
+          class="cover-seam-glow pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 z-20 w-0.5"
+        ></div>
+      )}
+
+      <!-- Grand Split Gate Panels with Physical Door Thickness -->
+      <div
+        id="cover-gate-left"
+        class={`cover-gate cover-gate-left absolute inset-y-0 left-0 w-1/2 overflow-hidden pointer-events-none ${unboxingStyle === 'wax-seal' ? 'shadow-none border-none' : 'border-r border-[#f5c563]/40'}`}
+        style={`background: linear-gradient(135deg, ${theme.backgroundColor}, ${theme.primaryColor}22, ${theme.backgroundColor});`}
+      >
+        {unboxingStyle !== 'wax-seal' && (
+          <div class="absolute inset-y-0 right-0 w-24 opacity-25 pointer-events-none bg-linear-to-l from-[#f5c563]/30 via-amber-300/10 to-transparent"></div>
+        )}
+      </div>
+
+      <div
+        id="cover-gate-right"
+        class={`cover-gate cover-gate-right absolute inset-y-0 right-0 w-1/2 overflow-hidden pointer-events-none ${unboxingStyle === 'wax-seal' ? 'shadow-none border-none' : 'border-l border-[#f5c563]/40'}`}
+        style={`background: linear-gradient(225deg, ${theme.backgroundColor}, ${theme.secondaryColor}22, ${theme.backgroundColor});`}
+      >
+        {unboxingStyle !== 'wax-seal' && (
+          <div class="absolute inset-y-0 left-0 w-24 opacity-25 pointer-events-none bg-linear-to-r from-[#f5c563]/30 via-amber-300/10 to-transparent"></div>
+        )}
+      </div>
+
+      {unboxingStyle === 'wax-seal' && (
+        <!-- 3D Perspective Wax Seal Envelope Flap (Decorative Top Edge behind content) -->
+        <div class="wax-envelope-perspective absolute top-0 inset-x-0 h-24 sm:h-32 pointer-events-none z-5 flex justify-center overflow-visible">
+          <div
+            id="envelope-flap"
+            class="wax-seal-flap w-full max-w-xl h-full relative"
+          >
+            <svg class="w-full h-full drop-shadow-md" viewBox="0 0 600 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="flap-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color={theme.backgroundColor} stop-opacity="0.95" />
+                  <stop offset="60%" stop-color={theme.primaryColor} stop-opacity="0.25" />
+                  <stop offset="100%" stop-color={theme.primaryColor} stop-opacity="0.45" />
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 600,0 300,115" fill="url(#flap-grad)" stroke="#f5c563" stroke-opacity="0.35" stroke-width="1.2" />
+              <line x1="0" y1="0" x2="300" y2="115" stroke="#f5c563" stroke-opacity="0.45" stroke-width="1.2" />
+              <line x1="600" y1="0" x2="300" y2="115" stroke="#f5c563" stroke-opacity="0.45" stroke-width="1.2" />
+            </svg>
+          </div>
+        </div>
+      )}
+
+      <!-- Backdrop Overlay for smooth fading -->
+      <div
+        id="cover-backdrop"
+        class="absolute inset-0 pointer-events-none transition-opacity duration-1000"
+        style={`background: radial-gradient(circle at center, transparent 30%, ${theme.backgroundColor} 90%);`}
+      ></div>
+
       <!-- Decorative particles -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none">
         <div class="absolute top-10 left-10 w-2 h-2 rounded-full animate-pulse" style={`background: ${theme.primaryColor}40;`}></div>
@@ -158,44 +224,74 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         <div class="absolute top-1/3 right-8 w-2.5 h-2.5 rounded-full animate-pulse" style={`background: ${theme.secondaryColor}25; animation-delay: 1.5s;`}></div>
       </div>
 
-      <div class="text-center px-6 relative z-10">
-        <!-- Wedding ornament -->
-        <div class="text-5xl mb-6 animate-bounce" style="animation-duration: 3s;">💍</div>
+      <div id="wedding-cover-content" class="text-center px-6 relative z-20 max-w-lg transition-all duration-700">
+        <!-- Hero couple portrait on cover or ornament -->
+        {typedCard.media_urls.length > 0 ? (
+          <div class="relative mx-auto mb-4 h-36 w-28 sm:h-44 sm:w-34 overflow-hidden rounded-t-full border-2 border-amber-300/40 shadow-2xl shadow-amber-500/10 ring-4 ring-white/10 bg-black/20">
+            <img
+              id="cover-hero-img"
+              src={resolveMediaUrl(typedCard.media_urls[0])}
+              alt="Mempelai"
+              class="hero-couple-photo h-full w-full object-cover will-change-transform"
+            />
+            <div class="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
+          </div>
+        ) : (
+          <div class="text-5xl mb-4 animate-bounce" style="animation-duration: 3s;">💍</div>
+        )}
 
-        <p class="text-xs uppercase tracking-[0.3em] text-surface-400 mb-2" style={`font-family: ${fontFamily};`}>The Wedding of</p>
+        <p class="text-xs uppercase tracking-[0.3em] text-surface-400 mb-2" style={`font-family: ${fontFamily};`}>{weddingHeaderTitle}</p>
 
         <h1 class="text-3xl sm:text-4xl font-bold mb-1 wrap-anywhere max-w-full" style={`color: ${theme.primaryColor}; font-family: ${fontFamily};`}>
           {weddingData.bride.nickname || weddingData.bride.fullName}
         </h1>
-        <p class="text-2xl sm:text-3xl font-light text-surface-300 my-1" style={`font-family: ${fontFamily};`}>&</p>
-        <h1 class="text-3xl sm:text-4xl font-bold mb-6 wrap-anywhere max-w-full" style={`color: ${theme.secondaryColor}; font-family: ${fontFamily};`}>
+        <p class="text-2xl sm:text-3xl font-light text-surface-300 my-0.5" style={`font-family: ${fontFamily};`}>&</p>
+        <h1 class="text-3xl sm:text-4xl font-bold mb-4 wrap-anywhere max-w-full" style={`color: ${theme.secondaryColor}; font-family: ${fontFamily};`}>
           {weddingData.groom.nickname || weddingData.groom.fullName}
         </h1>
 
         <!-- Always show guest greeting -->
-        <div class="mb-6 animate-fade-in-up max-w-full" style="animation-delay: 400ms; opacity: 0; animation-fill-mode: forwards;">
-          <p class="text-xs text-surface-500 mb-1">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+        <div class="mb-4 animate-fade-in-up max-w-full" style="animation-delay: 400ms; opacity: 0; animation-fill-mode: forwards;">
+          <p class="text-xs text-surface-400 mb-1">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
           <p class="text-lg font-semibold text-surface-100 wrap-anywhere max-w-full">{guestName}</p>
         </div>
 
         {weddingData.akadEvent.date && (
-          <p class="text-sm text-surface-400 mb-8" style={`font-family: ${fontFamily};`}>
+          <p class="text-sm text-surface-400 mb-4" style={`font-family: ${fontFamily};`}>
             {new Date(weddingData.akadEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         )}
 
-        <button
-          id="wedding-cover-btn"
-          class="group inline-flex items-center gap-2.5 rounded-full px-8 py-3.5 text-sm font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-[0.98] cursor-pointer"
-          style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor}); box-shadow: 0 8px 32px ${theme.primaryColor}40;`}
-        >
-          <span>Buka Undangan</span>
-          <span class="text-lg transition-transform duration-300 group-hover:translate-x-0.5">💌</span>
-        </button>
+        {unboxingStyle === 'wax-seal' ? (
+          <div id="wedding-wax-seal-container" class="relative z-30 mt-3 mb-2 flex flex-col items-center">
+            <button
+              type="button"
+              id="wedding-wax-seal-btn"
+              role="button"
+              aria-label="Ketuk Segel untuk Membuka Undangan"
+              class="wax-seal-medallion wax-seal-pulse group relative flex h-20 w-20 sm:h-22 sm:w-22 items-center justify-center rounded-full shadow-2xl cursor-pointer transition-transform duration-300 hover:scale-105 active:scale-95"
+              title="Ketuk Segel untuk Membuka"
+            >
+              <div class="wax-seal-inner absolute inset-1.5 rounded-full border-2 border-amber-200/50"></div>
+              <span class="text-2xl select-none">👑</span>
+              <div class="absolute -inset-1.5 rounded-full border border-amber-300/40 animate-ping opacity-25 pointer-events-none"></div>
+            </button>
+            <span class="mt-2 text-xs font-medium tracking-widest uppercase text-amber-200/90 drop-shadow-xs">Ketuk Segel untuk Membuka</span>
+          </div>
+        ) : (
+          <button
+            id="wedding-cover-btn"
+            class="group inline-flex items-center gap-2.5 rounded-full px-8 py-3.5 text-sm font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-[0.98] cursor-pointer"
+            style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor}); box-shadow: 0 8px 32px ${theme.primaryColor}40;`}
+          >
+            <span>Buka Undangan</span>
+            <span class="text-lg transition-transform duration-300 group-hover:translate-x-0.5">{unboxingStyle === 'curtain-lift' ? '✨' : '🏛️'}</span>
+          </button>
+        )}
       </div>
 
       <!-- Scroll hint -->
-      <div class="absolute bottom-8 animate-bounce text-surface-500" style="animation-duration: 2s;">
+      <div id="wedding-cover-hint" class="absolute bottom-8 animate-bounce text-surface-500 transition-opacity duration-500" style="animation-duration: 2s;">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
         </svg>
@@ -205,7 +301,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     <!-- Wedding Content (hidden until cover is dismissed) -->
     <main
       id="wedding-content"
-      class="hidden min-h-dvh"
+      class="hidden min-h-dvh relative"
       style={`--primary: ${theme.primaryColor}; --secondary: ${theme.secondaryColor}; background: ${theme.backgroundColor}; background-image: ${bgPattern}; background-size: ${bgPatternSize}; font-family: ${fontFamily};`}
     >
       <!-- Confetti Canvas -->
@@ -214,20 +310,31 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
       <!-- Ambient Effect -->
       <AmbientEffect effect={(theme as any).ambientEffect ?? 'none'} />
 
-      <!-- Rotating Music Disc -->
+      <!-- ── Customizable Corner Ornaments (Indonesian Luxury Standard) ── -->
+      <CornerOrnaments
+        ornament={cornerOrnament}
+        primaryColor={theme.primaryColor}
+        secondaryColor={theme.secondaryColor}
+      />
+
+      <!-- ── Dynamic Vinyl Music Widget ── -->
       {hasAudio && (
-        <button
-          id="audio-toggle"
-          class="music-disc"
-          style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
-          aria-label="Toggle music"
-        >
-          <div class="disc-inner">
-            <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path id="audio-icon-path" stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-            </svg>
-          </div>
-        </button>
+        <>
+          <!-- Rising Floating Notes Container -->
+          <div id="music-notes-container" class="pointer-events-none fixed z-47" style="bottom: 4.25rem; right: 1.25rem; width: 3rem; height: 5rem; overflow: visible;" aria-hidden="true"></div>
+          <button
+            id="audio-toggle"
+            class="music-disc"
+            style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
+            aria-label="Toggle music"
+          >
+            <div class="disc-inner">
+              <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path id="audio-icon-path" stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+            </div>
+          </button>
+        </>
       )}
       {audioUrl && (
         <audio id="bg-audio" src={audioUrl} loop preload="none">
@@ -237,36 +344,64 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
       <!-- Floating Bottom Dock -->
       <nav id="floating-dock" class="floating-dock" aria-label="Section navigation">
-        <a href="#couple" title="Mempelai">💑</a>
-        <a href="#event" title="Acara">📅</a>
+        <a href="#mempelai" title="Mempelai">💑</a>
+        <a href="#acara" title="Acara">📅</a>
         <a href="#countdown" title="Hitung Mundur">⏳</a>
-        <a href="#gallery" title="Galeri">🖼️</a>
-        <a href="#gift" title="Amplop Digital">🎁</a>
-        <a href="#wishes" title="Ucapan">💬</a>
+        <a href="#galeri" title="Galeri">🖼️</a>
+        <a href="#amplop" title="Amplop Digital">🎁</a>
+        <a href="#doa" title="Ucapan">💬</a>
       </nav>
 
       <div class="mx-auto max-w-4xl px-4">
 
+        <!-- ── Hero Couple Banner with Ken Burns Zoom ── -->
+        {typedCard.media_urls.length > 0 && (
+          <div class="wedding-reveal reveal-hero pt-10 sm:pt-14 pb-4 text-center">
+            <div class="relative mx-auto max-w-sm sm:max-w-md overflow-hidden rounded-t-[120px] rounded-b-3xl border-2 border-amber-300/40 shadow-2xl shadow-amber-500/10 bg-white/5 backdrop-blur-xs ring-4 ring-white/10">
+              <div class="aspect-4/5 sm:aspect-3/4 w-full overflow-hidden">
+                <img
+                  id="hero-couple-img"
+                  src={resolveMediaUrl(typedCard.media_urls[0])}
+                  alt={`The Wedding of ${weddingData.bride.nickname || weddingData.bride.fullName} & ${weddingData.groom.nickname || weddingData.groom.fullName}`}
+                  class="hero-couple-photo hero-photo-init w-full h-full object-cover will-change-transform"
+                />
+              </div>
+              <div class="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent pointer-events-none"></div>
+              <div class="absolute bottom-4 inset-x-0 text-center pointer-events-none px-4">
+                <p id="hero-header-badge" class="hero-stagger-text text-xs uppercase tracking-[0.25em] text-amber-200/90 font-medium mb-1">{weddingHeaderTitle}</p>
+                <h3 id="hero-couple-names" class="hero-stagger-text text-xl sm:text-2xl font-serif font-bold text-white tracking-wide">
+                  {weddingData.bride.nickname || weddingData.bride.fullName} & {weddingData.groom.nickname || weddingData.groom.fullName}
+                </h3>
+              </div>
+            </div>
+          </div>
+        )}
+
         <!-- ── Couple Profile Section ── -->
-        <section id="couple" class="py-16 sm:py-20 max-w-2xl mx-auto" data-reveal="fade-up">
+        <section id="mempelai" class="py-10 sm:py-16 max-w-2xl mx-auto">
+          <span id="couple" class="sr-only"></span>
         {weddingData.openingGreeting ? (
-          <div class="text-center mb-8">
+          <div class="wedding-reveal reveal-heading text-center mb-8">
             <p class="text-slate-100 font-normal leading-relaxed text-center max-w-lg mx-auto drop-shadow-xs italic whitespace-pre-line text-sm sm:text-base" style={`font-family: ${fontFamily};`}>
               {weddingData.openingGreeting}
             </p>
+            <div class="champagne-divider"></div>
           </div>
         ) : (
-          <p class="text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase mb-8" style={`font-family: ${fontFamily};`}>
-            Bismillahirrahmanirrahim
-          </p>
+          <div class="wedding-reveal reveal-heading text-center mb-8">
+            <p class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase" style={`font-family: ${fontFamily};`}>
+              Bismillahirrahmanirrahim
+            </p>
+            <div class="champagne-divider"></div>
+          </div>
         )}
 
           <div class="flex flex-col items-center gap-8 sm:flex-row sm:justify-center sm:gap-12">
             <!-- Bride -->
-            <div class="text-center flex-1 max-w-50" data-reveal="fade-right" data-reveal-delay="100">
-              {typedCard.media_urls.length > 0 && (
-                <div class="mx-auto mb-4 h-36 w-36 overflow-hidden rounded-full border-4 shadow-lg" style={`border-color: ${theme.primaryColor}40;`}>
-                  <img src={resolveMediaUrl(typedCard.media_urls[0])} alt={weddingData.bride.fullName} class="h-full w-full object-cover" />
+            <div class="wedding-reveal reveal-portrait portrait-bride text-center flex-1 max-w-50">
+              {(typedCard.media_urls[1] || typedCard.media_urls[0]) && (
+                <div class="mx-auto mb-4 h-36 w-36 overflow-hidden rounded-full border-4 shadow-lg ring-2 ring-amber-300/30" style={`border-color: ${theme.primaryColor}40;`}>
+                  <img src={resolveMediaUrl(typedCard.media_urls[1] || typedCard.media_urls[0])} alt={weddingData.bride.fullName} class="h-full w-full object-cover" />
                 </div>
               )}
               <h2 class="text-xl font-bold" style={`color: ${theme.primaryColor}; font-family: ${fontFamily};`}>
@@ -278,13 +413,13 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
             </div>
 
             <!-- Separator -->
-            <div class="text-4xl font-light" style={`color: ${theme.secondaryColor}60; font-family: ${fontFamily};`} data-reveal="zoom-in" data-reveal-delay="200">&</div>
+            <div class="wedding-reveal reveal-portrait portrait-sep text-4xl font-light" style={`color: ${theme.secondaryColor}60; font-family: ${fontFamily};`}>&</div>
 
             <!-- Groom -->
-            <div class="text-center flex-1 max-w-50" data-reveal="fade-left" data-reveal-delay="300">
-              {typedCard.media_urls.length > 1 && (
-                <div class="mx-auto mb-4 h-36 w-36 overflow-hidden rounded-full border-4 shadow-lg" style={`border-color: ${theme.secondaryColor}40;`}>
-                  <img src={resolveMediaUrl(typedCard.media_urls[1])} alt={weddingData.groom.fullName} class="h-full w-full object-cover" />
+            <div class="wedding-reveal reveal-portrait portrait-groom text-center flex-1 max-w-50">
+              {typedCard.media_urls[2] && (
+                <div class="mx-auto mb-4 h-36 w-36 overflow-hidden rounded-full border-4 shadow-lg ring-2 ring-amber-300/30" style={`border-color: ${theme.secondaryColor}40;`}>
+                  <img src={resolveMediaUrl(typedCard.media_urls[2])} alt={weddingData.groom.fullName} class="h-full w-full object-cover" />
                 </div>
               )}
               <h2 class="text-xl font-bold" style={`color: ${theme.secondaryColor}; font-family: ${fontFamily};`}>
@@ -298,9 +433,9 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         </section>
 
         <!-- ── Invitation Message ── -->
-        <section class="pb-12 max-w-2xl mx-auto overflow-hidden" data-reveal="fade-up">
+        <section class="pb-12 max-w-2xl mx-auto overflow-hidden">
           <div
-            class="rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden"
+            class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden"
             style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}
           >
             <p class="wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden text-slate-100 text-sm md:text-base font-medium leading-relaxed" style={`font-family: ${fontFamily};`}>
@@ -311,8 +446,8 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
         <!-- ── Love Story / Quote ── -->
         {weddingData.loveStory && (
-          <section class="pb-12 max-w-2xl mx-auto overflow-hidden" data-reveal="fade-up">
-            <div class="text-center w-full max-w-lg mx-auto overflow-hidden">
+          <section class="pb-12 max-w-2xl mx-auto overflow-hidden">
+            <div class="wedding-reveal reveal-card text-center w-full max-w-lg mx-auto overflow-hidden">
               <div class="text-4xl mb-4" style={`color: ${theme.primaryColor}30;`}>❝</div>
               <p class="text-slate-100 font-normal leading-relaxed text-center max-w-lg mx-auto drop-shadow-xs italic wrap-anywhere whitespace-pre-wrap overflow-hidden text-sm md:text-base" style={`font-family: ${fontFamily};`}>
                 {weddingData.loveStory}
@@ -324,14 +459,17 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
         <!-- ── Countdown Timer ── -->
         {weddingData.akadEvent.date && (
-          <section id="countdown" class="pb-12 max-w-2xl mx-auto" data-reveal="fade-up">
+          <section id="countdown" class="pb-12 max-w-2xl mx-auto">
             <div class="text-center">
-              <h2 class="mb-4 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Menghitung Hari</h2>
+              <div class="wedding-reveal reveal-heading text-center mb-4">
+                <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Menghitung Hari</h2>
+                <div class="champagne-divider"></div>
+              </div>
               <div class="countdown-timer flex justify-center gap-3 sm:gap-5" data-target-date={weddingData.akadEvent.date || typedCard.event_date || ''}>
                 {['Hari', 'Jam', 'Mnt', 'Dtk'].map((unit, idx) => (
-                  <div class="flex flex-col items-center">
+                  <div class="wedding-reveal reveal-countdown flex flex-col items-center" style={`transition-delay: ${idx * 80}ms;`}>
                     <div
-                      class="flex h-16 w-16 items-center justify-center rounded-xl text-2xl font-bold text-white sm:h-20 sm:w-20 sm:text-3xl"
+                      class="countdown-box flex h-16 w-16 items-center justify-center rounded-xl text-2xl font-bold text-white sm:h-20 sm:w-20 sm:text-3xl"
                       style={`background: linear-gradient(135deg, ${theme.primaryColor}40, ${theme.secondaryColor}30);`}
                       data-countdown={['days', 'hours', 'minutes', 'seconds'][idx]}
                     >
@@ -346,12 +484,16 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         )}
 
         <!-- ── Event Schedule ── -->
-        <section id="event" class="pb-12 max-w-2xl mx-auto" data-reveal="fade-up">
-          <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Jadwal Acara</h2>
+        <section id="acara" class="pb-12 max-w-2xl mx-auto">
+          <span id="event" class="sr-only"></span>
+          <div class="wedding-reveal reveal-heading text-center mb-6">
+            <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Jadwal Acara</h2>
+            <div class="champagne-divider"></div>
+          </div>
 
           <div class="space-y-4">
             <!-- Akad -->
-            <div class="rounded-2xl p-5 sm:p-6" style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}>
+            <div class="wedding-reveal reveal-card reveal-card-akad rounded-2xl p-5 sm:p-6" style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}>
               <div class="flex items-center gap-2 mb-3">
                 <span class="text-lg">🕌</span>
                 <h3 class="text-base font-semibold" style={`color: ${theme.primaryColor};`}>Akad Nikah</h3>
@@ -385,7 +527,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
             <!-- Resepsi -->
             {(weddingData.receptionEvent.date || weddingData.receptionEvent.venue) && (
-              <div class="rounded-2xl p-5 sm:p-6" style={`background: ${theme.secondaryColor}08; border: 1px solid ${theme.secondaryColor}15;`}>
+              <div class="wedding-reveal reveal-card reveal-card-resepsi rounded-2xl p-5 sm:p-6" style={`background: ${theme.secondaryColor}08; border: 1px solid ${theme.secondaryColor}15;`}>
                 <div class="flex items-center gap-2 mb-3">
                   <span class="text-lg">🎉</span>
                   <h3 class="text-base font-semibold" style={`color: ${theme.secondaryColor};`}>Resepsi</h3>
@@ -421,8 +563,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
             <!-- Unduh Mantu -->
             {weddingData.unduhMantu?.enabled && (
               <div
-                class="border border-white/15 bg-white/5 backdrop-blur-xs rounded-3xl p-5 sm:p-6"
-                data-reveal="fade-up"
+                class="wedding-reveal reveal-card reveal-card-unduh border border-white/15 bg-white/5 backdrop-blur-xs rounded-3xl p-5 sm:p-6"
               >
                 <div class="flex items-center gap-2 mb-3">
                   <span class="text-lg">🏡</span>
@@ -460,21 +601,26 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           </div>
         </section>
 
-        <!-- ── Photo Gallery ── -->
-        {typedCard.media_urls.length > 2 && (
-          <section id="gallery" class="pb-12" data-reveal="fade-up">
-            <div class="text-center mb-8">
+        <!-- ── Photo Gallery (Slot 4-11: up to 8 photos) ── -->
+        {typedCard.media_urls.slice(3, 11).filter(Boolean).length > 0 && (
+          <section id="galeri" class="pb-12">
+            <span id="gallery" class="sr-only"></span>
+            <div class="wedding-reveal reveal-heading text-center mb-8">
               <p class="text-xs uppercase tracking-[0.3em] font-semibold text-slate-300 mb-1">OUR SWEET MOMENTS</p>
               <h2 class="text-3xl md:text-4xl font-serif font-bold tracking-tight bg-linear-to-r from-(--primary) to-(--secondary) bg-clip-text text-transparent inline-block">
                 Galeri Foto
               </h2>
+              <div class="champagne-divider"></div>
               <p class="text-xs md:text-sm text-slate-200/90 font-light max-w-md mx-auto leading-relaxed mt-2 text-center">
                 Setiap potret mengabadikan tawa dan cerita, mengiringi langkah kami menuju ikatan suci yang abadi.
               </p>
             </div>
             <div class="w-full max-w-md md:max-w-lg mx-auto flex flex-col gap-8 md:gap-12 px-4 mt-6">
-              {typedCard.media_urls.slice(2).map((url, index) => (
-                <div class="romantic-photo-wrapper">
+              {typedCard.media_urls.slice(3, 11).filter(Boolean).map((url, index) => (
+                <div
+                  class="wedding-reveal reveal-gallery-item romantic-photo-wrapper"
+                  style={`transition-delay: calc(${index} * 75ms);`}
+                >
                   <div
                     class="border border-white/25 rounded-3xl overflow-hidden shadow-2xl bg-white/5 backdrop-blur-xs relative group gallery-item cursor-pointer"
                     data-gallery-src={resolveMediaUrl(url)}
@@ -506,10 +652,14 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
         <!-- ── Digital Envelope (Amplop Digital) ── -->
         {(weddingData.digitalEnvelope.bankName || weddingData.digitalEnvelope.accountNumber) && (
-          <section id="gift" class="pb-12 max-w-2xl mx-auto" data-reveal="fade-up">
-            <h2 class="mb-4 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">💰 Amplop Digital</h2>
+          <section id="amplop" class="pb-12 max-w-2xl mx-auto">
+            <span id="gift" class="sr-only"></span>
+            <div class="wedding-reveal reveal-heading text-center mb-4">
+              <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">💰 Amplop Digital</h2>
+              <div class="champagne-divider"></div>
+            </div>
             <div
-              class="rounded-2xl p-5 sm:p-6 text-center"
+              class="wedding-reveal reveal-card reveal-blur-card rounded-2xl p-5 sm:p-6 text-center"
               style={`background: linear-gradient(135deg, ${theme.primaryColor}10, ${theme.secondaryColor}08); border: 1px solid ${theme.primaryColor}20;`}
             >
               {weddingData.digitalEnvelope.bankName && (
@@ -538,13 +688,17 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         )}
 
         <!-- ── RSVP & Wish Wall ── -->
-        <section id="wishes" class="pb-12 max-w-2xl mx-auto" data-reveal="fade-up">
-          <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
-            💬 Ucapan & Doa
-          </h2>
+        <section id="doa" class="pb-12 max-w-2xl mx-auto">
+          <span id="wishes" class="sr-only"></span>
+          <div class="wedding-reveal reveal-heading text-center mb-6">
+            <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
+              💬 Ucapan & Doa
+            </h2>
+            <div class="champagne-divider"></div>
+          </div>
 
           <!-- Submit Wish Form with RSVP -->
-          <form id="wish-form" class="mb-8">
+          <form id="wish-form" class="wedding-reveal reveal-card reveal-blur-card mb-8">
             <div class="rounded-2xl p-5" style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}>
               <input
                 type="text"
@@ -593,8 +747,11 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
           <!-- Wishes List -->
           <div id="wishes-container" class="space-y-3 max-w-full overflow-hidden">
-            {typedWishes.map((wish) => (
-              <div class="rounded-xl p-4 max-w-full overflow-hidden" style={`background: ${theme.primaryColor}06; border: 1px solid ${theme.primaryColor}10;`}>
+            {typedWishes.map((wish, index) => (
+              <div
+                class="wedding-reveal reveal-card reveal-blur-card rounded-xl p-4 max-w-full overflow-hidden"
+                style={`background: ${theme.primaryColor}06; border: 1px solid ${theme.primaryColor}10; transition-delay: calc(${index % 5} * 80ms);`}
+              >
                 <div class="flex items-baseline justify-between gap-2 max-w-full">
                   <span class="text-sm font-semibold text-white wrap-anywhere min-w-0">{wish.sender_name}</span>
                   <span class="text-xs text-surface-500 shrink-0">
@@ -769,6 +926,13 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
       <!-- Ambient Effect -->
       <AmbientEffect effect={resolvedAmbientEffect} />
+
+      <!-- Corner Ornaments -->
+      <CornerOrnaments
+        ornament={cornerOrnament}
+        primaryColor={theme.primaryColor}
+        secondaryColor={theme.secondaryColor}
+      />
 
       <!-- Audio Player (hidden, autoplay-compliant) -->
       {hasAudio && (
@@ -1125,7 +1289,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   const dataEl = document.getElementById('card-data') as HTMLElement;
   const cardId = dataEl?.dataset.cardId || '';
   const audioUrl = dataEl?.dataset.audioUrl || '';
-  const trackId = dataEl?.dataset.trackId || 'warm-piano';
+  const trackId = dataEl?.dataset.trackId || dataEl?.dataset.category || 'wedding';
   const hasAudio = dataEl?.dataset.hasAudio === 'true';
   const unboxStyle = dataEl?.dataset.unboxStyle || 'envelope';
   const isWedding = dataEl?.dataset.isWedding === 'true';
@@ -1139,43 +1303,174 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   const weddingContent = document.getElementById('wedding-content');
 
   // ═══════════════════════════════════════════════════════
-  // Wedding Cover Unlock
+  // Wedding Cinematic Cover Unlock
   // ═══════════════════════════════════════════════════════
   if (isWedding && weddingCover && weddingContent) {
     document.body.style.overflow = 'hidden';
 
-    document.getElementById('wedding-cover-btn')?.addEventListener('click', () => {
-      // Slide cover up and fade out
-      weddingCover.style.transform = 'translateY(-100%)';
-      weddingCover.style.opacity = '0';
-      weddingCover.style.pointerEvents = 'none';
+    let invitationOpened = false;
 
+    const openInvitation = () => {
+      if (invitationOpened) return;
+      invitationOpened = true;
+
+      const style = weddingCover.dataset.unboxingStyle || 'gate-split';
+      const coverBtn = document.getElementById('wedding-cover-btn');
+      const waxSealBtn = document.getElementById('wedding-wax-seal-btn');
+      const seamGlow = document.getElementById('cover-seam-glow');
+      const coverContent = document.getElementById('wedding-cover-content');
+      const coverHint = document.getElementById('wedding-cover-hint');
+      const gateLeft = document.getElementById('cover-gate-left');
+      const gateRight = document.getElementById('cover-gate-right');
+      const backdrop = document.getElementById('cover-backdrop');
+      const envelopeFlap = document.getElementById('envelope-flap');
+      const heroPhoto = document.getElementById('hero-couple-img');
+      const heroBadge = document.getElementById('hero-header-badge');
+      const heroNames = document.getElementById('hero-couple-names');
+      const dock = document.getElementById('floating-dock');
+      const disc = document.querySelector('.music-disc');
+
+      // ─────────────────────────────────────────────────────────────
+      // PHASE 1 (0.0s - 0.2s): Button press feedback & center seam gold glow pulse
+      // ─────────────────────────────────────────────────────────────
+      if (coverBtn) coverBtn.classList.add('cover-btn-pressed');
+      if (waxSealBtn) waxSealBtn.classList.add('wax-seal-pressed');
+      if (seamGlow) seamGlow.classList.add('seam-pulse-active');
+
+      // ─────────────────────────────────────────────────────────────
+      // PHASE 2 (0.2s - 1.2s / 1.5s): Gate parting / curtain lift / wax-seal opening
+      // ─────────────────────────────────────────────────────────────
       setTimeout(() => {
-        weddingCover.style.display = 'none';
+        // 1. Reveal wedding content beneath the opening gates
         weddingContent.classList.remove('hidden');
         document.body.style.overflow = '';
+        window.scrollTo({ top: 0, behavior: 'instant' });
 
-        // Smooth scroll to top of content
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // 2. Audio Fade-in Coordination: starts smoothly as gates begin parting (Item 4)
+        if (hasAudio) {
+          startAudio(true);
+        }
 
-        // Reveal floating dock & music disc
-        const dock = document.getElementById('floating-dock');
-        const disc = document.querySelector('.music-disc');
+        // 3. Stately 1.5s luxury decelerating transition
+        const luxuryEase = 'cubic-bezier(0.16, 1, 0.3, 1)';
+
+        if (style === 'wax-seal') {
+          // Wax Seal: 3D flap perspective rotation (rotateX(-180deg)) and seal separation
+          if (waxSealBtn) waxSealBtn.classList.add('wax-seal-broken');
+          if (envelopeFlap) envelopeFlap.classList.add('flap-opened');
+
+          if (coverContent) {
+            coverContent.style.transition = `opacity 0.8s ${luxuryEase}, transform 0.8s ${luxuryEase}`;
+            coverContent.style.opacity = '0';
+            coverContent.style.transform = 'translate3d(0, -30px, 0) scale(0.98)';
+          }
+          if (coverHint) coverHint.style.opacity = '0';
+          if (backdrop) backdrop.style.opacity = '0';
+
+          if (gateLeft) {
+            gateLeft.style.transition = `transform 1.5s ${luxuryEase}`;
+            gateLeft.style.transform = 'translate3d(-100%, 0, 0)';
+          }
+          if (gateRight) {
+            gateRight.style.transition = `transform 1.5s ${luxuryEase}`;
+            gateRight.style.transform = 'translate3d(100%, 0, 0)';
+          }
+
+          weddingCover.style.transition = `opacity 1.3s ${luxuryEase} 0.2s`;
+          weddingCover.style.opacity = '0';
+          weddingCover.style.pointerEvents = 'none';
+
+        } else if (style === 'curtain-lift') {
+          // Curtain Lift: backdrop blur dissolve and ease-out upward glide
+          weddingCover.classList.add('curtain-lift-dissolve');
+          if (coverHint) coverHint.style.opacity = '0';
+          if (coverContent) {
+            coverContent.style.transition = 'opacity 0.7s ease-out';
+            coverContent.style.opacity = '0';
+          }
+
+          weddingCover.style.transition = `transform 1.5s ${luxuryEase}, opacity 1.5s ${luxuryEase}, backdrop-filter 1.5s ${luxuryEase}, -webkit-backdrop-filter 1.5s ${luxuryEase}`;
+          weddingCover.style.transform = 'translate3d(0, -100%, 0)';
+          weddingCover.style.opacity = '0';
+          weddingCover.style.pointerEvents = 'none';
+
+        } else {
+          // Royal Gate Split: 1.5s lateral reveal with realistic depth shadows
+          if (coverContent) {
+            coverContent.style.transition = `opacity 0.7s ${luxuryEase}, transform 0.7s ${luxuryEase}`;
+            coverContent.style.opacity = '0';
+            coverContent.style.transform = 'translate3d(0, -35px, 0) scale(0.98)';
+          }
+          if (coverHint) coverHint.style.opacity = '0';
+          if (backdrop) backdrop.style.opacity = '0';
+
+          if (gateLeft) {
+            gateLeft.style.transition = `transform 1.5s ${luxuryEase}`;
+            gateLeft.style.transform = 'translate3d(-100%, 0, 0)';
+          }
+          if (gateRight) {
+            gateRight.style.transition = `transform 1.5s ${luxuryEase}`;
+            gateRight.style.transform = 'translate3d(100%, 0, 0)';
+          }
+
+          weddingCover.style.transition = `opacity 1.5s ${luxuryEase}`;
+          weddingCover.style.opacity = '0';
+          weddingCover.style.pointerEvents = 'none';
+        }
+
+        // Reveal dock & music disc
         if (dock) dock.classList.add('dock-visible');
         if (disc) disc.classList.add('disc-visible');
+      }, 200);
 
-        // Trigger confetti
-        triggerConfetti();
+      // ─────────────────────────────────────────────────────────────
+      // PHASE 3 (0.3s - 1.6s): Hero settle, typography stagger, delayed seam confetti
+      // ─────────────────────────────────────────────────────────────
+      // Confetti burst delayed by 300ms from opening seam (Item 2)
+      setTimeout(() => {
+        triggerWeddingSeamConfetti();
+      }, 300);
 
-        // Start audio (autoplay-compliant: user has interacted)
-        if (hasAudio) startAudio();
+      // Hero background photo smooth scale settle (from scale(1.08) to scale(1.0))
+      setTimeout(() => {
+        if (heroPhoto) {
+          heroPhoto.classList.remove('hero-photo-init');
+          heroPhoto.classList.add('hero-photo-settling');
+        }
+      }, 300);
 
-        // Observe scroll-reveal elements
-        setTimeout(() => {
-          observeRevealElements();
-        }, 100);
-      }, 1000);
-    });
+      // Staggered fade-in of header typography
+      setTimeout(() => {
+        if (heroBadge) heroBadge.classList.add('is-revealed');
+      }, 380);
+
+      setTimeout(() => {
+        if (heroNames) heroNames.classList.add('is-revealed');
+      }, 520);
+
+      // Once settle finishes (~1.6s), engage continuous ambient Ken Burns loop
+      setTimeout(() => {
+        if (heroPhoto) {
+          heroPhoto.classList.remove('hero-photo-settling');
+          heroPhoto.classList.add('ken-burns-active');
+        }
+      }, 1600);
+
+      // ─────────────────────────────────────────────────────────────
+      // Final Staging & Cleanup
+      // ─────────────────────────────────────────────────────────────
+      setTimeout(() => {
+        weddingCover.style.display = 'none';
+      }, 1700);
+
+      setTimeout(() => {
+        observeWeddingReveals();
+        observeRevealElements();
+      }, 400);
+    };
+
+    document.getElementById('wedding-cover-btn')?.addEventListener('click', openInvitation);
+    document.getElementById('wedding-wax-seal-btn')?.addEventListener('click', openInvitation);
   }
 
   // ═══════════════════════════════════════════════════════
@@ -1268,8 +1563,8 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         // Trigger confetti
         triggerConfetti();
 
-        // Start audio (autoplay-compliant: user has interacted)
-        if (hasAudio) startAudio();
+        // Start audio with smooth fade-in (autoplay-compliant: user has interacted)
+        if (hasAudio) startAudio(true);
 
         // Observe scroll-reveal elements
         setTimeout(() => {
@@ -1617,6 +1912,61 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     }
   }
 
+  // Wedding Opening Seam Confetti Burst (Delayed 300ms, Radiating Outward from Opening Seam)
+  async function triggerWeddingSeamConfetti() {
+    try {
+      const confetti = (await import('canvas-confetti')).default;
+      const canvas = document.getElementById('confetti-canvas') as HTMLCanvasElement | null;
+      if (!canvas) return;
+
+      const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+      const luxuryPalette = ['#f5c563', '#fae09a', '#d4af37', '#ffd700', '#ffffff', '#e07a93'];
+
+      // Left radiation outward directly from opening seam (x: 0.5)
+      myConfetti({
+        particleCount: 55,
+        angle: 155,
+        spread: 60,
+        origin: { x: 0.5, y: 0.48 },
+        colors: luxuryPalette,
+        startVelocity: 42,
+        gravity: 0.8,
+        scalar: 1.1,
+        ticks: 240,
+      });
+
+      // Right radiation outward directly from opening seam (x: 0.5)
+      myConfetti({
+        particleCount: 55,
+        angle: 25,
+        spread: 60,
+        origin: { x: 0.5, y: 0.48 },
+        colors: luxuryPalette,
+        startVelocity: 42,
+        gravity: 0.8,
+        scalar: 1.1,
+        ticks: 240,
+      });
+
+      // Secondary ambient gold shimmer delayed +250ms
+      setTimeout(() => {
+        myConfetti({
+          particleCount: 40,
+          angle: 90,
+          spread: 95,
+          origin: { x: 0.5, y: 0.52 },
+          colors: ['#f5c563', '#fae09a', '#ffffff'],
+          startVelocity: 34,
+          gravity: 0.7,
+          scalar: 0.9,
+          ticks: 200,
+        });
+      }, 250);
+    } catch {
+      // Confetti fallback
+    }
+  }
+
   // ═══════════════════════════════════════════════════════
   // Resilient Audio Controller & Fallback Management
   // ═══════════════════════════════════════════════════════
@@ -1625,14 +1975,57 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   let isPlaying = false;
   let audioInitialized = false;
 
+  let musicNotesInterval: number | null = null;
+
+  function startMusicNotes() {
+    if (musicNotesInterval || !isWedding) return;
+    const container = document.getElementById('music-notes-container');
+    if (!container) return;
+
+    const notes = ['♪', '♫', '♩', '♬'];
+
+    musicNotesInterval = window.setInterval(() => {
+      if (!isPlaying) {
+        stopMusicNotes();
+        return;
+      }
+      const note = document.createElement('span');
+      note.className = 'floating-music-note';
+      note.textContent = notes[Math.floor(Math.random() * notes.length)];
+
+      const randomX = (Math.random() - 0.5) * 24; // -12px to +12px
+      const randomRotate = (Math.random() - 0.5) * 35;
+      const randomScale = 0.85 + Math.random() * 0.35;
+
+      note.style.setProperty('--note-x', `${randomX}px`);
+      note.style.setProperty('--note-rot', `${randomRotate}deg`);
+      note.style.setProperty('--note-scale', `${randomScale}`);
+
+      container.appendChild(note);
+
+      setTimeout(() => {
+        note.remove();
+      }, 2000);
+    }, 850);
+  }
+
+  function stopMusicNotes() {
+    if (musicNotesInterval) {
+      clearInterval(musicNotesInterval);
+      musicNotesInterval = null;
+    }
+  }
+
   function updateAudioUI(playing: boolean) {
     const disc = document.querySelector('.music-disc');
     const iconPath = document.getElementById('audio-icon-path');
     if (disc) {
       if (playing) {
         disc.classList.add('is-playing');
+        if (isWedding) startMusicNotes();
       } else {
         disc.classList.remove('is-playing');
+        if (isWedding) stopMusicNotes();
       }
     }
     // Update icon: music note when playing, muted icon when paused
@@ -1644,7 +2037,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     }
   }
 
-  async function fallbackToSynth() {
+  async function fallbackToSynth(fadeIn = false) {
     if (activeSource === 'synth' && isPlaying) return;
 
     // Clean up HTML5 audio if active or pending
@@ -1656,7 +2049,9 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     }
 
     activeSource = 'synth';
-    const started = await startSynth(trackId, 0.35);
+    const targetVol = 0.35;
+    const initialVol = fadeIn ? 0.08 : targetVol;
+    const started = await startSynth(trackId, initialVol);
     if (started) {
       isPlaying = true;
       updateAudioUI(true);
@@ -1666,7 +2061,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     }
   }
 
-  function startAudio() {
+  function startAudio(fadeIn = false) {
     if (audioInitialized) return;
     audioInitialized = true;
 
@@ -1689,7 +2084,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
       const onAudioError = () => {
         if (fallbackTriggered) return;
         fallbackTriggered = true;
-        fallbackToSynth();
+        fallbackToSynth(fadeIn);
       };
 
       audio.addEventListener('error', onAudioError, { once: true });
@@ -1698,7 +2093,12 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         sourceEl.addEventListener('error', onAudioError, { once: true });
       }
 
-      audio.volume = 0.4;
+      if (fadeIn) {
+        audio.volume = 0;
+      } else {
+        audio.volume = 0.4;
+      }
+
       audio
         .play()
         .then(() => {
@@ -1706,6 +2106,26 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
             activeSource = 'html5';
             isPlaying = true;
             updateAudioUI(true);
+
+            if (fadeIn) {
+              // Smooth volume ramp over 1000ms to eliminate clicks
+              const targetVol = 0.4;
+              const fadeDuration = 1000;
+              const stepMs = 50;
+              const stepInc = targetVol / (fadeDuration / stepMs);
+              let curVol = 0;
+              const fadeTimer = setInterval(() => {
+                if (!isPlaying || activeSource !== 'html5') {
+                  clearInterval(fadeTimer);
+                  return;
+                }
+                curVol = Math.min(targetVol, curVol + stepInc);
+                audio.volume = curVol;
+                if (curVol >= targetVol) {
+                  clearInterval(fadeTimer);
+                }
+              }, stepMs);
+            }
           }
         })
         .catch(() => {
@@ -1715,7 +2135,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     } else {
       // Missing audio URL, unsupported web link (e.g. YouTube), or no <audio> element:
       // Fallback straight to Web Audio synth
-      fallbackToSynth();
+      fallbackToSynth(fadeIn);
     }
 
     // Floating Sound Control Button (Toggle Play / Pause / Mute)
@@ -1919,23 +2339,26 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   });
 
   // ═════════════════════════════════════════════════════════
-  // Romantic Photo Scroll Reveal (IntersectionObserver)
+  // Unified Orchestrated Wedding Scroll Transitions (60 FPS)
   // ═════════════════════════════════════════════════════════
-  const romanticObserver = new IntersectionObserver(
+  const weddingObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed');
           entry.target.classList.add('in-view');
-          romanticObserver.unobserve(entry.target);
+          weddingObserver.unobserve(entry.target);
         }
       });
     },
     { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
   );
 
-  document.querySelectorAll('.romantic-photo-wrapper').forEach((el) => {
-    romanticObserver.observe(el);
-  });
+  function observeWeddingReveals() {
+    document.querySelectorAll('.wedding-reveal:not(.is-revealed)').forEach((el) => {
+      weddingObserver.observe(el);
+    });
+  }
 
   // ═════════════════════════════════════════════════════════
   // Lightweight Scroll-Reveal Engine (data-reveal driven)
@@ -1958,6 +2381,25 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     });
   }
 
+  if (isWedding) {
+    observeWeddingReveals();
+  } else {
+    // Non-wedding photo reveal
+    const romanticObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            romanticObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.romantic-photo-wrapper').forEach((el) => {
+      romanticObserver.observe(el);
+    });
+  }
   observeRevealElements();
 </script>
 
@@ -2044,5 +2486,449 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   }
   .shake {
     animation: shake 0.4s ease-in-out;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     Indonesian Luxury Wedding: Cinematic Cover & Unboxing Styles
+     ══════════════════════════════════════════════════════════════ */
+  .cover-gate {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .cover-gate-left:not(.shadow-none) {
+    box-shadow: inset -22px 0 38px -10px rgba(0, 0, 0, 0.88),
+                inset -2px 0 5px 0 rgba(245, 197, 99, 0.35);
+  }
+
+  .cover-gate-right:not(.shadow-none) {
+    box-shadow: inset 22px 0 38px -10px rgba(0, 0, 0, 0.88),
+                inset 2px 0 5px 0 rgba(245, 197, 99, 0.35);
+  }
+
+  /* Center Seam Gold Glow Line */
+  .cover-seam-glow {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(245, 197, 99, 0.35) 15%,
+      rgba(254, 240, 138, 0.9) 50%,
+      rgba(245, 197, 99, 0.35) 85%,
+      transparent 100%
+    );
+    opacity: 0.65;
+    transition: opacity 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .cover-seam-glow.seam-pulse-active {
+    animation: seam-gold-pulse 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes seam-gold-pulse {
+    0% {
+      opacity: 0.6;
+      transform: translateX(-50%) scaleY(0.7);
+      box-shadow: 0 0 10px 2px rgba(245, 197, 99, 0.4);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(-50%) scaleY(1);
+      box-shadow: 0 0 32px 8px rgba(245, 197, 99, 1),
+                  0 0 65px 18px rgba(245, 197, 99, 0.6);
+    }
+    100% {
+      opacity: 0.85;
+      transform: translateX(-50%) scaleY(1);
+      box-shadow: 0 0 22px 5px rgba(245, 197, 99, 0.85);
+    }
+  }
+
+  /* Button Micro-Feedback (Phase 1) */
+  .cover-btn-pressed {
+    transform: scale(0.95) !important;
+    filter: brightness(1.2) !important;
+    box-shadow: 0 0 35px rgba(245, 197, 99, 0.8),
+                0 4px 15px rgba(0, 0, 0, 0.4) !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.2s ease,
+                box-shadow 0.2s ease !important;
+  }
+
+  .wax-seal-pressed {
+    transform: scale(0.93) !important;
+    filter: brightness(1.25) !important;
+    box-shadow: 0 0 40px rgba(245, 197, 99, 0.9),
+                0 6px 20px rgba(0, 0, 0, 0.5) !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.2s ease,
+                box-shadow 0.2s ease !important;
+  }
+
+  /* Wax Seal 3D Perspective & Realistic Flap */
+  .wax-envelope-perspective {
+    perspective: 1200px;
+  }
+
+  .wax-seal-flap {
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .wax-seal-flap.flap-opened {
+    transform: rotateX(-180deg);
+  }
+
+  /* Wax Seal Luxury Medallion */
+  .wax-seal-medallion {
+    background: radial-gradient(circle at 35% 35%, #ffd700, #d4af37 45%, #b8860b 80%, #7a580b 100%);
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(212, 175, 55, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    border: 3px solid rgba(255, 215, 0, 0.5);
+    will-change: transform, opacity;
+  }
+
+  /* Breathing Glow Pulse for Wax Seal Medallion */
+  @keyframes wax-seal-glow-pulse {
+    0%, 100% {
+      box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.5),
+                  0 4px 14px rgba(212, 175, 55, 0.35),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.6);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 12px 30px -2px rgba(0, 0, 0, 0.55),
+                  0 0 24px 6px rgba(245, 197, 99, 0.65),
+                  inset 0 2px 5px rgba(255, 255, 255, 0.8);
+      transform: scale(1.03);
+    }
+  }
+
+  .wax-seal-pulse {
+    animation: wax-seal-glow-pulse 3s ease-in-out infinite;
+  }
+
+  .wax-seal-pulse:hover {
+    animation-play-state: paused;
+  }
+
+  .wax-seal-broken {
+    transform: scale(1.4) rotate(28deg) !important;
+    opacity: 0 !important;
+    filter: blur(4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+    transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.55s ease-out,
+                filter 0.55s ease-out,
+                box-shadow 0.55s ease-out !important;
+  }
+
+  /* Curtain Lift Mode */
+  .curtain-lift-mode {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: backdrop-filter 1.5s cubic-bezier(0.16, 1, 0.3, 1),
+                -webkit-backdrop-filter 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .curtain-lift-dissolve {
+    backdrop-filter: blur(0px) !important;
+    -webkit-backdrop-filter: blur(0px) !important;
+  }
+
+  /* ── Phase 3: Hero Photo Settle & Staggered Typography ── */
+  .hero-couple-photo {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .hero-couple-photo.hero-photo-init {
+    transform: scale3d(1.08, 1.08, 1);
+  }
+
+  .hero-couple-photo.hero-photo-settling {
+    transform: scale3d(1, 1, 1);
+    transition: transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hero-stagger-text {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+
+  .hero-stagger-text.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* ── Ken Burns Zoom for Hero Couple Photo ── */
+  @keyframes wedding-kenburns {
+    0% {
+      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+    50% {
+      transform: scale3d(1.08, 1.08, 1) translate3d(-1%, -1%, 0);
+    }
+    100% {
+      transform: scale3d(1.04, 1.04, 1) translate3d(0, 0, 0);
+    }
+  }
+
+  .hero-couple-photo.ken-burns-active {
+    animation: wedding-kenburns 16s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     Wedding Scroll-Driven Reveal (IntersectionObserver)
+     ══════════════════════════════════════════════════════════════ */
+  .wedding-reveal {
+    will-change: opacity, transform;
+  }
+
+  /* 1. Section Headings: Fade-in down + Expanding Champagne Gold Divider */
+  .wedding-reveal.reveal-heading {
+    opacity: 0;
+    transform: translate3d(0, -22px, 0);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .wedding-reveal.reveal-heading.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .champagne-divider {
+    display: block;
+    height: 1.5px;
+    width: 90px;
+    margin: 0.75rem auto 0;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), #e2c974, #fef08a, #e2c974, rgba(212, 175, 55, 0.3), transparent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+    will-change: transform;
+  }
+
+  .wedding-reveal.reveal-heading.is-revealed .champagne-divider {
+    transform: scaleX(1);
+  }
+
+  /* 2. Couple Profile Section (#mempelai) */
+  .wedding-reveal.reveal-portrait {
+    will-change: opacity, transform;
+  }
+
+  .wedding-reveal.reveal-portrait.portrait-bride {
+    opacity: 0;
+    transform: translate3d(-20px, 30px, 0);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .wedding-reveal.reveal-portrait.portrait-bride.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .wedding-reveal.reveal-portrait.portrait-groom {
+    opacity: 0;
+    transform: translate3d(20px, 30px, 0);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 120ms,
+                transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 120ms;
+  }
+
+  .wedding-reveal.reveal-portrait.portrait-groom.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  @keyframes emblem-gold-pulse {
+    0% {
+      transform: scale(0.85);
+      filter: drop-shadow(0 0 0 rgba(245, 197, 99, 0));
+    }
+    45% {
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 18px rgba(245, 197, 99, 0.8));
+    }
+    100% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 8px rgba(245, 197, 99, 0.3));
+    }
+  }
+
+  .wedding-reveal.reveal-portrait.portrait-sep {
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 220ms,
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 220ms;
+    will-change: opacity, transform, filter;
+  }
+
+  .wedding-reveal.reveal-portrait.portrait-sep.is-revealed {
+    opacity: 1;
+    transform: scale(1);
+    animation: emblem-gold-pulse 1.3s cubic-bezier(0.16, 1, 0.3, 1) 220ms forwards;
+  }
+
+  /* 3. Event Schedule Cards (#acara) */
+  .wedding-reveal.reveal-card {
+    opacity: 0;
+    transform: translate3d(0, 36px, 0);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    will-change: opacity, transform, box-shadow;
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.9s ease;
+  }
+
+  .wedding-reveal.reveal-card.reveal-card-akad {
+    transition-delay: 0ms;
+  }
+
+  .wedding-reveal.reveal-card.reveal-card-resepsi {
+    transition-delay: 150ms;
+  }
+
+  .wedding-reveal.reveal-card.reveal-card-unduh {
+    transition-delay: 300ms;
+  }
+
+  .wedding-reveal.reveal-card.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.45),
+                0 0 35px -5px rgba(245, 197, 99, 0.2),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  /* 4. 8-Photo Gallery Grid (#galeri) */
+  .wedding-reveal.reveal-gallery-item {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0) scale(0.97);
+    will-change: opacity, transform;
+    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .wedding-reveal.reveal-gallery-item.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  /* 5. Digital Envelope & Wishes (#amplop, #doa) */
+  .wedding-reveal.reveal-blur-card {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    filter: blur(4px);
+    will-change: opacity, transform, filter;
+    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .wedding-reveal.reveal-blur-card.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0px);
+  }
+
+  /* 6. Countdown Boxes: Gentle Heartbeat Pulse when in view */
+  @keyframes countdown-heartbeat {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    14% {
+      transform: translate3d(0, 0, 0) scale(1.06);
+    }
+    28% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    42% {
+      transform: translate3d(0, 0, 0) scale(1.03);
+    }
+    70% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  .wedding-reveal.reveal-countdown {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .wedding-reveal.reveal-countdown.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .wedding-reveal.reveal-countdown.is-revealed .countdown-box {
+    animation: countdown-heartbeat 3s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* 7. Hero Banner Reveal */
+  .wedding-reveal.reveal-hero {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .wedding-reveal.reveal-hero.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     Customizable Corner Ornaments (Indonesian Luxury Standard)
+     ══════════════════════════════════════════════════════════════ */
+  .foliage-corner {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10;
+    will-change: transform, opacity;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     Dynamic Vinyl Music Widget: Rising Musical Notes
+     ══════════════════════════════════════════════════════════════ */
+  @keyframes float-music-note {
+    0% {
+      opacity: 0;
+      transform: translate3d(var(--note-x, 0px), 12px, 0) scale(0.6) rotate(0deg);
+    }
+    20% {
+      opacity: 0.95;
+      transform: translate3d(var(--note-x, 0px), -15px, 0) scale(var(--note-scale, 1)) rotate(calc(var(--note-rot, 0deg) * 0.5));
+    }
+    75% {
+      opacity: 0.85;
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(calc(var(--note-x, 0px) * 1.6), -70px, 0) scale(calc(var(--note-scale, 1) * 0.85)) rotate(var(--note-rot, 0deg));
+    }
+  }
+
+  .floating-music-note {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    font-size: 1.25rem;
+    color: #fef08a;
+    text-shadow: 0 0 10px rgba(234, 179, 8, 0.7), 0 0 20px rgba(212, 175, 55, 0.5);
+    pointer-events: none;
+    user-select: none;
+    will-change: transform, opacity;
+    animation: float-music-note 2.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 </style>
