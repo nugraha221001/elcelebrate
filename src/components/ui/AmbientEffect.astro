@@ -94,9 +94,11 @@ const { effect } = Astro.props;
     function rand(min: number, max: number) { return Math.random() * (max - min) + min; }
 
     const particles: Particle[] = [];
-    const MAX = effect === 'starlight' || effect === 'bokeh' || effect === 'fireflies' || effect === 'champagne-dust'
-      ? 30
-      : (effect === 'aurora-mist' ? 10 : 22);
+    const MAX = effect === 'aurora-mist'
+      ? 0
+      : (effect === 'starlight' || effect === 'bokeh' || effect === 'fireflies' || effect === 'champagne-dust'
+        ? 30
+        : 22);
 
     // ── Offscreen Sprite Cache (60 FPS Mobile GPU Acceleration) ──
 
@@ -483,21 +485,139 @@ const { effect } = Astro.props;
       return cvs;
     }
 
-    function createAuroraWaveSprite(): HTMLCanvasElement {
-      const { cvs, c } = createOffscreen(128, 128);
-      const cx = 64, cy = 64;
+    // ── Fluid Sinusoidal Aurora Mist Wave Curtains ────────
+    function renderAuroraMist(t: number) {
+      const w = W();
+      const h = H();
+      if (w <= 0 || h <= 0) return;
 
-      const grad = c.createRadialGradient(cx, cy, 4, cx, cy, 60);
-      grad.addColorStop(0, 'rgba(254, 240, 138, 0.28)');
-      grad.addColorStop(0.35, 'rgba(244, 114, 182, 0.22)');
-      grad.addColorStop(0.68, 'rgba(192, 132, 252, 0.12)');
-      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      c.fillStyle = grad;
-      c.beginPath();
-      c.arc(cx, cy, 60, 0, Math.PI * 2);
-      c.fill();
+      const layers = [
+        {
+          // Layer 0: Vibrant Emerald Glow
+          baseY: h * 0.12,
+          ribbonHeight: Math.min(380, h * 0.40),
+          amp1: 36,
+          amp2: 20,
+          freq1: 0.0022,
+          freq2: 0.0048,
+          speed1: 0.0028,
+          speed2: 0.0019,
+          colorPeak: 'rgba(46, 213, 115, 0.28)',
+          colorFade: 'rgba(46, 213, 115, 0)',
+        },
+        {
+          // Layer 1: Luminous Cyan Teal
+          baseY: h * 0.22,
+          ribbonHeight: Math.min(420, h * 0.44),
+          amp1: 42,
+          amp2: 24,
+          freq1: 0.0018,
+          freq2: 0.0042,
+          speed1: -0.0024,
+          speed2: 0.0027,
+          colorPeak: 'rgba(0, 210, 211, 0.25)',
+          colorFade: 'rgba(0, 210, 211, 0)',
+        },
+        {
+          // Layer 2: Violet Twilight
+          baseY: h * 0.30,
+          ribbonHeight: Math.min(350, h * 0.38),
+          amp1: 32,
+          amp2: 18,
+          freq1: 0.0026,
+          freq2: 0.0054,
+          speed1: 0.0034,
+          speed2: -0.0020,
+          colorPeak: 'rgba(165, 94, 234, 0.22)',
+          colorFade: 'rgba(165, 94, 234, 0)',
+        },
+        {
+          // Layer 3: Champagne Shimmer
+          baseY: h * 0.18,
+          ribbonHeight: Math.min(390, h * 0.42),
+          amp1: 38,
+          amp2: 22,
+          freq1: 0.0020,
+          freq2: 0.0046,
+          speed1: -0.0026,
+          speed2: -0.0016,
+          colorPeak: 'rgba(245, 197, 99, 0.20)',
+          colorFade: 'rgba(245, 197, 99, 0)',
+        },
+      ];
 
-      return cvs;
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+
+      const step = Math.max(16, Math.floor(w / 40));
+
+      layers.forEach((layer, index) => {
+        ctx.save();
+
+        const topPoints: { x: number; y: number }[] = [];
+        const bottomPoints: { x: number; y: number }[] = [];
+
+        let minY = Infinity;
+        let maxY = -Infinity;
+
+        // Gentle horizontal and vertical wave undulation using Math.sin(time + index)
+        const waveUndulation = Math.sin(t * 0.0018 + index * 1.5) * (h * 0.035);
+
+        for (let x = -step; x <= w + step * 2; x += step) {
+          const yTop = layer.baseY
+            + waveUndulation
+            + Math.sin(x * layer.freq1 + t * layer.speed1 + index) * layer.amp1
+            + Math.cos(x * layer.freq2 + t * layer.speed2) * layer.amp2;
+          const yBottom = yTop + layer.ribbonHeight + Math.sin(x * layer.freq1 * 1.3 - t * layer.speed1 * 0.8) * (layer.amp1 * 0.35);
+
+          topPoints.push({ x, y: yTop });
+          bottomPoints.push({ x, y: yBottom });
+
+          if (yTop < minY) minY = yTop;
+          if (yBottom > maxY) maxY = yBottom;
+        }
+
+        if (maxY > minY) {
+          // Vertical gradient fade towards bottom so center card text remains sharp & legible
+          const grad = ctx.createLinearGradient(0, minY, 0, maxY);
+          grad.addColorStop(0, layer.colorFade);
+          grad.addColorStop(0.28, layer.colorPeak);
+          grad.addColorStop(0.65, layer.colorPeak);
+          grad.addColorStop(1, layer.colorFade);
+
+          ctx.beginPath();
+          ctx.moveTo(topPoints[0].x, topPoints[0].y);
+          for (let i = 1; i < topPoints.length; i++) {
+            const prev = topPoints[i - 1];
+            const curr = topPoints[i];
+            const midX = (prev.x + curr.x) / 2;
+            const midY = (prev.y + curr.y) / 2;
+            ctx.quadraticCurveTo(prev.x, prev.y, midX, midY);
+          }
+          const lastTop = topPoints[topPoints.length - 1];
+          ctx.lineTo(lastTop.x, lastTop.y);
+
+          const lastBottom = bottomPoints[bottomPoints.length - 1];
+          ctx.lineTo(lastBottom.x, lastBottom.y);
+
+          for (let i = bottomPoints.length - 2; i >= 0; i--) {
+            const next = bottomPoints[i + 1];
+            const curr = bottomPoints[i];
+            const midX = (next.x + curr.x) / 2;
+            const midY = (next.y + curr.y) / 2;
+            ctx.quadraticCurveTo(next.x, next.y, midX, midY);
+          }
+          ctx.lineTo(bottomPoints[0].x, bottomPoints[0].y);
+          ctx.closePath();
+
+          ctx.fillStyle = grad;
+          ctx.fill();
+        }
+
+        ctx.restore();
+      });
+
+      ctx.restore();
     }
 
     // Lazy sprite cache dictionary
@@ -743,16 +863,6 @@ const { effect } = Astro.props;
           base.maxLife = rand(360, 680);
           base.phase = rand(0, Math.PI * 2);
           break;
-        case 'aurora-mist':
-          base.x = rand(-50, W() + 50);
-          base.y = rand(0, H());
-          base.vy = rand(-0.08, 0.08);
-          base.vx = rand(-0.12, 0.12);
-          base.size = rand(80, 160);
-          base.opacity = 0;
-          base.maxLife = rand(420, 840);
-          base.phase = rand(0, Math.PI * 2);
-          break;
       }
       return base;
     }
@@ -867,6 +977,11 @@ const { effect } = Astro.props;
       ctx.clearRect(0, 0, W(), H());
       frameCount++;
 
+      if (effect === 'aurora-mist') {
+        renderAuroraMist(frameCount);
+        return;
+      }
+
       // Gentle horizontal wind oscillation (sinusoidal breeze)
       const breeze = Math.sin(frameCount * 0.008) * 0.35 + Math.sin(frameCount * 0.003) * 0.2;
 
@@ -881,7 +996,7 @@ const { effect } = Astro.props;
 
         // Lifecycle opacity envelope
         const progress = p.life / p.maxLife;
-        if (effect === 'golden-sparkles' || effect === 'starlight' || effect === 'sparklers' || effect === 'bokeh' || effect === 'keraton-glow' || effect === 'fireflies' || effect === 'champagne-dust' || effect === 'prism-glow' || effect === 'floating-pearls' || effect === 'aurora-mist') {
+        if (effect === 'golden-sparkles' || effect === 'starlight' || effect === 'sparklers' || effect === 'bokeh' || effect === 'keraton-glow' || effect === 'fireflies' || effect === 'champagne-dust' || effect === 'prism-glow' || effect === 'floating-pearls') {
           if (progress < 0.2) {
             p.opacity = (progress / 0.2) * 0.85;
           } else if (progress > 0.75) {
@@ -1062,17 +1177,6 @@ const { effect } = Astro.props;
             const sprite = getSprite('pearl', createPearlSprite);
             ctx.save();
             ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity));
-            ctx.drawImage(sprite, p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
-            ctx.restore();
-            break;
-          }
-          case 'aurora-mist': {
-            p.vx += Math.sin(p.life * 0.005 + p.phase) * 0.015;
-            p.vy += Math.cos(p.life * 0.004 + p.phase) * 0.01;
-            const wave = 0.7 + 0.3 * Math.sin(p.life * 0.012 + p.phase);
-            const sprite = getSprite('auroraWave', createAuroraWaveSprite);
-            ctx.save();
-            ctx.globalAlpha = Math.max(0, Math.min(0.65, p.opacity * wave));
             ctx.drawImage(sprite, p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
             ctx.restore();
             break;

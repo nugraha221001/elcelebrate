@@ -1088,30 +1088,32 @@ const isEdit = Boolean(editId);
               <!-- Akad / Holy Matrimony -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
                 <div class="text-xs font-semibold uppercase tracking-wider text-amber-400">🕌 Akad Nikah / Holy Matrimony</div>
-                <div class="grid grid-cols-3 gap-3">
-                  <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">Date <span class="text-confetti-pink">*</span></label>
-                    <input type="date" id="w-akad-date" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div class="w-full min-w-0 block col-span-1 sm:col-span-1">
+                    <label for="w-akad-date" class="mb-1 block text-xs font-medium text-surface-300">Date <span class="text-confetti-pink">*</span></label>
+                    <input type="date" id="w-akad-date" class="form-input w-full min-w-0 rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                   </div>
-                  <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">Start Time</label>
-                    <input type="time" id="w-akad-start" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
-                  </div>
-                  <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">End Time</label>
-                    <input type="time" id="w-akad-end" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  <div class="col-span-1 sm:col-span-2 flex gap-2 w-full min-w-0">
+                    <div class="w-full min-w-0 flex-1 block">
+                      <label for="w-akad-start" class="mb-1 block text-xs font-medium text-surface-300">Start Time</label>
+                      <input type="time" id="w-akad-start" class="form-input w-full min-w-0 rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                    </div>
+                    <div class="w-full min-w-0 flex-1 block">
+                      <label for="w-akad-end" class="mb-1 block text-xs font-medium text-surface-300">End Time</label>
+                      <input type="time" id="w-akad-end" class="form-input w-full min-w-0 rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                    </div>
                   </div>
                 </div>
                 <div>
-                  <label class="mb-1 block text-xs font-medium text-surface-300">Venue Name</label>
+                  <label for="w-akad-venue" class="mb-1 block text-xs font-medium text-surface-300">Venue Name</label>
                   <input type="text" id="w-akad-venue" placeholder="Masjid Al-Ikhlas" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                 </div>
                 <div>
-                  <label class="mb-1 block text-xs font-medium text-surface-300">Address</label>
+                  <label for="w-akad-address" class="mb-1 block text-xs font-medium text-surface-300">Address</label>
                   <input type="text" id="w-akad-address" placeholder="Jl. Raya No. 123, Jakarta" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                 </div>
                 <div>
-                  <label class="mb-1 block text-xs font-medium text-surface-300">Google Maps URL</label>
+                  <label for="w-akad-maps" class="mb-1 block text-xs font-medium text-surface-300">Google Maps URL</label>
                   <input type="url" id="w-akad-maps" placeholder="https://maps.google.com/..." class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                 </div>
               </div>
@@ -1119,30 +1121,32 @@ const isEdit = Boolean(editId);
               <!-- Resepsi / Reception -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
                 <div class="text-xs font-semibold uppercase tracking-wider text-emerald-400">🎉 Resepsi / Reception</div>
-                <div class="grid grid-cols-3 gap-3">
-                  <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">Date</label>
-                    <input type="date" id="w-resepsi-date" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div class="w-full min-w-0 block col-span-1 sm:col-span-1">
+                    <label for="w-resepsi-date" class="mb-1 block text-xs font-medium text-surface-300">Date</label>
+                    <input type="date" id="w-resepsi-date" class="form-input w-full min-w-0 rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                   </div>
-                  <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">Start Time</label>
-                    <input type="time" id="w-resepsi-start" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
-                  </div>
-                  <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">End Time</label>
-                    <input type="time" id="w-resepsi-end" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                  <div class="col-span-1 sm:col-span-2 flex gap-2 w-full min-w-0">
+                    <div class="w-full min-w-0 flex-1 block">
+                      <label for="w-resepsi-start" class="mb-1 block text-xs font-medium text-surface-300">Start Time</label>
+                      <input type="time" id="w-resepsi-start" class="form-input w-full min-w-0 rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                    </div>
+                    <div class="w-full min-w-0 flex-1 block">
+                      <label for="w-resepsi-end" class="mb-1 block text-xs font-medium text-surface-300">End Time</label>
+                      <input type="time" id="w-resepsi-end" class="form-input w-full min-w-0 rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                    </div>
                   </div>
                 </div>
                 <div>
-                  <label class="mb-1 block text-xs font-medium text-surface-300">Venue Name</label>
+                  <label for="w-resepsi-venue" class="mb-1 block text-xs font-medium text-surface-300">Venue Name</label>
                   <input type="text" id="w-resepsi-venue" placeholder="Ballroom Grand Hotel" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                 </div>
                 <div>
-                  <label class="mb-1 block text-xs font-medium text-surface-300">Address</label>
+                  <label for="w-resepsi-address" class="mb-1 block text-xs font-medium text-surface-300">Address</label>
                   <input type="text" id="w-resepsi-address" placeholder="Jl. Sudirman No. 456, Jakarta" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                 </div>
                 <div>
-                  <label class="mb-1 block text-xs font-medium text-surface-300">Google Maps URL</label>
+                  <label for="w-resepsi-maps" class="mb-1 block text-xs font-medium text-surface-300">Google Maps URL</label>
                   <input type="url" id="w-resepsi-maps" placeholder="https://maps.google.com/..." class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                 </div>
               </div>
@@ -1164,14 +1168,14 @@ const isEdit = Boolean(editId);
                 </div>
 
                 <div id="w-unduh-mantu-fields" class="hidden space-y-3 pt-2 border-t border-white/5">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="w-full min-w-0 block col-span-1 sm:col-span-1">
                       <label for="w-unduh-mantu-date" class="mb-1 block text-xs font-medium text-surface-300">Tanggal Unduh Mantu</label>
-                      <input type="date" id="w-unduh-mantu-date" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                      <input type="date" id="w-unduh-mantu-date" class="form-input w-full min-w-0 rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                     </div>
-                    <div>
+                    <div class="w-full min-w-0 block col-span-1 sm:col-span-2">
                       <label for="w-unduh-mantu-time" class="mb-1 block text-xs font-medium text-surface-300">Waktu</label>
-                      <input type="text" id="w-unduh-mantu-time" placeholder="10:00 — 14:00 WIB" class="form-input w-full rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
+                      <input type="text" id="w-unduh-mantu-time" placeholder="10:00 — 14:00 WIB" class="form-input w-full min-w-0 rounded-lg border bg-surface-800/50 px-3 py-2 text-sm focus-ring" />
                     </div>
                   </div>
                   <div>
@@ -1501,15 +1505,15 @@ const isEdit = Boolean(editId);
         </div>
 
         <!-- Step 5: Preview -->
-        <div id="step-5" class="wizard-step hidden">
+        <div id="step-5" class="wizard-step hidden w-full max-w-full min-w-0 overflow-x-hidden">
           <h2 class="text-xl font-bold text-surface-50">{isEdit ? "Preview & Save Changes" : "Preview & Publish"}</h2>
           <p class="mt-2 text-sm text-surface-400">{isEdit ? "Review your changes before saving" : "Review your card before sharing it with the world"}</p>
 
           <!-- Mobile inline preview (visible < 1020px on step 5) -->
-          <div id="step5-mobile-preview" class="mt-6 hidden">
+          <div id="step5-mobile-preview" class="mt-6 hidden w-full max-w-full min-w-0 overflow-x-hidden">
             <div class="mb-3 text-xs font-medium text-surface-400">Card Preview</div>
-            <div class="mx-auto w-full max-w-sm">
-              <div class="overflow-hidden rounded-[2rem] border-4 border-surface-600 bg-surface-900 shadow-elevated">
+            <div class="mx-auto w-full max-w-sm min-w-0 overflow-x-hidden">
+              <div class="w-full max-w-full min-w-0 overflow-x-hidden rounded-[2rem] border-4 border-surface-600 bg-surface-900 shadow-elevated">
                 <div class="mx-auto h-6 w-28 rounded-b-xl bg-surface-600"></div>
                 <div id="step5-preview-screen" class="relative min-h-100 overflow-y-auto p-4" style="max-height: 520px;"></div>
                 <div class="flex justify-center py-2">
@@ -1519,8 +1523,8 @@ const isEdit = Boolean(editId);
             </div>
           </div>
 
-          <div class="mt-6 rounded-2xl border border-white/8 bg-surface-900/60 backdrop-blur-md p-6">
-            <div id="preview-summary" class="space-y-4">
+          <div class="mt-6 rounded-2xl border border-white/8 bg-surface-900/60 backdrop-blur-md p-6 w-full max-w-full min-w-0 overflow-x-hidden">
+            <div id="preview-summary" class="space-y-4 w-full max-w-full min-w-0">
               <!-- Populated by JS -->
             </div>
 
@@ -2034,6 +2038,7 @@ const isEdit = Boolean(editId);
   function updateModalPreview() {
     const modalScreen = document.getElementById('modal-preview-screen');
     applyPreviewToScreen(modalScreen, buildPreviewHTML());
+    syncPreviewAmbientLoop();
   }
 
   // ═══════════════════════════════════════════════════════
@@ -4174,11 +4179,14 @@ const isEdit = Boolean(editId);
     );
 
     const activeAmbient = (state.themeConfig as any).ambientEffect || 'none';
+    const ambientCanvasHtml = activeAmbient !== 'none'
+      ? `<canvas class="phone-ambient-canvas pointer-events-none absolute inset-0 z-0 w-full h-full" style="width:100%;height:100%;"></canvas>`
+      : '';
     const ambientBadgeHtml = activeAmbient !== 'none'
       ? `<div class="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/10 backdrop-blur-xs text-[10px] font-medium text-amber-300 shadow-sm whitespace-nowrap"><span>${ambientSummaryMap[activeAmbient] || activeAmbient}</span></div>`
       : '';
 
-    let html = `${cornerOverlayHtml}${ambientBadgeHtml}<div class="text-center space-y-3 relative z-1" style="font-family: ${font}">`;
+    let html = `${cornerOverlayHtml}${ambientCanvasHtml}${ambientBadgeHtml}<div class="text-center space-y-3 relative z-1" style="font-family: ${font}">`;
 
     // ── Wedding-specific preview ──
     if (state.category === 'wedding' && state.themeConfig.weddingData) {
@@ -4192,34 +4200,34 @@ const isEdit = Boolean(editId);
         html += `<div class="text-3xl mb-1">💍</div>`;
       }
       html += `<p class="text-[10px] uppercase tracking-widest text-[#e07a93]" style="font-family: ${font}">${state.themeConfig.weddingHeaderTitle || "Walimatul 'Urs"}</p>`;
-      html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">${brideName} & ${groomName}</h3>`;
+      html += `<h3 class="text-lg font-bold break-words break-all [overflow-wrap:anywhere]" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">${brideName} & ${groomName}</h3>`;
 
       if (wd.openingGreeting) {
-        html += `<p class="text-[10px] leading-relaxed text-surface-300/80 mt-2 italic whitespace-pre-line" style="font-family: ${font}">${wd.openingGreeting.slice(0, 120)}${wd.openingGreeting.length > 120 ? '...' : ''}</p>`;
+        html += `<p class="text-[10px] leading-relaxed text-surface-300/80 mt-2 italic whitespace-pre-line break-words break-all [overflow-wrap:anywhere]" style="font-family: ${font}">${wd.openingGreeting.slice(0, 120)}${wd.openingGreeting.length > 120 ? '...' : ''}</p>`;
       }
 
       if (state.message) {
-        html += `<p class="text-xs leading-relaxed text-surface-300 mt-2" style="font-family: ${font}">${state.message.slice(0, 100)}${state.message.length > 100 ? '...' : ''}</p>`;
+        html += `<p class="text-xs leading-relaxed text-surface-300 mt-2 break-words break-all [overflow-wrap:anywhere]" style="font-family: ${font}">${state.message.slice(0, 100)}${state.message.length > 100 ? '...' : ''}</p>`;
       }
 
       if (wd.akadEvent.date) {
-        html += `<div class="mt-3 rounded-lg p-2 text-xs" style="background: ${state.themeConfig.primaryColor}15; border: 1px solid ${state.themeConfig.primaryColor}20;">`;
+        html += `<div class="mt-3 rounded-lg p-2 text-xs min-w-0" style="background: ${state.themeConfig.primaryColor}15; border: 1px solid ${state.themeConfig.primaryColor}20;">`;
         html += `<div class="font-semibold text-surface-200">🕌 Akad</div>`;
-        html += `<div class="text-surface-400">${new Date(wd.akadEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>`;
-        if (wd.akadEvent.venue) html += `<div class="text-surface-500">${wd.akadEvent.venue}</div>`;
+        html += `<div class="text-surface-400 break-words break-all [overflow-wrap:anywhere]">${new Date(wd.akadEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>`;
+        if (wd.akadEvent.venue) html += `<div class="text-surface-500 break-words break-all [overflow-wrap:anywhere]">${wd.akadEvent.venue}</div>`;
         html += `</div>`;
       }
 
       if (wd.receptionEvent.date) {
-        html += `<div class="mt-1.5 rounded-lg p-2 text-xs" style="background: ${state.themeConfig.secondaryColor}15; border: 1px solid ${state.themeConfig.secondaryColor}20;">`;
+        html += `<div class="mt-1.5 rounded-lg p-2 text-xs min-w-0" style="background: ${state.themeConfig.secondaryColor}15; border: 1px solid ${state.themeConfig.secondaryColor}20;">`;
         html += `<div class="font-semibold text-surface-200">🎉 Resepsi</div>`;
-        html += `<div class="text-surface-400">${new Date(wd.receptionEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>`;
-        if (wd.receptionEvent.venue) html += `<div class="text-surface-500">${wd.receptionEvent.venue}</div>`;
+        html += `<div class="text-surface-400 break-words break-all [overflow-wrap:anywhere]">${new Date(wd.receptionEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>`;
+        if (wd.receptionEvent.venue) html += `<div class="text-surface-500 break-words break-all [overflow-wrap:anywhere]">${wd.receptionEvent.venue}</div>`;
         html += `</div>`;
       }
 
       if (wd.digitalEnvelope.bankName) {
-        html += `<div class="mt-2 text-[10px] text-surface-500">💰 ${wd.digitalEnvelope.bankName} — ${wd.digitalEnvelope.accountHolder || '...'}</div>`;
+        html += `<div class="mt-2 text-[10px] text-surface-500 break-words break-all [overflow-wrap:anywhere]">💰 ${wd.digitalEnvelope.bankName} — ${wd.digitalEnvelope.accountHolder || '...'}</div>`;
       }
     } else {
       // ── Standard card preview ──
@@ -4237,15 +4245,15 @@ const isEdit = Boolean(editId);
       html += `<div class="text-5xl mb-2">${emoji}</div>`;
 
       if (state.recipientName) {
-        html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">Happy ${state.category || 'celebration'}!</h3>`;
-        html += `<p class="text-sm text-surface-200" style="font-family: ${font}">Dear ${state.recipientName},</p>`;
+        html += `<h3 class="text-lg font-bold break-words break-all [overflow-wrap:anywhere]" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">Happy ${state.category || 'celebration'}!</h3>`;
+        html += `<p class="text-sm text-surface-200 break-words break-all [overflow-wrap:anywhere]" style="font-family: ${font}">Dear ${state.recipientName},</p>`;
       } else {
-        html += `<h3 class="text-lg font-bold" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">Happy ${state.category || 'Celebration'}!</h3>`;
-        html += `<p class="text-sm text-surface-400" style="font-family: ${font}">Dear Someone Special,</p>`;
+        html += `<h3 class="text-lg font-bold break-words break-all [overflow-wrap:anywhere]" style="color: ${state.themeConfig.primaryColor || '#f5c563'}; font-family: ${font}">Happy ${state.category || 'Celebration'}!</h3>`;
+        html += `<p class="text-sm text-surface-400 break-words break-all [overflow-wrap:anywhere]" style="font-family: ${font}">Dear Someone Special,</p>`;
       }
 
       if (state.message) {
-        html += `<p class="text-xs leading-relaxed text-surface-300 mt-2" style="font-family: ${font}">${state.message.slice(0, 150)}${state.message.length > 150 ? '...' : ''}</p>`;
+        html += `<p class="text-xs leading-relaxed text-surface-300 mt-2 break-words break-all [overflow-wrap:anywhere]" style="font-family: ${font}">${state.message.slice(0, 150)}${state.message.length > 150 ? '...' : ''}</p>`;
       } else {
         html += `<p class="text-xs leading-relaxed text-surface-400 mt-2 italic" style="font-family: ${font}">Your message will appear here...</p>`;
       }
@@ -4344,6 +4352,210 @@ const isEdit = Boolean(editId);
     if (modalScreen && modal && !modal.classList.contains('hidden')) {
       applyPreviewToScreen(modalScreen, previewData);
     }
+
+    // Synchronize phone preview ambient canvas
+    syncPreviewAmbientLoop();
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Phone Mock Ambient Canvas Animation Engine
+  // ═══════════════════════════════════════════════════════
+  let previewAmbientAnimId = 0;
+  let previewAmbientFrame = 0;
+
+  function renderPreviewAuroraMist(ctx: CanvasRenderingContext2D, w: number, h: number, t: number) {
+    if (w <= 0 || h <= 0) return;
+    const layers = [
+      {
+        // Vibrant Emerald Glow
+        baseY: h * 0.10,
+        height: h * 0.36,
+        amp: 14,
+        freq: 0.008,
+        speed: 0.0032,
+        colorPeak: 'rgba(46, 213, 115, 0.28)',
+        colorFade: 'rgba(46, 213, 115, 0)',
+      },
+      {
+        // Luminous Cyan Teal
+        baseY: h * 0.20,
+        height: h * 0.40,
+        amp: 16,
+        freq: 0.007,
+        speed: -0.0028,
+        colorPeak: 'rgba(0, 210, 211, 0.25)',
+        colorFade: 'rgba(0, 210, 211, 0)',
+      },
+      {
+        // Violet Twilight
+        baseY: h * 0.28,
+        height: h * 0.34,
+        amp: 12,
+        freq: 0.009,
+        speed: 0.0036,
+        colorPeak: 'rgba(165, 94, 234, 0.22)',
+        colorFade: 'rgba(165, 94, 234, 0)',
+      },
+      {
+        // Champagne Shimmer
+        baseY: h * 0.16,
+        height: h * 0.38,
+        amp: 15,
+        freq: 0.0075,
+        speed: -0.0022,
+        colorPeak: 'rgba(245, 197, 99, 0.20)',
+        colorFade: 'rgba(245, 197, 99, 0)',
+      },
+    ];
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+
+    layers.forEach((layer, idx) => {
+      const undulation = Math.sin(t * 0.02 + idx * 1.5) * 10;
+      const step = Math.max(10, Math.floor(w / 20));
+      const topPts: { x: number; y: number }[] = [];
+      const btmPts: { x: number; y: number }[] = [];
+
+      let minY = Infinity;
+      let maxY = -Infinity;
+
+      for (let x = -step; x <= w + step * 2; x += step) {
+        const yTop = layer.baseY + undulation + Math.sin(x * layer.freq + t * layer.speed + idx) * layer.amp;
+        const yBtm = yTop + layer.height + Math.cos(x * layer.freq * 1.2 - t * layer.speed) * (layer.amp * 0.4);
+
+        topPts.push({ x, y: yTop });
+        btmPts.push({ x, y: yBtm });
+
+        if (yTop < minY) minY = yTop;
+        if (yBtm > maxY) maxY = yBtm;
+      }
+
+      if (maxY > minY) {
+        const grad = ctx.createLinearGradient(0, minY, 0, maxY);
+        grad.addColorStop(0, layer.colorFade);
+        grad.addColorStop(0.28, layer.colorPeak);
+        grad.addColorStop(0.65, layer.colorPeak);
+        grad.addColorStop(1, layer.colorFade);
+
+        ctx.beginPath();
+        ctx.moveTo(topPts[0].x, topPts[0].y);
+        for (let i = 1; i < topPts.length; i++) {
+          const midX = (topPts[i - 1].x + topPts[i].x) / 2;
+          const midY = (topPts[i - 1].y + topPts[i].y) / 2;
+          ctx.quadraticCurveTo(topPts[i - 1].x, topPts[i - 1].y, midX, midY);
+        }
+        ctx.lineTo(topPts[topPts.length - 1].x, topPts[topPts.length - 1].y);
+        ctx.lineTo(btmPts[btmPts.length - 1].x, btmPts[btmPts.length - 1].y);
+        for (let i = btmPts.length - 2; i >= 0; i--) {
+          const midX = (btmPts[i + 1].x + btmPts[i].x) / 2;
+          const midY = (btmPts[i + 1].y + btmPts[i].y) / 2;
+          ctx.quadraticCurveTo(btmPts[i + 1].x, btmPts[i + 1].y, midX, midY);
+        }
+        ctx.lineTo(btmPts[0].x, btmPts[0].y);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+    });
+
+    ctx.restore();
+  }
+
+  function syncPreviewAmbientLoop() {
+    if (previewAmbientAnimId) {
+      cancelAnimationFrame(previewAmbientAnimId);
+      previewAmbientAnimId = 0;
+    }
+
+    const activeAmbient = (state.themeConfig as any).ambientEffect || 'none';
+    if (activeAmbient === 'none') return;
+
+    const canvases = Array.from(document.querySelectorAll<HTMLCanvasElement>('.phone-ambient-canvas'));
+    if (!canvases.length) return;
+
+    canvases.forEach((cvs) => {
+      const parent = cvs.parentElement;
+      if (!parent) return;
+      const rect = parent.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const targetW = Math.round((rect.width || 280) * dpr);
+      const targetH = Math.round((rect.height || 520) * dpr);
+      if (cvs.width !== targetW || cvs.height !== targetH) {
+        cvs.width = targetW;
+        cvs.height = targetH;
+      }
+    });
+
+    function loop() {
+      previewAmbientAnimId = requestAnimationFrame(loop);
+      previewAmbientFrame++;
+
+      canvases.forEach((cvs) => {
+        if (cvs.offsetParent === null && cvs.offsetWidth === 0 && cvs.offsetHeight === 0) return;
+
+        const ctx = cvs.getContext('2d');
+        if (!ctx) return;
+        const w = cvs.width;
+        const h = cvs.height;
+        ctx.clearRect(0, 0, w, h);
+
+        switch (activeAmbient) {
+          case 'aurora-mist': {
+            renderPreviewAuroraMist(ctx, w, h, previewAmbientFrame);
+            break;
+          }
+          case 'petals':
+          case 'hearts-petals':
+          case 'sakura-drift': {
+            ctx.save();
+            for (let i = 0; i < 8; i++) {
+              const py = (previewAmbientFrame * (0.6 + i * 0.1) + i * (h / 8)) % (h + 20) - 10;
+              const px = (w * 0.15) + (i * (w * 0.1)) + Math.sin(previewAmbientFrame * 0.02 + i) * 16;
+              ctx.fillStyle = i % 2 === 0 ? 'rgba(244, 114, 182, 0.45)' : 'rgba(251, 113, 133, 0.35)';
+              ctx.beginPath();
+              ctx.ellipse(px, py, 4, 2.5, previewAmbientFrame * 0.02 + i, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+            break;
+          }
+          case 'golden-sparkles':
+          case 'starlight':
+          case 'champagne-dust': {
+            ctx.save();
+            for (let i = 0; i < 10; i++) {
+              const px = (w * (0.1 + (i * 0.08))) + Math.sin(previewAmbientFrame * 0.015 + i) * 10;
+              const py = (h * (0.1 + ((i * 0.09) % 0.8))) + Math.cos(previewAmbientFrame * 0.015 + i) * 10;
+              const pulse = (Math.sin(previewAmbientFrame * 0.05 + i * 2) + 1) / 2;
+              ctx.fillStyle = `rgba(245, 197, 99, ${0.2 + pulse * 0.5})`;
+              ctx.beginPath();
+              ctx.arc(px, py, 1.5 + pulse * 1.5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+            break;
+          }
+          case 'hearts': {
+            ctx.save();
+            for (let i = 0; i < 7; i++) {
+              const py = h - ((previewAmbientFrame * (0.5 + i * 0.08) + i * (h / 7)) % (h + 20));
+              const px = (w * 0.15) + (i * (w * 0.11)) + Math.sin(previewAmbientFrame * 0.02 + i) * 12;
+              const pulse = (Math.sin(previewAmbientFrame * 0.03 + i) + 1) / 2;
+              ctx.fillStyle = `rgba(244, 63, 94, ${0.3 + pulse * 0.4})`;
+              ctx.font = '10px sans-serif';
+              ctx.fillText('💖', px, py);
+            }
+            ctx.restore();
+            break;
+          }
+          default:
+            break;
+        }
+      });
+    }
+
+    loop();
   }
 
   // ═══════════════════════════════════════════════════════
@@ -4388,122 +4600,130 @@ const isEdit = Boolean(editId);
     };
 
     summary.innerHTML = `
-      <div class="space-y-3">
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Category</span>
-          <span class="text-sm font-medium text-surface-200">${categoryEmojis[state.category] || state.category}</span>
+      <div class="space-y-3 w-full min-w-0">
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Category</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${categoryEmojis[state.category] || state.category}</span>
         </div>
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">${state.category === 'wedding' ? 'Couple' : 'Recipient'}</span>
-          <span class="text-sm font-medium text-surface-200">${state.recipientName}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">${state.category === 'wedding' ? 'Couple / Mempelai' : 'Recipient'}</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.recipientName}</span>
         </div>
         ${state.senderName ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">From</span>
-          <span class="text-sm font-medium text-surface-200">${state.senderName}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">From</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.senderName}</span>
         </div>` : ''}
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Theme</span>
-          <span class="text-sm font-medium text-surface-200">${fontSummaryMap[state.themeConfig.fontFamily] || state.themeConfig.fontFamily} · ${patternSummaryMap[state.themeConfig.backgroundPattern] || state.themeConfig.backgroundPattern}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Theme</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${fontSummaryMap[state.themeConfig.fontFamily] || state.themeConfig.fontFamily} · ${patternSummaryMap[state.themeConfig.backgroundPattern] || state.themeConfig.backgroundPattern}</span>
         </div>
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Photos</span>
-          <span class="text-sm font-medium text-surface-200">${state.photos.length} photo${state.photos.length !== 1 ? 's' : ''}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Photos</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.photos.length} photo${state.photos.length !== 1 ? 's' : ''}</span>
         </div>
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Unboxing</span>
-          <span class="text-sm font-medium text-surface-200">${unboxSummaryMap[state.themeConfig.unboxStyle] || state.themeConfig.unboxStyle}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Unboxing</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${unboxSummaryMap[state.themeConfig.unboxStyle] || state.themeConfig.unboxStyle}</span>
         </div>
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Ambient Effect</span>
-          <span class="text-sm font-medium text-surface-200">${ambientSummaryMap[state.themeConfig.ambientEffect] || state.themeConfig.ambientEffect || 'None'}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Ambient Effect</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${ambientSummaryMap[state.themeConfig.ambientEffect] || state.themeConfig.ambientEffect || 'None'}</span>
         </div>
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Corner Ornaments</span>
-          <span class="text-sm font-medium text-surface-200">${cornerSummaryMap[state.themeConfig.cornerOrnament || (state.category === 'wedding' ? 'botanical' : 'none')] || 'None'}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Corner Ornaments</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${cornerSummaryMap[state.themeConfig.cornerOrnament || (state.category === 'wedding' ? 'botanical' : 'none')] || 'None'}</span>
         </div>
         ${state.category === 'love' && state.themeConfig.passcode ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Secret Passcode</span>
-          <span class="text-sm font-medium text-emerald-400">🔒 PIN Protected (${state.themeConfig.passcode.length}-digit)</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Secret Passcode</span>
+          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">🔒 PIN Protected (${state.themeConfig.passcode.length}-digit)</span>
         </div>` : ''}
         ${state.category === 'love' && state.themeConfig.interactiveConfession?.enabled ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Interactive Confession</span>
-          <span class="text-sm font-medium text-pink-400">💘 Active (Runaway No)</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Interactive Confession</span>
+          <span class="text-sm font-medium text-pink-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">💘 Active (Runaway No)</span>
         </div>` : ''}
         ${state.category === 'greetings' && state.themeConfig.occasion ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Occasion</span>
-          <span class="text-sm font-medium text-amber-400">${occasionSummaryMap[state.themeConfig.occasion] || state.themeConfig.occasion.replace(/-/g, ' ')}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Occasion</span>
+          <span class="text-sm font-medium text-amber-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">${occasionSummaryMap[state.themeConfig.occasion] || state.themeConfig.occasion.replace(/-/g, ' ')}</span>
         </div>` : ''}
         ${state.category === 'greetings' && state.themeConfig.signature ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Family Signature</span>
-          <span class="text-sm font-medium text-surface-200">${state.themeConfig.signature}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Family Signature</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.signature}</span>
         </div>` : ''}
         ${state.category === 'birthday' && state.themeConfig.ageMilestone ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Milestone</span>
-          <span class="text-sm font-medium text-pink-300">${state.themeConfig.ageMilestone}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Milestone</span>
+          <span class="text-sm font-medium text-pink-300 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.ageMilestone}</span>
         </div>` : ''}
         ${state.category === 'anniversary' && state.themeConfig.anniversaryMilestone ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Anniversary Milestone</span>
-          <span class="text-sm font-medium text-rose-300">${state.themeConfig.anniversaryMilestone}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Anniversary Milestone</span>
+          <span class="text-sm font-medium text-rose-300 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.anniversaryMilestone}</span>
         </div>` : ''}
         ${state.category === 'graduation' && state.themeConfig.degreeMajor ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Degree / Major</span>
-          <span class="text-sm font-medium text-blue-300">${state.themeConfig.degreeMajor}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Degree / Major</span>
+          <span class="text-sm font-medium text-blue-300 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.degreeMajor}</span>
         </div>` : ''}
         ${state.category === 'graduation' && state.themeConfig.schoolCampus ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">School / Campus</span>
-          <span class="text-sm font-medium text-surface-200">${state.themeConfig.schoolCampus}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">School / Campus</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.schoolCampus}</span>
         </div>` : ''}
         ${state.category === 'invitation' && state.themeConfig.invitationEventType ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Event Type</span>
-          <span class="text-sm font-medium text-emerald-300">${state.themeConfig.invitationEventType}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Event Type</span>
+          <span class="text-sm font-medium text-emerald-300 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.invitationEventType}</span>
         </div>` : ''}
         ${state.category === 'invitation' && state.themeConfig.invitationTime ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Schedule / Time</span>
-          <span class="text-sm font-medium text-surface-200">${state.themeConfig.invitationTime}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Schedule / Time</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.invitationTime}</span>
         </div>` : ''}
         ${state.category === 'invitation' && state.themeConfig.invitationVenue ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Venue Location</span>
-          <span class="text-sm font-medium text-surface-200">${state.themeConfig.invitationVenue}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Venue Location</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.invitationVenue}</span>
         </div>` : ''}
         ${state.themeConfig.customAudioUrl ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Music</span>
-          <span class="text-sm font-medium text-emerald-400">🎵 Custom Upload (MP3/Opus)</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Music</span>
+          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">🎵 Custom Upload (MP3/Opus)</span>
         </div>` : (state.themeConfig.audioTrackId ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Music</span>
-          <span class="text-sm font-medium text-surface-200">🎵 ${AUDIO_TRACKS.find(t => t.id === state.themeConfig.audioTrackId)?.name || state.themeConfig.audioTrackId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Music</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">🎵 ${AUDIO_TRACKS.find(t => t.id === state.themeConfig.audioTrackId)?.name || state.themeConfig.audioTrackId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
         </div>` : '')}
         ${state.eventDate ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Event Date</span>
-          <span class="text-sm font-medium text-surface-200">${new Date(state.eventDate).toLocaleDateString()}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Event Date</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${new Date(state.eventDate).toLocaleDateString()}</span>
         </div>` : ''}
         ${state.category === 'wedding' && state.themeConfig.weddingData ? `
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Couple</span>
-          <span class="text-sm font-medium text-surface-200">👰 ${state.themeConfig.weddingData.bride.fullName || '—'} & 🤵 ${state.themeConfig.weddingData.groom.fullName || '—'}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Mempelai</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">👰 ${state.themeConfig.weddingData.bride.fullName || '—'} & 🤵 ${state.themeConfig.weddingData.groom.fullName || '—'}</span>
         </div>
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-surface-400">Akad Date</span>
-          <span class="text-sm font-medium text-surface-200">${state.themeConfig.weddingData.akadEvent.date ? new Date(state.themeConfig.weddingData.akadEvent.date + 'T00:00:00').toLocaleDateString() : '—'}</span>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Akad</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">🕌 ${state.themeConfig.weddingData.akadEvent.date ? new Date(state.themeConfig.weddingData.akadEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}${state.themeConfig.weddingData.akadEvent.venue ? ` · ${state.themeConfig.weddingData.akadEvent.venue}` : ''}</span>
+        </div>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Resepsi</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">🎉 ${state.themeConfig.weddingData.receptionEvent.date ? new Date(state.themeConfig.weddingData.receptionEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}${state.themeConfig.weddingData.receptionEvent.venue ? ` · ${state.themeConfig.weddingData.receptionEvent.venue}` : ''}</span>
+        </div>
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Amplop Digital</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">💰 ${state.themeConfig.weddingData.digitalEnvelope.bankName ? `${state.themeConfig.weddingData.digitalEnvelope.bankName} (${state.themeConfig.weddingData.digitalEnvelope.accountNumber || '—'}) a/n ${state.themeConfig.weddingData.digitalEnvelope.accountHolder || '—'}` : '—'}</span>
         </div>` : ''}
         <hr class="border-white/5" />
-        <div>
+        <div class="min-w-0 w-full">
           <span class="text-sm text-surface-400">Message Preview</span>
-          <p class="mt-1 text-sm text-surface-300 leading-relaxed">${state.message.slice(0, 200)}${state.message.length > 200 ? '...' : ''}</p>
+          <p class="mt-1 text-sm text-surface-300 leading-relaxed break-words break-all [overflow-wrap:anywhere]">${state.message ? state.message.slice(0, 200) + (state.message.length > 200 ? '...' : '') : '<span class="italic text-surface-500">No message</span>'}</p>
         </div>
       </div>
     `;
@@ -4513,6 +4733,9 @@ const isEdit = Boolean(editId);
   // Publish / Save Card
   // ═══════════════════════════════════════════════════════
   document.getElementById('publish-btn')?.addEventListener('click', async () => {
+    // Open a blank window reference before async fetch/upload to bypass popup blocker
+    const newTab = window.open('about:blank', '_blank');
+
     // Stop any running audio preview before publishing
     if (isPlayingSynth()) stopSynth();
     previewingTrackId = null;
@@ -4650,9 +4873,18 @@ const isEdit = Boolean(editId);
         const updatedCard = await res.json();
         (window as any).showToast({ message: 'Card updated successfully!', type: 'success' });
 
-        // Redirect to dashboard (or view /c/[slug])
+        const updatedSlug = updatedCard?.slug || updatedCard?.card?.slug;
+        if (newTab && !newTab.closed) {
+          if (updatedSlug) {
+            newTab.location.href = '/c/' + updatedSlug;
+          } else {
+            newTab.close();
+          }
+        }
+
+        // Return current tab to dashboard
         setTimeout(() => {
-          window.location.href = updatedCard.slug ? `/c/${updatedCard.slug}` : '/dashboard';
+          window.location.href = '/dashboard';
         }, 1500);
       } else {
         // Normal POST /api/cards flow
@@ -4670,12 +4902,24 @@ const isEdit = Boolean(editId);
         const card = await res.json();
         (window as any).showToast({ message: '🎉 Card published successfully!', type: 'success' });
 
-        // Redirect to the card
+        const cardSlug = card?.slug || card?.card?.slug;
+        if (newTab && !newTab.closed) {
+          if (cardSlug) {
+            newTab.location.href = '/c/' + cardSlug;
+          } else {
+            newTab.close();
+          }
+        }
+
+        // Return current tab to dashboard
         setTimeout(() => {
-          window.location.href = `/c/${card.slug}`;
+          window.location.href = '/dashboard';
         }, 1500);
       }
     } catch (err: any) {
+      if (newTab && !newTab.closed) {
+        newTab.close();
+      }
       (window as any).showToast({ message: err.message || (isEditMode ? 'Failed to update' : 'Failed to publish'), type: 'error' });
       btn.disabled = false;
       btn.innerHTML = isEditMode
@@ -4978,6 +5222,19 @@ const isEdit = Boolean(editId);
 <style>
   .wizard-step {
     animation: fade-in-up 0.4s var(--ease-smooth) forwards;
+  }
+
+  /* Prevent CSS transform/filter ancestors from interfering with native datepicker positioning in Chromium/WebKit */
+  #step-4 {
+    animation: fade-in-step 0.3s ease-out forwards;
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+  }
+
+  @keyframes fade-in-step {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   /* Toggle switch */

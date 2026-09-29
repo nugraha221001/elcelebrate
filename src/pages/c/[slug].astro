@@ -337,7 +337,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
       <canvas id="confetti-canvas" class="pointer-events-none fixed inset-0 z-(--z-confetti)" style="width:100%;height:100%;"></canvas>
 
       <!-- Ambient Effect -->
-      <AmbientEffect effect={(theme as any).ambientEffect ?? 'none'} />
+      <AmbientEffect effect={resolvedAmbientEffect} />
 
       <!-- ── Customizable Corner Ornaments (Indonesian Luxury Standard) ── -->
       <CornerOrnaments
@@ -632,9 +632,16 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
         <!-- ── Photo Gallery (Slot 4-11: up to 8 photos) ── -->
         {typedCard.media_urls.slice(3, 11).filter(Boolean).length > 0 && (
-          <section id="galeri" class="pb-12">
+          <section id="galeri" class="pb-12 relative overflow-hidden">
             <span id="gallery" class="sr-only"></span>
-            <div class="wedding-reveal reveal-heading text-center mb-8">
+
+            <!-- Misty Ambient Backdrop Behind 8 Prewedding Cards -->
+            <div class="pointer-events-none absolute -inset-x-8 -inset-y-12 z-0 overflow-hidden" aria-hidden="true">
+              <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-xl h-96 rounded-full bg-linear-to-b from-[#2ed573]/16 via-[#00d2d3]/14 to-transparent blur-3xl"></div>
+              <div class="absolute bottom-10 left-1/3 w-80 h-80 rounded-full bg-linear-to-tr from-[#a55eea]/15 via-[#f5c563]/12 to-transparent blur-3xl"></div>
+            </div>
+
+            <div class="wedding-reveal reveal-heading text-center mb-8 relative z-10">
               <p class="text-xs uppercase tracking-[0.3em] font-semibold text-slate-300 mb-1">OUR SWEET MOMENTS</p>
               <h2 class="text-3xl md:text-4xl font-serif font-bold tracking-tight bg-linear-to-r from-(--primary) to-(--secondary) bg-clip-text text-transparent inline-block">
                 Galeri Foto
@@ -644,7 +651,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                 Setiap potret mengabadikan tawa dan cerita, mengiringi langkah kami menuju ikatan suci yang abadi.
               </p>
             </div>
-            <div class="w-full max-w-md md:max-w-lg mx-auto flex flex-col gap-8 md:gap-12 px-4 mt-6">
+            <div class="w-full max-w-md md:max-w-lg mx-auto flex flex-col gap-8 md:gap-12 px-4 mt-6 relative z-10">
               {typedCard.media_urls.slice(3, 11).filter(Boolean).map((url, index) => (
                 <div
                   class="wedding-reveal reveal-gallery-item romantic-photo-wrapper"

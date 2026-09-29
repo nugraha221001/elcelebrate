@@ -311,6 +311,14 @@ body {
   &:focus { border-color: var(--color-error); }
 }
 
+/* Native Date & Time picker dark obsidian scheme */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color-scheme: dark;
+  accent-color: var(--color-primary, #f5c563);
+}
+
 /* Focus ring utility */
 .focus-ring {
   outline: none;
