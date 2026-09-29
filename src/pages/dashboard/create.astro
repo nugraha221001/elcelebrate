@@ -19,7 +19,7 @@ const isEdit = Boolean(editId);
 <DashboardLayout title={isEdit ? "Edit Card" : "Create Card"} description={isEdit ? "Update your digital greeting card" : "Design a beautiful digital greeting card"}>
   <Toast />
 
-  <div class="mx-auto max-w-5xl">
+  <div class="mx-auto max-w-5xl w-full min-w-0 overflow-x-hidden">
     <!-- Step Indicator -->
     <div class="mb-10" id="step-indicator">
       <div class="flex items-center justify-between">
@@ -44,11 +44,11 @@ const isEdit = Boolean(editId);
       </div>
     </div>
 
-    <div class="grid gap-8 lg:grid-cols-5">
+    <div class="grid gap-8 lg:grid-cols-5 w-full max-w-full min-w-0 overflow-x-hidden">
       <!-- Wizard Panel (3 cols) -->
-      <div class="lg:col-span-3">
+      <div class="lg:col-span-3 w-full max-w-full min-w-0 overflow-x-hidden">
         <!-- Step 1: Category -->
-        <div id="step-1" class="wizard-step">
+        <div id="step-1" class="wizard-step pb-36 sm:pb-24 w-full max-w-full min-w-0 overflow-x-hidden">
           <div class="mb-4">
             <a
               href="/dashboard"
@@ -87,7 +87,7 @@ const isEdit = Boolean(editId);
         </div>
 
         <!-- Step 2: Theme Customizer -->
-        <div id="step-2" class="wizard-step hidden">
+        <div id="step-2" class="wizard-step hidden pb-36 sm:pb-24 w-full max-w-full min-w-0 overflow-x-hidden">
           <h2 class="text-xl font-bold text-surface-50">Customize Theme</h2>
           <p class="mt-2 text-sm text-surface-400">Set the visual mood for your card</p>
 
@@ -177,19 +177,100 @@ const isEdit = Boolean(editId);
             </div>
 
             <!-- Colors -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="mb-1.5 block text-sm font-medium text-surface-200">Primary Color</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <!-- Primary Color -->
+              <div class="rounded-2xl border border-white/10 bg-surface-900/40 p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="block text-sm font-semibold text-surface-200">Primary Color</label>
+                  <span class="text-xs font-mono text-surface-400 bg-surface-800 px-2 py-0.5 rounded-md border border-white/5" id="theme-primary-hex">#f5c563</span>
+                </div>
                 <div class="flex items-center gap-3">
-                  <input type="color" id="theme-primary" value="#f5c563" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
-                  <span class="text-xs text-surface-400" id="theme-primary-hex">#f5c563</span>
+                  <input type="color" id="theme-primary" value="#f5c563" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent shrink-0" />
+                  <span class="text-xs text-surface-400">Pilih via palet atau sentuh lingkaran di bawah</span>
+                </div>
+
+                <!-- Curated 12 Celebration Color Circles for Primary -->
+                <div class="mt-3.5 pt-3 border-t border-white/5">
+                  <div class="text-[11px] font-medium text-surface-400 mb-2 flex items-center justify-between">
+                    <span>✨ Celebration Swatches</span>
+                    <span class="text-[10px] text-surface-500">Tap to select</span>
+                  </div>
+                  <div class="grid grid-cols-6 gap-2" id="primary-swatches-grid">
+                    {[
+                      { hex: '#f5c563', name: 'Gold Champagne' },
+                      { hex: '#d4af37', name: 'Classic Gold' },
+                      { hex: '#e5c07b', name: 'Warm Gold' },
+                      { hex: '#e07a93', name: 'Rose' },
+                      { hex: '#eba0a0', name: 'Blush Coral' },
+                      { hex: '#f4a261', name: 'Sunset Coral' },
+                      { hex: '#2a9d8f', name: 'Emerald' },
+                      { hex: '#52b788', name: 'Sage Green' },
+                      { hex: '#84a98c', name: 'Soft Sage' },
+                      { hex: '#9b51e0', name: 'Royal Velvet' },
+                      { hex: '#4a90e2', name: 'Royal Blue' },
+                      { hex: '#2b2523', name: 'Midnight Espresso' },
+                    ].map((c) => (
+                      <button
+                        type="button"
+                        class="color-swatch-circle relative flex h-8 w-8 items-center justify-center rounded-full border border-white/25 shadow-xs transition-all hover:scale-115 active:scale-95 cursor-pointer focus:outline-hidden"
+                        style={`background-color: ${c.hex};`}
+                        data-target="primary"
+                        data-color={c.hex}
+                        title={`${c.name} (${c.hex})`}
+                        aria-label={`Select ${c.name} for Primary`}
+                      >
+                        <span class="active-check hidden text-[11px] font-bold text-white drop-shadow-md">✓</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div>
-                <label class="mb-1.5 block text-sm font-medium text-surface-200">Secondary Color</label>
+
+              <!-- Secondary Color -->
+              <div class="rounded-2xl border border-white/10 bg-surface-900/40 p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="block text-sm font-semibold text-surface-200">Secondary Color</label>
+                  <span class="text-xs font-mono text-surface-400 bg-surface-800 px-2 py-0.5 rounded-md border border-white/5" id="theme-secondary-hex">#e07a93</span>
+                </div>
                 <div class="flex items-center gap-3">
-                  <input type="color" id="theme-secondary" value="#e07a93" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
-                  <span class="text-xs text-surface-400" id="theme-secondary-hex">#e07a93</span>
+                  <input type="color" id="theme-secondary" value="#e07a93" class="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent shrink-0" />
+                  <span class="text-xs text-surface-400">Pilih via palet atau sentuh lingkaran di bawah</span>
+                </div>
+
+                <!-- Curated 12 Celebration Color Circles for Secondary -->
+                <div class="mt-3.5 pt-3 border-t border-white/5">
+                  <div class="text-[11px] font-medium text-surface-400 mb-2 flex items-center justify-between">
+                    <span>✨ Celebration Swatches</span>
+                    <span class="text-[10px] text-surface-500">Tap to select</span>
+                  </div>
+                  <div class="grid grid-cols-6 gap-2" id="secondary-swatches-grid">
+                    {[
+                      { hex: '#f5c563', name: 'Gold Champagne' },
+                      { hex: '#d4af37', name: 'Classic Gold' },
+                      { hex: '#e5c07b', name: 'Warm Gold' },
+                      { hex: '#e07a93', name: 'Rose' },
+                      { hex: '#eba0a0', name: 'Blush Coral' },
+                      { hex: '#f4a261', name: 'Sunset Coral' },
+                      { hex: '#2a9d8f', name: 'Emerald' },
+                      { hex: '#52b788', name: 'Sage Green' },
+                      { hex: '#84a98c', name: 'Soft Sage' },
+                      { hex: '#9b51e0', name: 'Royal Velvet' },
+                      { hex: '#4a90e2', name: 'Royal Blue' },
+                      { hex: '#2b2523', name: 'Midnight Espresso' },
+                    ].map((c) => (
+                      <button
+                        type="button"
+                        class="color-swatch-circle relative flex h-8 w-8 items-center justify-center rounded-full border border-white/25 shadow-xs transition-all hover:scale-115 active:scale-95 cursor-pointer focus:outline-hidden"
+                        style={`background-color: ${c.hex};`}
+                        data-target="secondary"
+                        data-color={c.hex}
+                        title={`${c.name} (${c.hex})`}
+                        aria-label={`Select ${c.name} for Secondary`}
+                      >
+                        <span class="active-check hidden text-[11px] font-bold text-white drop-shadow-md">✓</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -590,7 +671,7 @@ const isEdit = Boolean(editId);
         </div>
 
         <!-- Step 3: Media Upload -->
-        <div id="step-3" class="wizard-step hidden">
+        <div id="step-3" class="wizard-step hidden pb-36 sm:pb-24 w-full max-w-full min-w-0 overflow-x-hidden">
           <h2 class="text-xl font-bold text-surface-50">Add Photos</h2>
           <p class="mt-2 text-sm text-surface-400" id="photo-upload-hint">Upload up to 4 photos (auto-compressed to WebP, max 200KB each)</p>
 
@@ -715,7 +796,7 @@ const isEdit = Boolean(editId);
         </div>
 
         <!-- Step 4: Message & Details -->
-        <div id="step-4" class="wizard-step hidden">
+        <div id="step-4" class="wizard-step hidden pb-36 sm:pb-24 w-full max-w-full min-w-0 overflow-x-hidden">
           <h2 class="text-xl font-bold text-surface-50">Card Details</h2>
           <p class="mt-2 text-sm text-surface-400">Add your personal message and event details</p>
 
@@ -1505,7 +1586,7 @@ const isEdit = Boolean(editId);
         </div>
 
         <!-- Step 5: Preview -->
-        <div id="step-5" class="wizard-step hidden w-full max-w-full min-w-0 overflow-x-hidden">
+        <div id="step-5" class="wizard-step hidden pb-36 sm:pb-24 w-full max-w-full min-w-0 overflow-x-hidden">
           <h2 class="text-xl font-bold text-surface-50">{isEdit ? "Preview & Save Changes" : "Preview & Publish"}</h2>
           <p class="mt-2 text-sm text-surface-400">{isEdit ? "Review your changes before saving" : "Review your card before sharing it with the world"}</p>
 
@@ -1544,7 +1625,7 @@ const isEdit = Boolean(editId);
         </div>
 
         <!-- Navigation Buttons -->
-        <div class="mt-8 flex items-center justify-between">
+        <div class="mt-8 flex items-center justify-between pb-36 sm:pb-24 w-full max-w-full min-w-0">
           <a
             href="/dashboard"
             id="step1-cancel-link"
@@ -2180,17 +2261,77 @@ const isEdit = Boolean(editId);
   const primaryInput = document.getElementById('theme-primary') as HTMLInputElement;
   const secondaryInput = document.getElementById('theme-secondary') as HTMLInputElement;
 
+  function syncColorSwatchActiveStates() {
+    const currentPrimary = (primaryInput?.value || state.themeConfig.primaryColor || '').toLowerCase();
+    const currentSecondary = (secondaryInput?.value || state.themeConfig.secondaryColor || '').toLowerCase();
+
+    document.querySelectorAll<HTMLElement>('.color-swatch-circle').forEach((btn) => {
+      const target = btn.dataset.target;
+      const color = (btn.dataset.color || '').toLowerCase();
+      const isActive = (target === 'primary' && color === currentPrimary) ||
+                       (target === 'secondary' && color === currentSecondary);
+      const check = btn.querySelector('.active-check');
+
+      if (isActive) {
+        btn.classList.add('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-surface-900', 'scale-110');
+        if (check) check.classList.remove('hidden');
+      } else {
+        btn.classList.remove('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-surface-900', 'scale-110');
+        if (check) check.classList.add('hidden');
+      }
+    });
+  }
+
   primaryInput?.addEventListener('input', (e) => {
     state.themeConfig.primaryColor = (e.target as HTMLInputElement).value;
     const hex = document.getElementById('theme-primary-hex');
     if (hex) hex.textContent = state.themeConfig.primaryColor;
+    syncColorSwatchActiveStates();
     updateLivePreview();
   });
+  primaryInput?.addEventListener('change', () => {
+    syncColorSwatchActiveStates();
+    updateLivePreview();
+  });
+
   secondaryInput?.addEventListener('input', (e) => {
     state.themeConfig.secondaryColor = (e.target as HTMLInputElement).value;
     const hex = document.getElementById('theme-secondary-hex');
     if (hex) hex.textContent = state.themeConfig.secondaryColor;
+    syncColorSwatchActiveStates();
     updateLivePreview();
+  });
+  secondaryInput?.addEventListener('change', () => {
+    syncColorSwatchActiveStates();
+    updateLivePreview();
+  });
+
+  // Curated Color Swatch Circle Buttons (Mobile & Desktop)
+  document.querySelectorAll<HTMLElement>('.color-swatch-circle').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = btn.dataset.target;
+      const color = btn.dataset.color;
+      if (!color) return;
+
+      if (target === 'primary' && primaryInput) {
+        primaryInput.value = color;
+        state.themeConfig.primaryColor = color;
+        const hex = document.getElementById('theme-primary-hex');
+        if (hex) hex.textContent = color;
+        primaryInput.dispatchEvent(new Event('input', { bubbles: true }));
+        primaryInput.dispatchEvent(new Event('change', { bubbles: true }));
+      } else if (target === 'secondary' && secondaryInput) {
+        secondaryInput.value = color;
+        state.themeConfig.secondaryColor = color;
+        const hex = document.getElementById('theme-secondary-hex');
+        if (hex) hex.textContent = color;
+        secondaryInput.dispatchEvent(new Event('input', { bubbles: true }));
+        secondaryInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      syncColorSwatchActiveStates();
+      updateLivePreview();
+    });
   });
 
   // Quick Palette Swatches
@@ -2210,6 +2351,7 @@ const isEdit = Boolean(editId);
         secondaryInput.dispatchEvent(new Event('input', { bubbles: true }));
         secondaryInput.dispatchEvent(new Event('change', { bubbles: true }));
       }
+      syncColorSwatchActiveStates();
     });
   });
 
@@ -2382,6 +2524,9 @@ const isEdit = Boolean(editId);
         }
       }
     });
+
+    // 7. Color Swatches
+    syncColorSwatchActiveStates();
   }
 
   // Click listeners with immediate active styling, state updates & live preview re-rendering
@@ -2448,6 +2593,13 @@ const isEdit = Boolean(editId);
   // ═══════════════════════════════════════════════════════
   // Wedding Structured Photo Slots (11 Slots across 4 Sections)
   // ═══════════════════════════════════════════════════════
+  const weddingSlotsLoading = {
+    cover: false,
+    bride: false,
+    groom: false,
+    galleryCount: 0,
+  };
+
   async function handleSingleSlotFile(file: File, slot: 'cover' | 'bride' | 'groom') {
     const statusEl = document.getElementById('w-upload-status');
     const progressEl = document.getElementById('w-upload-progress');
@@ -2456,8 +2608,19 @@ const isEdit = Boolean(editId);
     if (textEl) textEl.textContent = 'Memproses foto...';
     if (progressEl) progressEl.style.width = '50%';
 
+    weddingSlotsLoading[slot] = true;
+    renderWeddingSlots();
+
     try {
       const result = await compressImage(file);
+      // Resilient output validation: eliminate blank thumbnails & enforce <= 200KB
+      if (!result || !result.file || result.file.size <= 0) {
+        throw new Error('Hasil kompresi foto kosong (0 bytes).');
+      }
+      if (result.file.size > 200 * 1024) {
+        throw new Error(`Ukuran foto (${Math.round(result.file.size / 1024)}KB) melebihi batas 200KB.`);
+      }
+
       if (weddingSlots[slot]?.previewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(weddingSlots[slot]!.previewUrl);
       }
@@ -2466,6 +2629,7 @@ const isEdit = Boolean(editId);
     } catch (err: any) {
       (window as any).showToast?.({ message: err.message || 'Kompresi foto gagal', type: 'error' });
     } finally {
+      weddingSlotsLoading[slot] = false;
       if (statusEl) statusEl.classList.add('hidden');
       renderWeddingSlots();
       updateLivePreview();
@@ -2484,17 +2648,31 @@ const isEdit = Boolean(editId);
     const textEl = document.getElementById('w-upload-text');
     if (statusEl) statusEl.classList.remove('hidden');
 
+    weddingSlotsLoading.galleryCount = toProcess.length;
+    renderWeddingSlots();
+
     for (let i = 0; i < toProcess.length; i++) {
       if (textEl) textEl.textContent = `Memproses galeri ${i + 1}/${toProcess.length}...`;
       if (progressEl) progressEl.style.width = `${((i + 1) / toProcess.length) * 100}%`;
       try {
         const result = await compressImage(toProcess[i]);
+        // Output validation: size > 0 and <= 200KB
+        if (!result || !result.file || result.file.size <= 0) {
+          throw new Error('Hasil kompresi foto kosong.');
+        }
+        if (result.file.size > 200 * 1024) {
+          throw new Error(`Ukuran foto (${Math.round(result.file.size / 1024)}KB) melebihi batas 200KB.`);
+        }
         weddingSlots.gallery.push({ file: result.file, previewUrl: result.previewUrl });
       } catch (err: any) {
         (window as any).showToast?.({ message: err.message || 'Kompresi foto gagal', type: 'error' });
+      } finally {
+        weddingSlotsLoading.galleryCount = Math.max(0, weddingSlotsLoading.galleryCount - 1);
+        renderWeddingSlots();
       }
     }
     if (statusEl) statusEl.classList.add('hidden');
+    weddingSlotsLoading.galleryCount = 0;
     renderWeddingSlots();
     updateLivePreview();
   }
@@ -2504,18 +2682,38 @@ const isEdit = Boolean(editId);
     const coverBox = document.getElementById('w-slot-cover-box');
     const coverInput = document.getElementById('w-cover-file-input') as HTMLInputElement | null;
     if (coverBox) {
-      if (weddingSlots.cover) {
+      if (weddingSlotsLoading.cover) {
+        coverBox.innerHTML = `
+          <div class="flex items-center justify-center gap-3 rounded-xl border border-amber-500/30 bg-surface-800/80 p-6 min-h-[96px]">
+            <div class="h-7 w-7 animate-spin rounded-full border-2 border-amber-400 border-t-transparent"></div>
+            <span class="text-xs font-medium text-amber-200 animate-pulse">Mengompres & memproses foto sampul...</span>
+          </div>
+        `;
+      } else if (weddingSlots.cover) {
         coverBox.innerHTML = `
           <div class="relative flex items-center gap-4 rounded-xl border border-amber-500/30 bg-surface-800/80 p-3">
-            <img src="${weddingSlots.cover.previewUrl}" alt="Sampul Prewedding" class="h-24 w-20 rounded-lg object-cover border border-amber-400/30 shadow-md shrink-0" />
+            <div class="group relative shrink-0">
+              <img src="${weddingSlots.cover.previewUrl}" alt="Sampul Prewedding" class="h-24 w-20 rounded-lg object-cover border border-amber-400/30 shadow-md" />
+              <button
+                type="button"
+                id="btn-badge-remove-cover"
+                class="absolute -top-2 -right-2 z-10 flex h-9 w-9 min-w-[36px] min-h-[36px] items-center justify-center rounded-full bg-red-600 text-white shadow-lg border border-white/30 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-red-700 active:scale-90 transition-all cursor-pointer"
+                title="Hapus foto sampul"
+                aria-label="Hapus foto sampul"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             <div class="flex-1 min-w-0">
               <div class="text-xs font-semibold text-surface-100 truncate">Foto Sampul Terpasang</div>
               <p class="text-[11px] text-surface-400 mt-0.5">Tampil pada amplop cover dan hero section</p>
               <div class="flex items-center gap-2 mt-2">
-                <button type="button" id="btn-change-cover" class="rounded-lg bg-surface-700 hover:bg-surface-600 px-2.5 py-1 text-xs text-surface-200 cursor-pointer transition-colors">
+                <button type="button" id="btn-change-cover" class="rounded-lg bg-surface-700 hover:bg-surface-600 px-3 py-1.5 text-xs text-surface-200 cursor-pointer transition-colors min-h-[36px]">
                   Ganti Foto
                 </button>
-                <button type="button" id="btn-remove-cover" class="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 px-2.5 py-1 text-xs cursor-pointer transition-colors">
+                <button type="button" id="btn-remove-cover" class="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 px-3 py-1.5 text-xs cursor-pointer transition-colors min-h-[36px]">
                   Hapus
                 </button>
               </div>
@@ -2523,14 +2721,16 @@ const isEdit = Boolean(editId);
           </div>
         `;
         document.getElementById('btn-change-cover')?.addEventListener('click', () => coverInput?.click());
-        document.getElementById('btn-remove-cover')?.addEventListener('click', () => {
+        const removeCover = () => {
           if (weddingSlots.cover?.previewUrl.startsWith('blob:')) {
             URL.revokeObjectURL(weddingSlots.cover.previewUrl);
           }
           weddingSlots.cover = null;
           renderWeddingSlots();
           updateLivePreview();
-        });
+        };
+        document.getElementById('btn-remove-cover')?.addEventListener('click', removeCover);
+        document.getElementById('btn-badge-remove-cover')?.addEventListener('click', removeCover);
       } else {
         coverBox.innerHTML = `
           <div id="drop-cover-area" class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-amber-500/25 bg-amber-500/5 p-6 hover:bg-amber-500/10 hover:border-amber-500/50 cursor-pointer transition-all">
@@ -2555,17 +2755,37 @@ const isEdit = Boolean(editId);
     const brideBox = document.getElementById('w-slot-bride-box');
     const brideInput = document.getElementById('w-bride-file-input') as HTMLInputElement | null;
     if (brideBox) {
-      if (weddingSlots.bride) {
+      if (weddingSlotsLoading.bride) {
+        brideBox.innerHTML = `
+          <div class="flex items-center justify-center gap-3 rounded-xl border border-[#e07a93]/30 bg-surface-800/80 p-6 min-h-[96px]">
+            <div class="h-7 w-7 animate-spin rounded-full border-2 border-[#e07a93] border-t-transparent"></div>
+            <span class="text-xs font-medium text-[#e07a93] animate-pulse">Mengompres foto mempelai wanita...</span>
+          </div>
+        `;
+      } else if (weddingSlots.bride) {
         brideBox.innerHTML = `
           <div class="relative flex items-center gap-3 rounded-xl border border-[#e07a93]/30 bg-surface-800/80 p-3">
-            <img src="${weddingSlots.bride.previewUrl}" alt="Mempelai Wanita" class="h-20 w-20 rounded-full object-cover border-2 border-[#e07a93]/40 shadow-md shrink-0" />
+            <div class="group relative shrink-0">
+              <img src="${weddingSlots.bride.previewUrl}" alt="Mempelai Wanita" class="h-20 w-20 rounded-full object-cover border-2 border-[#e07a93]/40 shadow-md" />
+              <button
+                type="button"
+                id="btn-badge-remove-bride"
+                class="absolute -top-1 -right-1 z-10 flex h-9 w-9 min-w-[36px] min-h-[36px] items-center justify-center rounded-full bg-red-600 text-white shadow-lg border border-white/30 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-red-700 active:scale-90 transition-all cursor-pointer"
+                title="Hapus foto mempelai wanita"
+                aria-label="Hapus foto mempelai wanita"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             <div class="flex-1 min-w-0">
               <div class="text-xs font-semibold text-[#e07a93] truncate">Foto Putri Terpasang</div>
               <div class="flex items-center gap-2 mt-2">
-                <button type="button" id="btn-change-bride" class="rounded-lg bg-surface-700 hover:bg-surface-600 px-2 py-1 text-xs text-surface-200 cursor-pointer transition-colors">
+                <button type="button" id="btn-change-bride" class="rounded-lg bg-surface-700 hover:bg-surface-600 px-3 py-1.5 text-xs text-surface-200 cursor-pointer transition-colors min-h-[36px]">
                   Ganti
                 </button>
-                <button type="button" id="btn-remove-bride" class="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 px-2 py-1 text-xs cursor-pointer transition-colors">
+                <button type="button" id="btn-remove-bride" class="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 px-3 py-1.5 text-xs cursor-pointer transition-colors min-h-[36px]">
                   Hapus
                 </button>
               </div>
@@ -2573,14 +2793,16 @@ const isEdit = Boolean(editId);
           </div>
         `;
         document.getElementById('btn-change-bride')?.addEventListener('click', () => brideInput?.click());
-        document.getElementById('btn-remove-bride')?.addEventListener('click', () => {
+        const removeBride = () => {
           if (weddingSlots.bride?.previewUrl.startsWith('blob:')) {
             URL.revokeObjectURL(weddingSlots.bride.previewUrl);
           }
           weddingSlots.bride = null;
           renderWeddingSlots();
           updateLivePreview();
-        });
+        };
+        document.getElementById('btn-remove-bride')?.addEventListener('click', removeBride);
+        document.getElementById('btn-badge-remove-bride')?.addEventListener('click', removeBride);
       } else {
         brideBox.innerHTML = `
           <div id="drop-bride-area" class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#e07a93]/25 bg-[#e07a93]/5 p-5 hover:bg-[#e07a93]/10 hover:border-[#e07a93]/50 cursor-pointer transition-all">
@@ -2605,17 +2827,37 @@ const isEdit = Boolean(editId);
     const groomBox = document.getElementById('w-slot-groom-box');
     const groomInput = document.getElementById('w-groom-file-input') as HTMLInputElement | null;
     if (groomBox) {
-      if (weddingSlots.groom) {
+      if (weddingSlotsLoading.groom) {
+        groomBox.innerHTML = `
+          <div class="flex items-center justify-center gap-3 rounded-xl border border-blue-400/30 bg-surface-800/80 p-6 min-h-[96px]">
+            <div class="h-7 w-7 animate-spin rounded-full border-2 border-blue-400 border-t-transparent"></div>
+            <span class="text-xs font-medium text-blue-300 animate-pulse">Mengompres foto mempelai pria...</span>
+          </div>
+        `;
+      } else if (weddingSlots.groom) {
         groomBox.innerHTML = `
           <div class="relative flex items-center gap-3 rounded-xl border border-blue-400/30 bg-surface-800/80 p-3">
-            <img src="${weddingSlots.groom.previewUrl}" alt="Mempelai Pria" class="h-20 w-20 rounded-full object-cover border-2 border-blue-400/40 shadow-md shrink-0" />
+            <div class="group relative shrink-0">
+              <img src="${weddingSlots.groom.previewUrl}" alt="Mempelai Pria" class="h-20 w-20 rounded-full object-cover border-2 border-blue-400/40 shadow-md" />
+              <button
+                type="button"
+                id="btn-badge-remove-groom"
+                class="absolute -top-1 -right-1 z-10 flex h-9 w-9 min-w-[36px] min-h-[36px] items-center justify-center rounded-full bg-red-600 text-white shadow-lg border border-white/30 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-red-700 active:scale-90 transition-all cursor-pointer"
+                title="Hapus foto mempelai pria"
+                aria-label="Hapus foto mempelai pria"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             <div class="flex-1 min-w-0">
               <div class="text-xs font-semibold text-blue-300 truncate">Foto Putra Terpasang</div>
               <div class="flex items-center gap-2 mt-2">
-                <button type="button" id="btn-change-groom" class="rounded-lg bg-surface-700 hover:bg-surface-600 px-2 py-1 text-xs text-surface-200 cursor-pointer transition-colors">
+                <button type="button" id="btn-change-groom" class="rounded-lg bg-surface-700 hover:bg-surface-600 px-3 py-1.5 text-xs text-surface-200 cursor-pointer transition-colors min-h-[36px]">
                   Ganti
                 </button>
-                <button type="button" id="btn-remove-groom" class="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 px-2 py-1 text-xs cursor-pointer transition-colors">
+                <button type="button" id="btn-remove-groom" class="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 px-3 py-1.5 text-xs cursor-pointer transition-colors min-h-[36px]">
                   Hapus
                 </button>
               </div>
@@ -2623,14 +2865,16 @@ const isEdit = Boolean(editId);
           </div>
         `;
         document.getElementById('btn-change-groom')?.addEventListener('click', () => groomInput?.click());
-        document.getElementById('btn-remove-groom')?.addEventListener('click', () => {
+        const removeGroom = () => {
           if (weddingSlots.groom?.previewUrl.startsWith('blob:')) {
             URL.revokeObjectURL(weddingSlots.groom.previewUrl);
           }
           weddingSlots.groom = null;
           renderWeddingSlots();
           updateLivePreview();
-        });
+        };
+        document.getElementById('btn-remove-groom')?.addEventListener('click', removeGroom);
+        document.getElementById('btn-badge-remove-groom')?.addEventListener('click', removeGroom);
       } else {
         groomBox.innerHTML = `
           <div id="drop-groom-area" class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-blue-400/25 bg-blue-400/5 p-5 hover:bg-blue-400/10 hover:border-blue-400/50 cursor-pointer transition-all">
@@ -2670,7 +2914,7 @@ const isEdit = Boolean(editId);
           </div>
         `;
       }
-      if (weddingSlots.gallery.length > 0) {
+      if (weddingSlots.gallery.length > 0 || weddingSlotsLoading.galleryCount > 0) {
         html += `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">`;
         weddingSlots.gallery.forEach((p, idx) => {
           html += `
@@ -2679,17 +2923,28 @@ const isEdit = Boolean(editId);
               <span class="absolute top-1.5 left-1.5 rounded-full bg-black/60 px-1.5 py-0.5 text-[9px] text-white/80 font-mono">#${idx + 1}</span>
               <button
                 type="button"
-                class="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-500 cursor-pointer"
+                class="absolute right-1.5 top-1.5 z-10 flex h-9 w-9 min-w-[36px] min-h-[36px] items-center justify-center rounded-full bg-red-600/90 text-white shadow-lg border border-white/30 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-red-700 active:scale-90 transition-all cursor-pointer"
                 data-remove-wedding-gallery="${idx}"
                 title="Hapus foto ini"
+                aria-label="Hapus foto ini"
               >
-                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           `;
         });
+        if (weddingSlotsLoading.galleryCount > 0) {
+          for (let k = 0; k < weddingSlotsLoading.galleryCount; k++) {
+            html += `
+              <div class="relative aspect-square flex flex-col items-center justify-center rounded-xl border border-dashed border-amber-400/50 bg-surface-800/80 p-2">
+                <div class="h-7 w-7 animate-spin rounded-full border-2 border-amber-400 border-t-transparent mb-1.5"></div>
+                <span class="text-[10px] text-amber-200 font-medium text-center">Memproses...</span>
+              </div>
+            `;
+          }
+        }
         html += `</div>`;
       }
       galleryBox.innerHTML = html;
@@ -2763,6 +3018,8 @@ const isEdit = Boolean(editId);
     });
   }
 
+  let standardPhotosLoadingCount = 0;
+
   async function handleFiles(files: FileList) {
     const maxPhotos = state.category === 'wedding' ? 10 : 4;
     const remaining = maxPhotos - state.photos.length;
@@ -2777,19 +3034,33 @@ const isEdit = Boolean(editId);
     const textEl = document.getElementById('upload-text');
     if (statusEl) statusEl.classList.remove('hidden');
 
+    standardPhotosLoadingCount = toProcess.length;
+    renderPhotoGrid();
+
     for (let i = 0; i < toProcess.length; i++) {
       if (textEl) textEl.textContent = `Compressing ${i + 1}/${toProcess.length}...`;
       if (progressEl) progressEl.style.width = `${((i + 1) / toProcess.length) * 100}%`;
 
       try {
         const result = await compressImage(toProcess[i]);
+        // Output validation: size > 0 and <= 200KB
+        if (!result || !result.file || result.file.size <= 0) {
+          throw new Error('Hasil kompresi foto kosong.');
+        }
+        if (result.file.size > 200 * 1024) {
+          throw new Error(`Ukuran foto (${Math.round(result.file.size / 1024)}KB) melebihi batas 200KB.`);
+        }
         state.photos.push({ file: result.file, previewUrl: result.previewUrl });
       } catch (err: any) {
         (window as any).showToast({ message: err.message || 'Compression failed', type: 'error' });
+      } finally {
+        standardPhotosLoadingCount = Math.max(0, standardPhotosLoadingCount - 1);
+        renderPhotoGrid();
       }
     }
 
     if (statusEl) statusEl.classList.add('hidden');
+    standardPhotosLoadingCount = 0;
     renderPhotoGrid();
     updateLivePreview();
   }
@@ -2797,20 +3068,35 @@ const isEdit = Boolean(editId);
   function renderPhotoGrid() {
     const grid = document.getElementById('photo-grid');
     if (!grid) return;
-    grid.innerHTML = state.photos.map((p, i) => `
+    let html = state.photos.map((p, i) => `
       <div class="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-surface-800">
         <img src="${p.previewUrl}" alt="Photo ${i + 1}" class="h-full w-full object-cover" />
         <button
           type="button"
-          class="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+          class="absolute right-1.5 top-1.5 z-10 flex h-9 w-9 min-w-[36px] min-h-[36px] items-center justify-center rounded-full bg-red-600/90 text-white shadow-lg border border-white/30 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-red-700 active:scale-90 transition-all cursor-pointer"
           data-remove-photo="${i}"
+          title="Hapus foto ini"
+          aria-label="Hapus foto ini"
         >
-          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
     `).join('');
+
+    if (standardPhotosLoadingCount > 0) {
+      for (let k = 0; k < standardPhotosLoadingCount; k++) {
+        html += `
+          <div class="relative aspect-square flex flex-col items-center justify-center rounded-xl border border-dashed border-primary/50 bg-surface-800/80 p-2">
+            <div class="h-7 w-7 animate-spin rounded-full border-2 border-primary border-t-transparent mb-1.5"></div>
+            <span class="text-[10px] text-surface-300 font-medium text-center">Compressing...</span>
+          </div>
+        `;
+      }
+    }
+
+    grid.innerHTML = html;
 
     grid.querySelectorAll('[data-remove-photo]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -4760,6 +5046,13 @@ const isEdit = Boolean(editId);
         if (!slotItem) return '';
         if (slotItem.publicUrl) return slotItem.publicUrl;
         if (slotItem.file) {
+          // STRICT SIZE GUARD: Enforce strictly <= 200KB WebP before requesting R2 presigned URL
+          if (slotItem.file.size <= 0) {
+            throw new Error('File foto tidak valid (0 bytes).');
+          }
+          if (slotItem.file.size > 200 * 1024) {
+            throw new Error(`Ukuran foto (${Math.round(slotItem.file.size / 1024)}KB) melebihi batas maksimal 200KB.`);
+          }
           const presignRes = await fetch('/api/storage/presigned-url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -4807,6 +5100,13 @@ const isEdit = Boolean(editId);
             continue;
           }
           if (photo.file) {
+            // STRICT SIZE GUARD: Enforce strictly <= 200KB WebP before requesting R2 presigned URL
+            if (photo.file.size <= 0) {
+              throw new Error('Photo file is empty (0 bytes).');
+            }
+            if (photo.file.size > 200 * 1024) {
+              throw new Error(`Photo size (${Math.round(photo.file.size / 1024)}KB) exceeds the 200KB limit.`);
+            }
             const presignRes = await fetch('/api/storage/presigned-url', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
