@@ -6,9 +6,9 @@ export type CardCategory = 'birthday' | 'anniversary' | 'graduation' | 'invitati
 
 export type UnboxStyle = 'envelope' | 'giftbox' | 'ribbon';
 
-export type AmbientEffectType = 'petals' | 'golden-sparkles' | 'hearts' | 'confetti-float' | 'starlight' | 'lanterns' | 'butterflies' | 'bokeh' | 'sparklers' | 'snowfall' | 'hearts-petals' | 'jasmine' | 'beras-kuning' | 'keraton-glow' | 'fireflies' | 'none';
+export type AmbientEffectType = 'petals' | 'golden-sparkles' | 'hearts' | 'confetti-float' | 'starlight' | 'lanterns' | 'butterflies' | 'bokeh' | 'sparklers' | 'snowfall' | 'hearts-petals' | 'jasmine' | 'beras-kuning' | 'keraton-glow' | 'fireflies' | 'champagne-dust' | 'prism-glow' | 'sakura-drift' | 'floating-pearls' | 'aurora-mist' | 'none';
 
-export type CornerOrnamentType = 'none' | 'botanical' | 'keraton' | 'melati' | 'pucukrebung' | 'artdeco';
+export type CornerOrnamentType = 'none' | 'botanical' | 'keraton' | 'melati' | 'pucukrebung' | 'artdeco' | 'baroque' | 'diamond-frame' | 'celestial' | 'gunungan' | 'mandala';
 
 /** Wedding-specific structured data stored inside ThemeConfig.weddingData */
 export interface WeddingEventDetail {
@@ -62,7 +62,7 @@ export interface InteractiveConfessionConfig {
   noText?: string;
 }
 
-export type GreetingsOccasion = 'idul-fitri' | 'natal-tahun-baru' | 'hari-ibu-ayah' | 'general' | string;
+export type GreetingsOccasion = 'idul-fitri' | 'natal-tahun-baru' | 'imlek' | 'idul-adha' | 'waisak' | 'nyepi' | 'kemerdekaan' | 'hari-ibu-ayah' | 'get-well-soon' | 'general' | string;
 
 export interface ThemeConfig {
   primaryColor: string;
@@ -74,6 +74,7 @@ export interface ThemeConfig {
   audioTrackId: string | null;
   externalAudioUrl: string | null;
   customAudioUrl?: string | null;
+  audioStartTime?: number;
   ambientEffect?: AmbientEffectType;
   cornerOrnament?: CornerOrnamentType;
   unboxingStyle?: 'gate-split' | 'curtain-lift' | 'wax-seal' | string;
@@ -148,6 +149,7 @@ export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   audioTrackId: null,
   externalAudioUrl: null,
   customAudioUrl: null,
+  audioStartTime: 0,
   cornerOrnament: 'none',
 };
 

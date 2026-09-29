@@ -42,6 +42,7 @@ const resolvedTrack = audioTrack || defaultTrack;
 const audioUrl = customAudioUrl || (resolvedTrack ? getTrackUrl(resolvedTrack.filename) : (theme.externalAudioUrl || `/audio/${typedCard.category}.opus`));
 const trackId = customAudioUrl ? 'custom' : (resolvedTrack ? resolvedTrack.id : typedCard.category);
 const hasAudio = Boolean(customAudioUrl || audioUrl || theme.externalAudioUrl || resolvedTrack);
+const audioStartTime = typeof theme.audioStartTime === 'number' && theme.audioStartTime > 0 ? theme.audioStartTime : 0;
 
 const fontMap: Record<string, string> = {
   sans: "'Inter', sans-serif",
@@ -113,13 +114,40 @@ const ogImage = typedCard.media_urls.length > 0
   ? resolveMediaUrl(typedCard.media_urls[0])
   : '/og-default.png';
 
+// Occasion ambient defaults & metadata
+const occasionAmbientDefaults: Record<string, string> = {
+  'idul-fitri': 'lanterns',
+  'idul-adha': 'lanterns',
+  'natal-tahun-baru': 'snowfall',
+  'imlek': 'lanterns',
+  'waisak': 'lanterns',
+  'nyepi': 'starlight',
+  'kemerdekaan': 'sparklers',
+  'hari-ibu-ayah': 'petals',
+  'get-well-soon': 'jasmine',
+  'general': 'sparklers',
+};
+
+const occasionMetaMap: Record<string, { emoji: string; label: string }> = {
+  'idul-fitri': { emoji: '🌙', label: 'Idul Fitri' },
+  'idul-adha': { emoji: '🕌', label: 'Idul Adha' },
+  'natal-tahun-baru': { emoji: '🎄', label: 'Natal & Tahun Baru' },
+  'imlek': { emoji: '🧧', label: 'Tahun Baru Imlek' },
+  'waisak': { emoji: '☸️', label: 'Hari Raya Waisak' },
+  'nyepi': { emoji: '🛕', label: 'Hari Raya Nyepi' },
+  'kemerdekaan': { emoji: '🇮🇩', label: 'Hari Kemerdekaan RI' },
+  'hari-ibu-ayah': { emoji: '💐', label: 'Hari Ibu & Ayah' },
+  'get-well-soon': { emoji: '🕊️', label: 'Lekas Sembuh & Doa' },
+  'general': { emoji: '✨', label: 'Special Greetings' },
+};
+
 // Ambient effect resolution with smart defaults for love & greetings
 const resolvedAmbientEffect = (theme as any).ambientEffect && (theme as any).ambientEffect !== 'none'
   ? (theme as any).ambientEffect
   : (typedCard.category === 'love'
       ? 'hearts-petals'
       : (typedCard.category === 'greetings'
-          ? (theme.occasion === 'natal-tahun-baru' ? 'snowfall' : 'lanterns')
+          ? (occasionAmbientDefaults[theme.occasion || ''] || 'lanterns')
           : 'none'));
 
 const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && theme.passcode.trim().length === 4);
@@ -142,6 +170,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     data-category={typedCard.category}
     data-passcode={theme.passcode || ''}
     data-has-passcode={hasPasscode ? 'true' : 'false'}
+    data-audio-start-time={audioStartTime.toString()}
     class="hidden"
   ></div>
 
@@ -337,7 +366,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         </>
       )}
       {audioUrl && (
-        <audio id="bg-audio" src={audioUrl} loop preload="none">
+        <audio id="bg-audio" src={audioUrl} preload="none">
           <source src={audioUrl} />
         </audio>
       )}
@@ -951,7 +980,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
             </svg>
           </button>
           {audioUrl && (
-            <audio id="bg-audio" src={audioUrl} loop preload="none">
+            <audio id="bg-audio" src={audioUrl} preload="none">
               <source src={audioUrl} />
             </audio>
           )}
@@ -1037,9 +1066,17 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
         {typedCard.category === 'greetings' && theme.occasion && (
           <div class="mt-4 flex justify-center" data-reveal="zoom-in" data-reveal-delay="250">
-            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300 shadow-sm backdrop-blur-sm capitalize">
-              <span>🌙</span>
-              <span>{theme.occasion.replace(/-/g, ' ')}</span>
+            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300 shadow-sm backdrop-blur-sm">
+              {theme.occasion === 'kemerdekaan' ? (
+                <svg class="h-3.5 w-4.5 rounded-xs shrink-0" viewBox="0 0 24 16" fill="none">
+                  <path d="M0 0h24v8H0z" fill="#e11d48"/>
+                  <path d="M0 8h24v8H0z" fill="#ffffff"/>
+                  <rect width="24" height="16" rx="2" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+                </svg>
+              ) : (
+                <span>{occasionMetaMap[theme.occasion]?.emoji || '✨'}</span>
+              )}
+              <span>{occasionMetaMap[theme.occasion]?.label || theme.occasion.replace(/-/g, ' ')}</span>
             </span>
           </div>
         )}
@@ -2067,6 +2104,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
     const audio = document.getElementById('bg-audio') as HTMLAudioElement | null;
     const toggle = document.getElementById('audio-toggle');
+    const audioStartTime = parseFloat(dataEl?.dataset.audioStartTime || '0') || 0;
 
     if (!toggle) return;
 
@@ -2081,6 +2119,21 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     if (audio && isDirectAudioUrl) {
       let fallbackTriggered = false;
 
+      // Ensure native loop attribute is off so 'ended' event fires reliably across all browsers
+      audio.loop = false;
+
+      // Handle seamless chorus loop back to audioStartTime upon track completion
+      audio.addEventListener('ended', () => {
+        if (audioStartTime > 0) {
+          try {
+            audio.currentTime = audioStartTime;
+          } catch {}
+        } else {
+          audio.currentTime = 0;
+        }
+        audio.play().catch(() => {});
+      });
+
       const onAudioError = () => {
         if (fallbackTriggered) return;
         fallbackTriggered = true;
@@ -2093,11 +2146,29 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         sourceEl.addEventListener('error', onAudioError, { once: true });
       }
 
+      // Set initial volume
       if (fadeIn) {
         audio.volume = 0;
       } else {
-        audio.volume = 0.4;
+        audio.volume = 1.0;
       }
+
+      // Apply start time offset before playback
+      const seekToStart = () => {
+        if (audioStartTime > 0) {
+          try {
+            audio.currentTime = audioStartTime;
+          } catch {}
+        }
+      };
+
+      if (audio.readyState >= 1) {
+        seekToStart();
+      } else {
+        audio.addEventListener('loadedmetadata', seekToStart, { once: true });
+        audio.addEventListener('canplay', seekToStart, { once: true });
+      }
+      seekToStart();
 
       audio
         .play()
@@ -2107,13 +2178,17 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
             isPlaying = true;
             updateAudioUI(true);
 
+            // Double check start time right after playback starts
+            seekToStart();
+
             if (fadeIn) {
-              // Smooth volume ramp over 1000ms to eliminate clicks
-              const targetVol = 0.4;
-              const fadeDuration = 1000;
+              // Smooth volume ramp over 1500ms (1.5s) from 0 to 1
+              const targetVol = 1.0;
+              const fadeDuration = 1500;
               const stepMs = 50;
               const stepInc = targetVol / (fadeDuration / stepMs);
               let curVol = 0;
+              audio.volume = 0;
               const fadeTimer = setInterval(() => {
                 if (!isPlaying || activeSource !== 'html5') {
                   clearInterval(fadeTimer);
@@ -2150,6 +2225,11 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         updateAudioUI(false);
       } else {
         if (activeSource === 'html5' && audio) {
+          if (audio.ended || (audioStartTime > 0 && audio.currentTime < 0.1)) {
+            try {
+              audio.currentTime = audioStartTime;
+            } catch {}
+          }
           audio
             .play()
             .then(() => {

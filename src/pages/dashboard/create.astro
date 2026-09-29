@@ -99,11 +99,17 @@ const isEdit = Boolean(editId);
                 <span class="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-medium">Holiday & Greetings</span>
               </div>
               <p class="text-xs text-surface-400">Choose the occasion to tailor ambient effects and holiday presets:</p>
-              <div class="grid grid-cols-2 gap-2.5" id="occasion-grid">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5" id="occasion-grid">
                 {[
                   { id: 'idul-fitri', emoji: '🌙', label: 'Idul Fitri', effect: 'lanterns' },
+                  { id: 'idul-adha', emoji: '🕌', label: 'Idul Adha', effect: 'lanterns' },
                   { id: 'natal-tahun-baru', emoji: '🎄', label: 'Natal & Tahun Baru', effect: 'snowfall' },
+                  { id: 'imlek', emoji: '🧧', label: 'Tahun Baru Imlek', effect: 'lanterns' },
+                  { id: 'waisak', emoji: '☸️', label: 'Hari Raya Waisak', effect: 'lanterns' },
+                  { id: 'nyepi', emoji: '🛕', label: 'Hari Raya Nyepi', effect: 'starlight' },
+                  { id: 'kemerdekaan', emoji: '🇮🇩', label: 'Hari Kemerdekaan RI', effect: 'sparklers' },
                   { id: 'hari-ibu-ayah', emoji: '💐', label: 'Hari Ibu / Ayah', effect: 'petals' },
+                  { id: 'get-well-soon', emoji: '🕊️', label: 'Lekas Sembuh / Doa', effect: 'jasmine' },
                   { id: 'general', emoji: '✨', label: 'General / Lainnya', effect: 'golden-sparkles' },
                 ].map((occ, idx) => (
                   <button
@@ -117,7 +123,46 @@ const isEdit = Boolean(editId);
                     data-occasion={occ.id}
                     data-effect={occ.effect}
                   >
-                    <span class="text-2xl">{occ.emoji}</span>
+                    <div class="flex h-6 w-6 shrink-0 items-center justify-center">
+                      {occ.id === 'kemerdekaan' ? (
+                        <svg class="h-6 w-6 drop-shadow-xs" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Bendera Merah Putih">
+                          <path d="M2 7 A3 3 0 0 1 5 4 h14 A3 3 0 0 1 22 7 V12 H2 Z" fill="#e11d48" />
+                          <path d="M2 12 H22 V17 A3 3 0 0 1 19 20 H5 A3 3 0 0 1 2 17 Z" fill="#ffffff" />
+                          <rect x="2" y="4" width="20" height="16" rx="3" stroke="white" stroke-opacity="0.3" stroke-width="1" />
+                          <line x1="2" y1="12" x2="22" y2="12" stroke="#e11d48" stroke-opacity="0.15" stroke-width="0.5" />
+                        </svg>
+                      ) : occ.id === 'waisak' ? (
+                        <svg class="h-6 w-6 drop-shadow-xs" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Bunga Teratai Waisak">
+                          <circle cx="12" cy="13" r="8" fill="#f59e0b" fill-opacity="0.2" />
+                          <path d="M12 19 C6.5 19 3 14 4.5 10.5 C7 11.5 9.5 14.5 12 19 Z" fill="#f472b6" fill-opacity="0.9" />
+                          <path d="M12 19 C17.5 19 21 14 19.5 10.5 C17 11.5 14.5 14.5 12 19 Z" fill="#f472b6" fill-opacity="0.9" />
+                          <path d="M12 19 C8 17 6.5 11 8 7.5 C10 10.5 11 14.5 12 19 Z" fill="#f43f5e" />
+                          <path d="M12 19 C16 17 17.5 11 16 7.5 C14 10.5 13 14.5 12 19 Z" fill="#f43f5e" />
+                          <path d="M12 3.5 C10 7.5 9.5 13.5 12 19 C14.5 13.5 14 7.5 12 3.5 Z" fill="#fb7185" />
+                          <path d="M12 7 C11 10 10.8 14 12 18 C13.2 14 13 10 12 7 Z" fill="#fbbf24" fill-opacity="0.85" />
+                          <circle cx="12" cy="14" r="1.5" fill="#fef08a" />
+                          <path d="M7 19.5 C9 20.8 15 20.8 17 19.5 C15.5 21 8.5 21 7 19.5 Z" fill="#f59e0b" />
+                        </svg>
+                      ) : occ.id === 'nyepi' ? (
+                        <svg class="h-6 w-6 drop-shadow-xs" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Candi Hindu Bali">
+                          <circle cx="12" cy="12" r="8.5" fill="#f59e0b" fill-opacity="0.15" />
+                          <path d="M12 1.5 L13 4 H11 L12 1.5 Z" fill="#fef08a" />
+                          <circle cx="12" cy="1.5" r="0.8" fill="#f59e0b" />
+                          <path d="M7 7.5 C9.5 6.8 14.5 6.8 17 7.5 C15.8 6 13.8 4.8 12 4.8 C10.2 4.8 8.2 6 7 7.5 Z" fill="#d97706" />
+                          <path d="M6.5 8 C9 7.3 15 7.3 17.5 8" stroke="#fde68a" stroke-width="0.8" stroke-linecap="round" />
+                          <path d="M5 11.5 C8 10.7 16 10.7 19 11.5 C17.5 9.8 14.8 8.5 12 8.5 C9.2 8.5 6.5 9.8 5 11.5 Z" fill="#b45309" />
+                          <path d="M4.5 12 C7.5 11.3 16.5 11.3 19.5 12" stroke="#fde68a" stroke-width="0.8" stroke-linecap="round" />
+                          <path d="M3 15.5 C6.5 14.5 17.5 14.5 21 15.5 C19.2 13.3 15.8 12 12 12 C8.2 12 4.8 13.3 3 15.5 Z" fill="#92400e" />
+                          <path d="M2.5 16 C6 15 18 15 21.5 16" stroke="#fde68a" stroke-width="0.8" stroke-linecap="round" />
+                          <rect x="6.5" y="16" width="11" height="3" fill="#78350f" />
+                          <rect x="10.5" y="16" width="3" height="3" rx="0.5" fill="#fef08a" />
+                          <path d="M4 19 H20 V20 H4 Z" fill="#d97706" />
+                          <path d="M2.5 20 H21.5 V21.5 H2.5 Z" fill="#b45309" />
+                        </svg>
+                      ) : (
+                        <span class="text-xl leading-none">{occ.emoji}</span>
+                      )}
+                    </div>
                     <div class="min-w-0 flex-1">
                       <div class="text-xs font-semibold text-surface-200 truncate">{occ.label}</div>
                       <div class="text-[10px] text-surface-400">Ambience: {occ.effect}</div>
@@ -410,6 +455,11 @@ const isEdit = Boolean(editId);
                   { id: 'beras-kuning', emoji: '🌾', label: 'Beras Kuning' },
                   { id: 'keraton-glow', emoji: '🕯️', label: 'Keraton Glow' },
                   { id: 'fireflies', emoji: '✨', label: 'Fireflies' },
+                  { id: 'champagne-dust', emoji: '🥂', label: 'Champagne Dust' },
+                  { id: 'prism-glow', emoji: '💎', label: 'Prism Glow' },
+                  { id: 'sakura-drift', emoji: '🌸', label: 'Sakura Drift' },
+                  { id: 'floating-pearls', emoji: '🦪', label: 'Floating Pearls' },
+                  { id: 'aurora-mist', emoji: '🌌', label: 'Aurora Mist' },
                 ].map((fx) => {
                   const isDefault = fx.id === 'none';
                   return (
@@ -476,6 +526,36 @@ const isEdit = Boolean(editId);
                     emoji: '⚜️',
                     label: 'Art Deco Gatsby',
                     desc: 'Symmetrical geometric luxury Gatsby lines',
+                  },
+                  {
+                    id: 'baroque',
+                    emoji: '👑',
+                    label: 'Baroque Flourish',
+                    desc: 'Royal Victorian floral filigree flourish',
+                  },
+                  {
+                    id: 'diamond-frame',
+                    emoji: '💎',
+                    label: 'Diamond Frame',
+                    desc: 'Minimalist dual-stroke lines with center diamond stud',
+                  },
+                  {
+                    id: 'celestial',
+                    emoji: '🌙',
+                    label: 'Celestial Starburst',
+                    desc: 'Starburst & crescent moon corner accents',
+                  },
+                  {
+                    id: 'gunungan',
+                    emoji: '🏔️',
+                    label: 'Gunungan Wayang',
+                    desc: 'Stylized traditional Indonesian gunungan finial',
+                  },
+                  {
+                    id: 'mandala',
+                    emoji: '🏵️',
+                    label: 'Mandala Lace',
+                    desc: 'Symmetrical lace filigree rosette corner',
                   },
                 ].map((co) => {
                   const isDefault = co.id === 'none';
@@ -818,8 +898,14 @@ const isEdit = Boolean(editId);
                 </div>
                 <select id="greetings-step4-occasion" class="form-input w-full rounded-xl border bg-surface-800/50 px-3 py-2 text-xs text-surface-200 transition-all focus-ring cursor-pointer">
                   <option value="idul-fitri">🌙 Idul Fitri (Lebaran)</option>
+                  <option value="idul-adha">🕌 Idul Adha</option>
                   <option value="natal-tahun-baru">🎄 Natal & Tahun Baru</option>
+                  <option value="imlek">🧧 Tahun Baru Imlek</option>
+                  <option value="waisak">☸️ Hari Raya Waisak</option>
+                  <option value="nyepi">🛕 Hari Raya Nyepi</option>
+                  <option value="kemerdekaan">🇮🇩 Hari Kemerdekaan RI</option>
                   <option value="hari-ibu-ayah">💐 Hari Ibu & Ayah</option>
+                  <option value="get-well-soon">🕊️ Lekas Sembuh / Doa</option>
                   <option value="general">✨ Umum & Sehari-hari</option>
                 </select>
               </div>
@@ -1279,6 +1365,137 @@ const isEdit = Boolean(editId);
                   </div>
                 </div>
               </div>
+
+              <!-- Studio Audio Preview Player & Custom Start Offset Control -->
+              <div
+                id="audio-preview-controller"
+                class="mt-4 rounded-2xl border border-white/10 bg-surface-900/80 p-4 sm:p-5 backdrop-blur-md shadow-card space-y-4"
+              >
+                <!-- Header / Active Track Indicator -->
+                <div class="flex items-center justify-between gap-2 border-b border-white/8 pb-3">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f5c563]/15 text-[#f5c563] text-sm shadow-inner">
+                      🎧
+                    </span>
+                    <div class="min-w-0">
+                      <div class="text-xs font-semibold text-surface-200 uppercase tracking-wider flex items-center gap-1.5">
+                        <span>Audio Preview & Titik Mulai</span>
+                      </div>
+                      <div id="audio-controller-track-name" class="text-xs text-surface-400 truncate font-medium">Pilih musik untuk preview</div>
+                    </div>
+                  </div>
+                  <span id="audio-start-offset-badge" class="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber-300">
+                    Mulai: 00:00
+                  </span>
+                </div>
+
+                <!-- Hidden native audio element for studio preview playback -->
+                <audio id="studio-preview-audio" preload="metadata" class="hidden"></audio>
+
+                <!-- Player Controls Bar -->
+                <div class="flex items-center gap-3">
+                  <!-- Play / Pause Button -->
+                  <button
+                    type="button"
+                    id="studio-player-play-btn"
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-r from-[#f5c563] to-[#e07a93] text-[#0f0d15] shadow-lg shadow-[#f5c563]/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                    aria-label="Play / Pause preview"
+                    title="Play / Pause"
+                  >
+                    <svg id="studio-player-icon-play" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                    </svg>
+                    <svg id="studio-player-icon-pause" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                    </svg>
+                  </button>
+
+                  <!-- Timeline Slider & Time Display -->
+                  <div class="flex-1 space-y-1.5">
+                    <div class="relative flex items-center">
+                      <input
+                        type="range"
+                        id="studio-player-seek-slider"
+                        min="0"
+                        max="100"
+                        value="0"
+                        step="0.1"
+                        class="w-full h-2 rounded-lg appearance-none bg-surface-700 accent-[#f5c563] cursor-pointer focus:outline-none"
+                      />
+                    </div>
+                    <div class="flex items-center justify-between text-xs font-mono text-surface-400">
+                      <span id="studio-player-time-current">00:00</span>
+                      <span id="studio-player-time-duration">00:00</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Start Time Offset Control Section -->
+                <div class="rounded-xl border border-white/5 bg-surface-800/60 p-3 sm:p-4 space-y-3">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <label class="block text-xs font-semibold text-surface-200">
+                        ⏱️ Titik Mulai Musik (Chorus / Reff Start)
+                      </label>
+                      <p class="text-[11px] text-surface-400 leading-tight mt-0.5">
+                        Musik akan otomatis diputar dari detik ini saat penerima membuka kartu.
+                      </p>
+                    </div>
+
+                    <!-- Manual Input & Action Buttons -->
+                    <div class="flex items-center gap-2 shrink-0">
+                      <div class="flex items-center gap-1.5 rounded-lg border border-white/10 bg-surface-900/90 px-2.5 py-1.5">
+                        <span class="text-xs text-surface-400">Waktu:</span>
+                        <input
+                          type="text"
+                          id="audio-start-time-input"
+                          placeholder="00:00"
+                          value="00:00"
+                          maxlength="5"
+                          class="w-14 text-center font-mono text-xs font-bold text-[#f5c563] bg-transparent focus:outline-none"
+                          title="Format MM:SS (contoh 00:24) atau angka detik"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        id="audio-preview-from-start-btn"
+                        class="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-300 hover:bg-amber-500/25 transition-all cursor-pointer active:scale-95"
+                        title="Tes putar audio dari titik mulai yang dipilih"
+                      >
+                        <span>▶ Tes</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        id="audio-reset-start-btn"
+                        class="rounded-lg border border-white/10 bg-surface-800 px-2.5 py-1.5 text-xs text-surface-400 hover:text-surface-200 transition-all cursor-pointer"
+                        title="Reset titik mulai ke 00:00 (awal lagu)"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Quick Set to Current Scrubbed Position Button -->
+                  <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-white/5">
+                    <button
+                      type="button"
+                      id="audio-set-current-start-btn"
+                      class="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-xs font-semibold text-primary hover:bg-primary/20 hover:border-primary/50 transition-all cursor-pointer active:scale-95 shadow-xs"
+                    >
+                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                      </svg>
+                      <span>Jadikan Detik Saat Ini sebagai Titik Mulai</span>
+                    </button>
+                    <span id="audio-start-status-text" class="text-[11px] text-surface-400 italic">
+                      Default: Mulai dari awal (00:00)
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1503,6 +1720,7 @@ const isEdit = Boolean(editId);
       audioTrackId: string | null;
       externalAudioUrl: string | null;
       customAudioUrl?: string | null;
+      audioStartTime?: number;
       ambientEffect: string;
       cornerOrnament?: string;
       weddingData?: WeddingDataState;
@@ -1587,6 +1805,7 @@ const isEdit = Boolean(editId);
       audioTrackId: null,
       externalAudioUrl: null,
       customAudioUrl: null,
+      audioStartTime: 0,
       ambientEffect: 'none',
       cornerOrnament: 'none',
       passcode: '',
@@ -1706,6 +1925,11 @@ const isEdit = Boolean(editId);
     }
 
     currentStep = step;
+
+    // Stop running previews when switching steps
+    stopCatalogAudioPreview();
+    stopCustomAudioPreview();
+    stopStudioAudioPreview();
 
     // Show/hide steps
     document.querySelectorAll('.wizard-step').forEach((el, i) => {
@@ -1919,6 +2143,7 @@ const isEdit = Boolean(editId);
       // Stop running previews when switching category
       stopCatalogAudioPreview();
       stopCustomAudioPreview();
+      stopStudioAudioPreview();
 
       // Apply smart defaults for the selected category
       const defaults = (CATEGORY_DEFAULTS as Record<string, { ambientEffect: string; audioTrackId: string }>)[state.category];
@@ -1938,6 +2163,7 @@ const isEdit = Boolean(editId);
       syncThemeSelectorActiveStates();
       updateTrackSelectionUI();
       sortAndBadgeAudioTracks();
+      syncStudioAudioSource(false);
 
       updateLivePreview();
     });
@@ -2124,6 +2350,11 @@ const isEdit = Boolean(editId);
         }
       }
     });
+
+    const step4OccasionSelect = document.getElementById('greetings-step4-occasion') as HTMLSelectElement | null;
+    if (step4OccasionSelect && step4OccasionSelect.value !== currentOccasion) {
+      step4OccasionSelect.value = currentOccasion;
+    }
 
     // 6. Corner Ornaments
     const currentCorner = state.themeConfig.cornerOrnament || (state.category === 'wedding' ? 'botanical' : 'none');
@@ -2759,9 +2990,15 @@ const isEdit = Boolean(editId);
     const occasionId = (e.target as HTMLSelectElement).value;
     state.themeConfig.occasion = occasionId;
     const occasionDefaults: Record<string, string> = {
-      'natal-tahun-baru': 'snowfall',
       'idul-fitri': 'lanterns',
+      'idul-adha': 'lanterns',
+      'natal-tahun-baru': 'snowfall',
+      'imlek': 'lanterns',
+      'waisak': 'lanterns',
+      'nyepi': 'starlight',
+      'kemerdekaan': 'sparklers',
       'hari-ibu-ayah': 'petals',
+      'get-well-soon': 'jasmine',
       'general': 'sparklers',
     };
     if (occasionDefaults[occasionId]) {
@@ -2786,6 +3023,16 @@ const isEdit = Boolean(editId);
         text: 'Di hari yang fitri ini, mari kita buka lembaran baru dengan saling memaafkan. Semoga Allah SWT senantiasa melimpahkan rahmat, kesehatan, dan kebahagiaan untuk kita sekeluarga. Selamat Idul Fitri! 🤲✨',
       },
     ],
+    'idul-adha': [
+      {
+        title: 'Keikhlasan & Pengorbanan Berkah 🕌',
+        text: 'Selamat Hari Raya Idul Adha. Semoga semangat keikhlasan dan pengorbanan Nabi Ibrahim senantiasa menginspirasi hidup kita untuk saling berbagi, mempererat silaturahmi, dan meraih ridha Ilahi. 🕌🐑🤲',
+      },
+      {
+        title: 'Doa & Berkah Kurban 🤲',
+        text: 'Di hari raya kurban yang suci ini, semoga setiap kebaikan dan pengorbanan kita diterima oleh Allah SWT, serta membawa kedamaian dan keberkahan berlimpah bagi keluarga tercinta. Taqabbalallahu minna wa minkum. 🌙✨',
+      },
+    ],
     'natal-tahun-baru': [
       {
         title: 'Damai & Sukacita Natal 🎄',
@@ -2796,6 +3043,46 @@ const isEdit = Boolean(editId);
         text: 'Merry Christmas and Happy New Year! Terima kasih telah menjadi bagian berharga dalam perjalanan kami. Mari sambut tahun baru dengan semangat baru dan kebahagiaan yang melimpah. 🥂🎁✨',
       },
     ],
+    'imlek': [
+      {
+        title: 'Kemakmuran & Rezeki Melimpah 🧧',
+        text: 'Gong Xi Fa Cai! Selamat Tahun Baru Imlek. Semoga di tahun yang baru ini Anda dan sekeluarga senantiasa dilimpahi kesehatan yang prima, rezeki berlimpah, kedamaian, dan kebahagiaan yang tak terhingga. 🧧🏮🍊',
+      },
+      {
+        title: 'Harmoni & Sukses Berkelanjutan 🏮',
+        text: 'Xin Nian Kuai Le! Kiranya musim semi yang baru membawa kehangatan di tengah keluarga, kesuksesan dalam setiap ikhtiar, serta kemakmuran yang berlipat ganda bagi kita semua. 恭喜发财! ✨🧧',
+      },
+    ],
+    'waisak': [
+      {
+        title: 'Cinta Kasih & Kedamaian Universal ☸️',
+        text: 'Selamat Hari Raya Tri Suci Waisak. Sabbe Satta Bhavantu Sukhitatta — semoga semua makhluk hidup berbahagia, terbebas dari penderitaan, dan hidup dalam naungan cinta kasih, welas asih, serta kedamaian sejati. ☸️🕯️✨',
+      },
+      {
+        title: 'Penerangan Batin & Harmoni 🕯️',
+        text: 'Semoga terang dharma senantiasa menyinari setiap langkah perjalanan kita menuju ketenangan batin, kebijaksanaan, dan keharmonisan hidup bersama. Selamat memperingati Hari Trisuci Waisak. ☸️🙏',
+      },
+    ],
+    'nyepi': [
+      {
+        title: 'Keheningan Menuju Kesucian 🛕',
+        text: 'Selamat Hari Raya Nyepi, Tahun Baru Saka. Rahajeng Rahina Nyepi. Dalam heningnya Catur Brata Penyepian, mari kita heningkan pikiran dan jiwa untuk menyambut lembaran baru yang lebih suci, damai, dan harmonis. 🛕🕯️🙏',
+      },
+      {
+        title: 'Penyucian Diri & Jagat Raya 🌿',
+        text: 'Semoga keheningan Nyepi membawa kedamaian mendalam bagi batin dan jagat raya (Bhur, Bwah, Swah). Selamat merayakan Tahun Baru Saka, semoga kedamaian dan kesejahteraan selalu menyertai kita sekeluarga. 🕊️✨',
+      },
+    ],
+    'kemerdekaan': [
+      {
+        title: 'Dirgahayu Republik Indonesia 🇮🇩',
+        text: 'Dirgahayu Republik Indonesia! Mari kita rayakan hari kemerdekaan dengan semangat persatuan, gotong royong, dan tekad membawa bangsa menuju kemajuan serta kejayaan yang berdaulat. Merdeka! 🇮🇩🎉✊',
+      },
+      {
+        title: 'Semangat Juang & Persatuan Merah Putih 🔴⚪',
+        text: 'Selamat Hari Ulang Tahun Kemerdekaan RI. Kobarkan terus semangat perjuangan, karya nyata, dan rasa cinta tanah air demi Indonesia yang lebih tangguh, adil, dan makmur. Jayalah negeriku! 🇮🇩✨',
+      },
+    ],
     'hari-ibu-ayah': [
       {
         title: 'Cinta Tanpa Batas 💐',
@@ -2804,6 +3091,16 @@ const isEdit = Boolean(editId);
       {
         title: 'Pahlawan Terbaikku 🌟',
         text: 'Untuk sosok terbaik yang selalu menjadi panutan dan tempat teraman untuk pulang. Selamat Hari Ibu/Ayah tercinta, terima kasih untuk setiap doa tulus yang selalu menyertai langkahku. 🌟🤗',
+      },
+    ],
+    'get-well-soon': [
+      {
+        title: 'Doa Lekas Pulih & Sembuh 🕊️',
+        text: 'Semoga lekas sembuh dan kembali sehat seperti sedia kala. Beristirahatlah dengan tenang, kami semua senantiasa mendoakan kekuatan, kesembuhan kilat, dan semangat baru untukmu setiap hari. 🕊️💐🤍',
+      },
+      {
+        title: 'Kekuatan & Pemulihan Penuh 🌿',
+        text: 'Sending you warm hugs and prayers! Semoga setiap hari membawa energi pemulihan yang semakin baik. Jangan ragu beristirahat penuh—kami selalu ada di sini mendukung kesembuhanmu. Lekas pulih ya! 🌸✨',
       },
     ],
     'general': [
@@ -3058,6 +3355,7 @@ const isEdit = Boolean(editId);
         resetCustomAudioUploadUI();
       }
       updateTrackSelectionUI();
+      syncStudioAudioSource(false);
     });
   });
 
@@ -3069,6 +3367,7 @@ const isEdit = Boolean(editId);
       const trackUrl = (btn as HTMLElement).dataset.audioUrl || `/audio/${trackId}.opus`;
 
       stopCustomAudioPreview();
+      stopStudioAudioPreview();
 
       if (previewingTrackId === trackId) {
         // Toggle pause/stop current preview
@@ -3364,6 +3663,7 @@ const isEdit = Boolean(editId);
       updateTrackSelectionUI();
 
       showCustomAudioActiveCard(publicUrl, file.name);
+      syncStudioAudioSource(false);
       (window as any).showToast?.({ message: '🎵 Musik kustom berhasil diupload!', type: 'success' });
     } catch (err: any) {
       console.error('Custom audio upload error:', err);
@@ -3382,8 +3682,9 @@ const isEdit = Boolean(editId);
       return;
     }
 
-    // Stop catalog audio/synth preview
+    // Stop catalog audio/synth preview & studio preview
     stopCatalogAudioPreview();
+    stopStudioAudioPreview();
 
     if (!customAudioPlayer || customAudioPlayer.src !== state.themeConfig.customAudioUrl) {
       customAudioPlayer = new Audio(state.themeConfig.customAudioUrl);
@@ -3415,7 +3716,315 @@ const isEdit = Boolean(editId);
   customAudioRemoveBtn?.addEventListener('click', () => {
     state.themeConfig.customAudioUrl = null;
     resetCustomAudioUploadUI();
+    syncStudioAudioSource(false);
     (window as any).showToast?.({ message: 'Musik kustom dihapus', type: 'info' });
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // Studio Audio Preview & Start Offset Controller
+  // ═══════════════════════════════════════════════════════
+  const studioAudio = document.getElementById('studio-preview-audio') as HTMLAudioElement | null;
+  const studioPlayBtn = document.getElementById('studio-player-play-btn');
+  const studioPlayIcon = document.getElementById('studio-player-icon-play');
+  const studioPauseIcon = document.getElementById('studio-player-icon-pause');
+  const studioSeekSlider = document.getElementById('studio-player-seek-slider') as HTMLInputElement | null;
+  const studioTimeCurrent = document.getElementById('studio-player-time-current');
+  const studioTimeDuration = document.getElementById('studio-player-time-duration');
+  const studioTrackName = document.getElementById('audio-controller-track-name');
+  const studioStartOffsetBadge = document.getElementById('audio-start-offset-badge');
+  const audioStartTimeInput = document.getElementById('audio-start-time-input') as HTMLInputElement | null;
+  const audioSetCurrentStartBtn = document.getElementById('audio-set-current-start-btn');
+  const audioPreviewFromStartBtn = document.getElementById('audio-preview-from-start-btn');
+  const audioResetStartBtn = document.getElementById('audio-reset-start-btn');
+  const audioStartStatusText = document.getElementById('audio-start-status-text');
+
+  let isStudioSeeking = false;
+
+  function formatTime(seconds: number): string {
+    if (isNaN(seconds) || seconds < 0 || !isFinite(seconds)) return '00:00';
+    const totalSecs = Math.floor(seconds);
+    const mins = Math.floor(totalSecs / 60);
+    const secs = totalSecs % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function parseTimeToSeconds(input: string): number {
+    if (!input) return 0;
+    const trimmed = input.trim();
+    if (trimmed.includes(':')) {
+      const parts = trimmed.split(':');
+      const mins = parseInt(parts[0], 10) || 0;
+      const secs = parseFloat(parts[1]) || 0;
+      return Math.max(0, Math.round(mins * 60 + secs));
+    }
+    const val = parseFloat(trimmed);
+    return isNaN(val) || val < 0 ? 0 : Math.round(val);
+  }
+
+  function updateAudioStartTimeUI(seconds: number) {
+    const rounded = Math.max(0, Math.round(seconds));
+    state.themeConfig.audioStartTime = rounded;
+
+    const formatted = formatTime(rounded);
+    if (audioStartTimeInput) {
+      audioStartTimeInput.value = formatted;
+    }
+    if (studioStartOffsetBadge) {
+      studioStartOffsetBadge.textContent = `Mulai: ${formatted}`;
+    }
+    if (audioStartStatusText) {
+      if (rounded === 0) {
+        audioStartStatusText.textContent = 'Default: Mulai dari awal (00:00)';
+      } else {
+        audioStartStatusText.textContent = `Aktif: Mulai dari detik ke-${rounded} (${formatted})`;
+      }
+    }
+  }
+
+  function stopStudioAudioPreview() {
+    if (studioAudio && !studioAudio.paused) {
+      studioAudio.pause();
+    }
+    studioPlayIcon?.classList.remove('hidden');
+    studioPauseIcon?.classList.add('hidden');
+  }
+
+  function getActiveAudioDetails(): { url: string | null; name: string } {
+    if (state.themeConfig.customAudioUrl) {
+      const customCardName = document.getElementById('custom-audio-card-name')?.textContent?.trim();
+      return {
+        url: state.themeConfig.customAudioUrl,
+        name: customCardName ? `Musik Kustom: ${customCardName}` : 'Musik Kustom',
+      };
+    }
+    if (state.themeConfig.audioTrackId) {
+      const trackRow = document.querySelector(`[data-track-row="${state.themeConfig.audioTrackId}"]`);
+      const trackTitle = trackRow?.querySelector('.text-surface-200')?.textContent?.trim() || state.themeConfig.audioTrackId;
+      const previewBtn = trackRow?.querySelector('[data-audio-preview]') as HTMLElement | null;
+      const trackUrl = previewBtn?.dataset.audioUrl || `/audio/${state.themeConfig.audioTrackId}.opus`;
+      return {
+        url: trackUrl,
+        name: trackTitle,
+      };
+    }
+    return {
+      url: null,
+      name: 'Belum ada musik yang dipilih',
+    };
+  }
+
+  function syncStudioAudioSource(autoPlay = false) {
+    if (!studioAudio) return;
+    const active = getActiveAudioDetails();
+
+    if (studioTrackName) {
+      studioTrackName.textContent = active.name;
+    }
+
+    if (!active.url) {
+      stopStudioAudioPreview();
+      studioAudio.removeAttribute('src');
+      studioAudio.load();
+      if (studioSeekSlider) {
+        studioSeekSlider.value = '0';
+        studioSeekSlider.max = '100';
+      }
+      if (studioTimeCurrent) studioTimeCurrent.textContent = '00:00';
+      if (studioTimeDuration) studioTimeDuration.textContent = '00:00';
+      return;
+    }
+
+    const currentSrc = studioAudio.currentSrc || studioAudio.src;
+    const isSameSrc = currentSrc && (currentSrc.endsWith(active.url) || currentSrc === active.url);
+
+    if (!isSameSrc) {
+      const wasPlaying = !studioAudio.paused;
+      stopStudioAudioPreview();
+      studioAudio.src = active.url;
+      studioAudio.load();
+      if (studioSeekSlider) studioSeekSlider.value = '0';
+      if (studioTimeCurrent) studioTimeCurrent.textContent = '00:00';
+
+      if (autoPlay || wasPlaying) {
+        const startTime = state.themeConfig.audioStartTime || 0;
+        const onCanPlay = () => {
+          studioAudio.removeEventListener('canplay', onCanPlay);
+          if (startTime > 0 && studioAudio.duration && startTime < studioAudio.duration) {
+            try { studioAudio.currentTime = startTime; } catch {}
+          }
+          studioAudio.play().catch(() => {});
+        };
+        studioAudio.addEventListener('canplay', onCanPlay);
+      }
+    }
+  }
+
+  // Native audio event listeners
+  studioAudio?.addEventListener('loadedmetadata', () => {
+    if (!studioAudio) return;
+    const duration = studioAudio.duration;
+    if (studioTimeDuration) studioTimeDuration.textContent = formatTime(duration);
+    if (studioSeekSlider && !isNaN(duration) && duration > 0) {
+      studioSeekSlider.max = duration.toString();
+    }
+  });
+
+  studioAudio?.addEventListener('timeupdate', () => {
+    if (!studioAudio || isStudioSeeking) return;
+    const curr = studioAudio.currentTime;
+    if (studioSeekSlider) {
+      studioSeekSlider.value = curr.toString();
+    }
+    if (studioTimeCurrent) {
+      studioTimeCurrent.textContent = formatTime(curr);
+    }
+  });
+
+  studioAudio?.addEventListener('play', () => {
+    studioPlayIcon?.classList.add('hidden');
+    studioPauseIcon?.classList.remove('hidden');
+  });
+
+  studioAudio?.addEventListener('pause', () => {
+    studioPlayIcon?.classList.remove('hidden');
+    studioPauseIcon?.classList.add('hidden');
+  });
+
+  studioAudio?.addEventListener('ended', () => {
+    studioPlayIcon?.classList.remove('hidden');
+    studioPauseIcon?.classList.add('hidden');
+    if (studioAudio) {
+      const start = state.themeConfig.audioStartTime || 0;
+      studioAudio.currentTime = start;
+    }
+  });
+
+  // Slider Scrubbing
+  studioSeekSlider?.addEventListener('input', () => {
+    isStudioSeeking = true;
+    if (!studioSeekSlider) return;
+    const val = parseFloat(studioSeekSlider.value);
+    if (studioTimeCurrent) studioTimeCurrent.textContent = formatTime(val);
+  });
+
+  studioSeekSlider?.addEventListener('change', () => {
+    if (!studioAudio || !studioSeekSlider) return;
+    const val = parseFloat(studioSeekSlider.value);
+    try {
+      studioAudio.currentTime = val;
+    } catch {}
+    isStudioSeeking = false;
+  });
+
+  // Play / Pause toggle
+  studioPlayBtn?.addEventListener('click', () => {
+    if (!studioAudio) return;
+    const active = getActiveAudioDetails();
+    if (!active.url) {
+      (window as any).showToast?.({ message: 'Pilih musik dari katalog atau upload musik sendiri terlebih dahulu', type: 'info' });
+      return;
+    }
+
+    // Stop catalog & custom previews first
+    stopCatalogAudioPreview();
+    stopCustomAudioPreview();
+
+    if (studioAudio.paused) {
+      if (studioAudio.currentTime === 0 && (state.themeConfig.audioStartTime || 0) > 0) {
+        try {
+          studioAudio.currentTime = state.themeConfig.audioStartTime!;
+        } catch {}
+      }
+      studioAudio.play().catch((err) => {
+        console.warn('Studio audio playback failed:', err);
+      });
+    } else {
+      studioAudio.pause();
+    }
+  });
+
+  // "Jadikan Detik Saat Ini sebagai Titik Mulai"
+  audioSetCurrentStartBtn?.addEventListener('click', () => {
+    let currentSec = 0;
+    if (studioAudio && studioAudio.duration) {
+      currentSec = Math.floor(studioAudio.currentTime);
+    } else if (studioSeekSlider) {
+      currentSec = Math.floor(parseFloat(studioSeekSlider.value) || 0);
+    }
+    updateAudioStartTimeUI(currentSec);
+    (window as any).showToast?.({
+      message: `Titik mulai diset ke detik ${currentSec} (${formatTime(currentSec)})`,
+      type: 'success',
+    });
+  });
+
+  // Manual input MM:SS or seconds
+  audioStartTimeInput?.addEventListener('change', () => {
+    if (!audioStartTimeInput) return;
+    const seconds = parseTimeToSeconds(audioStartTimeInput.value);
+    const maxDuration = studioAudio?.duration && !isNaN(studioAudio.duration) ? Math.floor(studioAudio.duration) : 3600;
+    const clamped = Math.min(seconds, maxDuration);
+    updateAudioStartTimeUI(clamped);
+    if (studioAudio && studioAudio.duration) {
+      try {
+        studioAudio.currentTime = clamped;
+      } catch {}
+      if (studioSeekSlider) {
+        studioSeekSlider.value = clamped.toString();
+      }
+      if (studioTimeCurrent) {
+        studioTimeCurrent.textContent = formatTime(clamped);
+      }
+    }
+  });
+
+  // "▶ Tes" button
+  audioPreviewFromStartBtn?.addEventListener('click', () => {
+    if (!studioAudio) return;
+    const active = getActiveAudioDetails();
+    if (!active.url) {
+      (window as any).showToast?.({ message: 'Pilih musik terlebih dahulu untuk mencoba playback', type: 'info' });
+      return;
+    }
+
+    stopCatalogAudioPreview();
+    stopCustomAudioPreview();
+
+    const startSec = state.themeConfig.audioStartTime || 0;
+    const seekAndPlay = () => {
+      try {
+        if (studioAudio.duration && startSec < studioAudio.duration) {
+          studioAudio.currentTime = startSec;
+        } else {
+          studioAudio.currentTime = 0;
+        }
+      } catch {}
+      studioAudio.play().catch(() => {});
+    };
+
+    if (studioAudio.readyState >= 1) {
+      seekAndPlay();
+    } else {
+      studioAudio.addEventListener('canplay', seekAndPlay, { once: true });
+      studioAudio.load();
+    }
+  });
+
+  // Reset button
+  audioResetStartBtn?.addEventListener('click', () => {
+    updateAudioStartTimeUI(0);
+    if (studioAudio) {
+      try {
+        studioAudio.currentTime = 0;
+      } catch {}
+      if (studioSeekSlider) {
+        studioSeekSlider.value = '0';
+      }
+      if (studioTimeCurrent) {
+        studioTimeCurrent.textContent = '00:00';
+      }
+    }
+    (window as any).showToast?.({ message: 'Titik mulai direset ke 00:00', type: 'info' });
   });
 
   // ═══════════════════════════════════════════════════════
@@ -3429,6 +4038,61 @@ const isEdit = Boolean(editId);
     bgColor: string;
     font: string;
   }
+
+  const ambientSummaryMap: Record<string, string> = {
+    none: 'None',
+    petals: '🌸 Petals',
+    'golden-sparkles': '✨ Golden Sparkles',
+    hearts: '💕 Hearts',
+    'confetti-float': '🎊 Confetti Float',
+    starlight: '🌟 Starlight',
+    lanterns: '🏮 Lanterns',
+    butterflies: '🦋 Butterflies',
+    bokeh: '💡 Bokeh',
+    sparklers: '🎇 Sparklers',
+    snowfall: '❄️ Snowfall',
+    'hearts-petals': '💖 Hearts & Petals',
+    jasmine: '🤍 Jasmine',
+    'beras-kuning': '🌾 Beras Kuning',
+    'keraton-glow': '🕯️ Keraton Glow',
+    fireflies: '✨ Fireflies',
+    'champagne-dust': '🥂 Champagne Dust',
+    'prism-glow': '💎 Prism Glow',
+    'sakura-drift': '🌸 Sakura Drift',
+    'floating-pearls': '🦪 Floating Pearls',
+    'aurora-mist': '🌌 Aurora Mist',
+  };
+
+  const cornerSummaryMap: Record<string, string> = {
+    none: 'None',
+    botanical: '🌿 Botanical Leafy',
+    keraton: '🏛️ Keraton Floral',
+    melati: '🤍 Ronce Melati',
+    pucukrebung: '🎋 Pucuk Rebung',
+    artdeco: '⚜️ Art Deco Gatsby',
+    baroque: '👑 Baroque Flourish',
+    'diamond-frame': '💎 Diamond Frame',
+    celestial: '🌙 Celestial Starburst',
+    gunungan: '🏔️ Gunungan Wayang',
+    mandala: '🏵️ Mandala Lace',
+  };
+
+  const flagIndoBadge = '<span class="inline-flex items-center gap-1.5"><svg class="inline-block h-3.5 w-4.5 rounded-xs shrink-0 align-middle" viewBox="0 0 24 16" fill="none"><path d="M0 0h24v8H0z" fill="#e11d48"/><path d="M0 8h24v8H0z" fill="#ffffff"/><rect width="24" height="16" rx="2" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/></svg><span>Hari Kemerdekaan RI</span></span>';
+  const lotusWaisakBadge = '<span class="inline-flex items-center gap-1.5"><svg class="inline-block h-3.5 w-3.5 shrink-0 align-middle" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" fill="#f59e0b" fill-opacity="0.2"/><path d="M12 19 C6.5 19 3 14 4.5 10.5 C7 11.5 9.5 14.5 12 19 Z" fill="#f472b6"/><path d="M12 19 C17.5 19 21 14 19.5 10.5 C17 11.5 14.5 14.5 12 19 Z" fill="#f472b6"/><path d="M12 19 C8 17 6.5 11 8 7.5 C10 10.5 11 14.5 12 19 Z" fill="#f43f5e"/><path d="M12 19 C16 17 17.5 11 16 7.5 C14 10.5 13 14.5 12 19 Z" fill="#f43f5e"/><path d="M12 3.5 C10 7.5 9.5 13.5 12 19 C14.5 13.5 14 7.5 12 3.5 Z" fill="#fb7185"/><circle cx="12" cy="14" r="1.5" fill="#fef08a"/></svg><span>Hari Raya Waisak</span></span>';
+  const templeNyepiBadge = '<span class="inline-flex items-center gap-1.5"><svg class="inline-block h-3.5 w-3.5 shrink-0 align-middle" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="#f59e0b" fill-opacity="0.2"/><path d="M12 1.5 L13 4 H11 L12 1.5 Z" fill="#fef08a"/><path d="M7 7.5 C9.5 6.8 14.5 6.8 17 7.5 C15.8 6 13.8 4.8 12 4.8 C10.2 4.8 8.2 6 7 7.5 Z" fill="#d97706"/><path d="M5 11.5 C8 10.7 16 10.7 19 11.5 C17.5 9.8 14.8 8.5 12 8.5 C9.2 8.5 6.5 9.8 5 11.5 Z" fill="#b45309"/><path d="M3 15.5 C6.5 14.5 17.5 14.5 21 15.5 C19.2 13.3 15.8 12 12 12 C8.2 12 4.8 13.3 3 15.5 Z" fill="#92400e"/><rect x="6.5" y="16" width="11" height="3" fill="#78350f"/><rect x="10.5" y="16" width="3" height="3" rx="0.5" fill="#fef08a"/><path d="M4 19 H20 V20 H4 Z" fill="#d97706"/><path d="M2.5 20 H21.5 V21.5 H2.5 Z" fill="#b45309"/></svg><span>Hari Raya Nyepi</span></span>';
+
+  const occasionSummaryMap: Record<string, string> = {
+    'idul-fitri': '🌙 Idul Fitri',
+    'idul-adha': '🕌 Idul Adha',
+    'natal-tahun-baru': '🎄 Natal & Tahun Baru',
+    imlek: '🧧 Tahun Baru Imlek',
+    waisak: lotusWaisakBadge,
+    nyepi: templeNyepiBadge,
+    kemerdekaan: flagIndoBadge,
+    'hari-ibu-ayah': '💐 Hari Ibu & Ayah',
+    'get-well-soon': '🕊️ Lekas Sembuh & Doa',
+    general: '✨ Umum & Sehari-hari',
+  };
 
   function buildPreviewHTML(): PreviewThemeData {
     const categoryEmojis: Record<string, string> = { birthday: '🎂', anniversary: '💍', graduation: '🎓', invitation: '✉️', wedding: '💍', love: '💌', greetings: '🌙' };
@@ -3509,7 +4173,12 @@ const isEdit = Boolean(editId);
       true
     );
 
-    let html = `${cornerOverlayHtml}<div class="text-center space-y-3 relative z-1" style="font-family: ${font}">`;
+    const activeAmbient = (state.themeConfig as any).ambientEffect || 'none';
+    const ambientBadgeHtml = activeAmbient !== 'none'
+      ? `<div class="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/10 backdrop-blur-xs text-[10px] font-medium text-amber-300 shadow-sm whitespace-nowrap"><span>${ambientSummaryMap[activeAmbient] || activeAmbient}</span></div>`
+      : '';
+
+    let html = `${cornerOverlayHtml}${ambientBadgeHtml}<div class="text-center space-y-3 relative z-1" style="font-family: ${font}">`;
 
     // ── Wedding-specific preview ──
     if (state.category === 'wedding' && state.themeConfig.weddingData) {
@@ -3621,6 +4290,11 @@ const isEdit = Boolean(editId);
         html += `</div></div>`;
       }
 
+      if (state.category === 'greetings' && state.themeConfig.occasion) {
+        const occLabel = occasionSummaryMap[state.themeConfig.occasion] || state.themeConfig.occasion.replace(/-/g, ' ');
+        html += `<div class="mt-2 text-center"><span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300 shadow-xs">${occLabel}</span></div>`;
+      }
+
       if (state.category === 'greetings' && state.themeConfig.signature) {
         html += `<div class="mt-3 pt-2 border-t border-white/10 text-right text-[11px] text-surface-400">Salam hangat: <span class="font-medium text-[#f5c563]">${state.themeConfig.signature}</span></div>`;
       }
@@ -3712,32 +4386,6 @@ const isEdit = Boolean(editId);
       handwritten: 'Handwritten',
       display: 'Display',
     };
-    const ambientSummaryMap: Record<string, string> = {
-      none: 'None',
-      petals: '🌸 Petals',
-      'golden-sparkles': '✨ Golden Sparkles',
-      hearts: '💕 Hearts',
-      'confetti-float': '🎊 Confetti Float',
-      starlight: '🌟 Starlight',
-      lanterns: '🏮 Lanterns',
-      butterflies: '🦋 Butterflies',
-      bokeh: '💡 Bokeh',
-      sparklers: '🎇 Sparklers',
-      snowfall: '❄️ Snowfall',
-      'hearts-petals': '💖 Hearts & Petals',
-      jasmine: '🤍 Jasmine',
-      'beras-kuning': '🌾 Beras Kuning',
-      'keraton-glow': '🕯️ Keraton Glow',
-      fireflies: '✨ Fireflies',
-    };
-    const cornerSummaryMap: Record<string, string> = {
-      none: 'None',
-      botanical: '🌿 Botanical Leafy',
-      keraton: '🏛️ Keraton Floral',
-      melati: '🤍 Ronce Melati',
-      pucukrebung: '🎋 Pucuk Rebung',
-      artdeco: '⚜️ Art Deco Gatsby',
-    };
 
     summary.innerHTML = `
       <div class="space-y-3">
@@ -3787,7 +4435,7 @@ const isEdit = Boolean(editId);
         ${state.category === 'greetings' && state.themeConfig.occasion ? `
         <div class="flex justify-between items-center">
           <span class="text-sm text-surface-400">Occasion</span>
-          <span class="text-sm font-medium text-amber-400 capitalize">${state.themeConfig.occasion.replace(/-/g, ' ')}</span>
+          <span class="text-sm font-medium text-amber-400">${occasionSummaryMap[state.themeConfig.occasion] || state.themeConfig.occasion.replace(/-/g, ' ')}</span>
         </div>` : ''}
         ${state.category === 'greetings' && state.themeConfig.signature ? `
         <div class="flex justify-between items-center">
@@ -4296,6 +4944,11 @@ const isEdit = Boolean(editId);
       syncThemeSelectorActiveStates();
       updateTrackSelectionUI();
       sortAndBadgeAudioTracks();
+      if (typeof (card.theme_config as any)?.audioStartTime === 'number') {
+        state.themeConfig.audioStartTime = (card.theme_config as any).audioStartTime;
+      }
+      updateAudioStartTimeUI(state.themeConfig.audioStartTime || 0);
+      syncStudioAudioSource(false);
       updateLivePreview();
 
       // Update Publish button label and header in edit mode
@@ -4317,6 +4970,8 @@ const isEdit = Boolean(editId);
   // Initialize
   goToStep(1);
   syncThemeSelectorActiveStates();
+  updateAudioStartTimeUI(state.themeConfig.audioStartTime || 0);
+  syncStudioAudioSource(false);
   checkAndLoadEditMode();
 </script>
 

@@ -44,6 +44,36 @@ export const CORNER_ORNAMENTS: CornerOrnamentOption[] = [
     label: 'Art Deco Gatsby',
     desc: 'Symmetrical geometric luxury Gatsby lines',
   },
+  {
+    id: 'baroque',
+    emoji: '👑',
+    label: 'Baroque Flourish',
+    desc: 'Royal Victorian floral filigree flourish',
+  },
+  {
+    id: 'diamond-frame',
+    emoji: '💎',
+    label: 'Diamond Frame',
+    desc: 'Minimalist dual-stroke lines with center diamond stud',
+  },
+  {
+    id: 'celestial',
+    emoji: '🌙',
+    label: 'Celestial Starburst',
+    desc: 'Starburst & crescent moon corner accents',
+  },
+  {
+    id: 'gunungan',
+    emoji: '🏔️',
+    label: 'Gunungan Wayang',
+    desc: 'Stylized traditional Indonesian gunungan finial',
+  },
+  {
+    id: 'mandala',
+    emoji: '🏵️',
+    label: 'Mandala Lace',
+    desc: 'Symmetrical lace filigree rosette corner',
+  },
 ];
 
 /**
@@ -177,6 +207,140 @@ export function getCornerOrnamentSvgContent(motif: string): string {
         <circle cx="76" cy="0" r="2.5" fill="#f5c563"/>
         <circle cx="0" cy="112" r="3" fill="#f5c563"/>
         <circle cx="112" cy="0" r="3" fill="#f5c563"/>
+      `;
+
+    case 'baroque':
+      return `
+        <!-- Baroque Corner Apex Scroll -->
+        <path d="M 0 0 C 20 6, 38 18, 46 36 C 52 50, 44 64, 32 60 C 22 56, 26 42, 36 44 C 42 46, 42 54, 38 56" stroke="url(#corner-grad)" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <path d="M 0 0 C 6 20, 18 38, 36 46 C 50 52, 64 44, 60 32 C 56 22, 42 26, 44 36 C 46 42, 54 42, 56 38" stroke="url(#corner-grad)" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <!-- Grand Outer Volute Arms -->
+        <path d="M 12 12 C 40 22, 72 26, 96 16 C 108 12, 114 20, 106 28 C 96 36, 82 32, 86 22" stroke="url(#corner-grad)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M 12 12 C 22 40, 26 72, 16 96 C 12 108, 20 114, 28 106 C 36 96, 32 82, 22 86" stroke="url(#corner-grad)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <!-- Diagonal Spine & Rococo Shell Crest -->
+        <path d="M 0 0 Q 35 35, 78 78" stroke="url(#corner-grad)" stroke-width="1.5" stroke-dasharray="3 3" fill="none"/>
+        <path d="M 28 8 C 42 16, 54 30, 48 42 C 38 34, 32 20, 28 8 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.2"/>
+        <path d="M 8 28 C 16 42, 30 54, 42 48 C 34 38, 20 32, 8 28 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.2"/>
+        <!-- Acanthus Leaf Flourishes -->
+        <path d="M 52 38 C 68 44, 82 60, 80 72 C 68 68, 60 54, 52 38 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.3"/>
+        <path d="M 38 52 C 44 68, 60 82, 72 80 C 68 68, 54 60, 38 52 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.3"/>
+        <!-- Royal Victorian Jewel Finials -->
+        <circle cx="14" cy="14" r="3.5" fill="#f5c563"/>
+        <circle cx="14" cy="14" r="1.5" fill="#ffffff"/>
+        <circle cx="106" cy="20" r="2.5" fill="#f5c563"/>
+        <circle cx="20" cy="106" r="2.5" fill="#f5c563"/>
+        <circle cx="82" cy="76" r="3" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1"/>
+        <circle cx="58" cy="18" r="2" fill="#f5c563"/>
+        <circle cx="18" cy="58" r="2" fill="#f5c563"/>
+      `;
+
+    case 'diamond-frame':
+      return `
+        <!-- Dual Precision Border Lines with Mitred Corner -->
+        <path d="M 6 114 L 6 18 L 18 6 L 114 6" stroke="url(#corner-grad)" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <path d="M 14 102 L 14 24 L 24 14 L 102 14" stroke="url(#corner-grad)" stroke-width="1.2" stroke-dasharray="4 2" stroke-linecap="round" fill="none"/>
+        <!-- Fine Tertiary Accent Line -->
+        <path d="M 22 88 L 22 30 L 30 22 L 88 22" stroke="url(#corner-grad)" stroke-width="0.8" stroke-opacity="0.6" fill="none"/>
+        <!-- Diagonal Connector Struts -->
+        <line x1="6" y1="18" x2="24" y2="14" stroke="url(#corner-grad)" stroke-width="1"/>
+        <line x1="18" y1="6" x2="14" y2="24" stroke="url(#corner-grad)" stroke-width="1"/>
+        <!-- Center Faceted Geometric Diamond Stud -->
+        <polygon points="46,34 58,46 46,58 34,46" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.6"/>
+        <polygon points="46,38 54,46 46,54 38,46" fill="#f5c563" fill-opacity="0.5" stroke="url(#corner-grad)" stroke-width="0.8"/>
+        <circle cx="46" cy="46" r="2" fill="#ffffff"/>
+        <!-- Satellite Diamond Studs on Frame Axis -->
+        <polygon points="18,6 22,10 18,14 14,10" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.2"/>
+        <polygon points="6,18 10,22 6,26 2,22" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.2"/>
+        <polygon points="76,6 80,10 76,14 72,10" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1"/>
+        <polygon points="6,76 10,80 6,84 2,80" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1"/>
+        <!-- Terminal Rivet Studs -->
+        <circle cx="114" cy="6" r="2.5" fill="#f5c563"/>
+        <circle cx="6" cy="114" r="2.5" fill="#f5c563"/>
+        <circle cx="102" cy="14" r="2" fill="#f5c563"/>
+        <circle cx="14" cy="102" r="2" fill="#f5c563"/>
+      `;
+
+    case 'celestial':
+      return `
+        <!-- Slender Crescent Moon Cradling Corner Vertex -->
+        <path d="M 8 38 C 10 20, 20 10, 38 8 C 24 16, 20 28, 26 42 C 30 50, 38 56, 44 60 C 26 56, 12 48, 8 38 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.5"/>
+        <!-- 8-Point Radiant Starburst on Diagonal Axis -->
+        <path d="M 64 64 L 66 52 L 72 62 L 84 64 L 72 66 L 66 76 L 64 64 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.4"/>
+        <path d="M 64 64 L 56 62 L 44 64 L 56 66 L 62 76 L 64 64 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.4"/>
+        <path d="M 64 64 L 62 52 L 64 44 L 66 52 L 76 56 L 64 64 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.4"/>
+        <circle cx="64" cy="64" r="3" fill="#ffffff"/>
+        <circle cx="64" cy="64" r="1.2" fill="#f5c563"/>
+        <!-- Constellation Orbital Trajectory Arc -->
+        <path d="M 0 84 A 84 84 0 0 1 84 0" stroke="url(#corner-grad)" stroke-width="1.2" stroke-dasharray="3 3" fill="none"/>
+        <path d="M 0 110 A 110 110 0 0 1 110 0" stroke="url(#corner-grad)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <!-- Constellation Star Nodes -->
+        <circle cx="84" cy="24" r="2.5" fill="#f5c563"/>
+        <circle cx="24" cy="84" r="2.5" fill="#f5c563"/>
+        <circle cx="104" cy="38" r="2" fill="#ffffff" stroke="url(#corner-grad)" stroke-width="0.8"/>
+        <circle cx="38" cy="104" r="2" fill="#ffffff" stroke="url(#corner-grad)" stroke-width="0.8"/>
+        <circle cx="16" cy="16" r="2.8" fill="#f5c563"/>
+        <circle cx="110" cy="0" r="2" fill="#f5c563"/>
+        <circle cx="0" cy="110" r="2" fill="#f5c563"/>
+        <!-- Micro Sparkle Crosses -->
+        <path d="M 48 24 L 52 24 M 50 22 L 50 26" stroke="#f5c563" stroke-width="1.2"/>
+        <path d="M 24 48 L 24 52 M 22 50 L 26 50" stroke="#f5c563" stroke-width="1.2"/>
+        <path d="M 94 72 L 98 72 M 96 70 L 96 74" stroke="#f5c563" stroke-width="1.2"/>
+      `;
+
+    case 'gunungan':
+      return `
+        <!-- Traditional Gunungan / Kayon Meru Spire along 45-degree diagonal -->
+        <path d="M 4 4 L 14 0 C 26 12, 38 18, 54 32 C 68 44, 78 62, 82 82 C 62 78, 44 68, 32 54 C 18 38, 12 26, 0 14 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.8"/>
+        <!-- Central Meru Tree-of-Life Axis Ridge -->
+        <path d="M 6 6 Q 42 42, 88 88" stroke="url(#corner-grad)" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <!-- Praba Radiance Flame Curls (Blumbangan / Lidah Api) -->
+        <path d="M 24 8 C 36 10, 46 22, 58 20 C 52 28, 44 32, 36 28 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.2"/>
+        <path d="M 8 24 C 10 36, 22 46, 20 58 C 28 52, 32 44, 28 36 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.2"/>
+        <path d="M 44 26 C 60 28, 74 42, 88 38 C 78 48, 68 54, 58 48 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.3"/>
+        <path d="M 26 44 C 28 60, 42 74, 38 88 C 48 78, 54 68, 48 58 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.3"/>
+        <!-- Gunungan Sacred Gate / Base Arc -->
+        <path d="M 0 68 Q 38 58, 68 0" stroke="url(#corner-grad)" stroke-width="1.4" stroke-dasharray="3 2" fill="none"/>
+        <path d="M 0 102 Q 62 92, 102 0" stroke="url(#corner-grad)" stroke-width="1.6" fill="none"/>
+        <!-- Crown Finial & Sacred Mustika Jewels -->
+        <circle cx="10" cy="10" r="3.5" fill="#f5c563"/>
+        <circle cx="10" cy="10" r="1.5" fill="#ffffff"/>
+        <circle cx="88" cy="88" r="3.2" fill="#f5c563"/>
+        <circle cx="58" cy="58" r="2.5" fill="#ffffff" stroke="url(#corner-grad)" stroke-width="1"/>
+        <circle cx="102" cy="0" r="2.5" fill="#f5c563"/>
+        <circle cx="0" cy="102" r="2.5" fill="#f5c563"/>
+        <circle cx="48" cy="16" r="2" fill="#f5c563"/>
+        <circle cx="16" cy="48" r="2" fill="#f5c563"/>
+      `;
+
+    case 'mandala':
+      return `
+        <!-- Tier 1 Rosette Petal Ring (Radius 30) -->
+        <path d="M 0 30 C 14 30, 22 22, 22 14 C 22 6, 28 0, 30 0" stroke="url(#corner-grad)" stroke-width="1.8" fill="none"/>
+        <path d="M 0 18 C 10 18, 14 14, 14 10 C 14 4, 16 0, 18 0" stroke="url(#corner-grad)" stroke-width="1.2" fill="none"/>
+        <!-- Tier 2 Scalloped Lace Petal Arches (Radius 65) -->
+        <path d="M 0 65 C 18 64, 30 52, 42 42 C 52 30, 64 18, 65 0" stroke="url(#corner-grad)" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <!-- Tier 2 Lotus Petal Lobes with Gradient Fills -->
+        <path d="M 22 46 C 34 40, 44 28, 48 18 C 36 24, 26 34, 22 46 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.2"/>
+        <path d="M 46 22 C 40 34, 28 44, 18 48 C 24 36, 34 26, 46 22 Z" fill="url(#corner-fill)" stroke="url(#corner-grad)" stroke-width="1.2"/>
+        <!-- Tier 3 Outer Beaded Lace Scallop Border (Radius 105) -->
+        <path d="M 0 105 A 105 105 0 0 1 105 0" stroke="url(#corner-grad)" stroke-width="1.6" stroke-dasharray="2 3" fill="none"/>
+        <path d="M 0 88 A 88 88 0 0 1 88 0" stroke="url(#corner-grad)" stroke-width="1.2" fill="none"/>
+        <!-- Radial Mandala Ray Spokes -->
+        <line x1="0" y1="0" x2="98" y2="38" stroke="url(#corner-grad)" stroke-width="1.2" stroke-opacity="0.8"/>
+        <line x1="0" y1="0" x2="74" y2="74" stroke="url(#corner-grad)" stroke-width="1.6"/>
+        <line x1="0" y1="0" x2="38" y2="98" stroke="url(#corner-grad)" stroke-width="1.2" stroke-opacity="0.8"/>
+        <!-- Droplet Pearls & Lace Rosette Beads -->
+        <circle cx="12" cy="12" r="3" fill="#f5c563"/>
+        <circle cx="34" cy="34" r="2.5" fill="#f5c563"/>
+        <circle cx="58" cy="58" r="3" fill="#ffffff" stroke="url(#corner-grad)" stroke-width="1"/>
+        <circle cx="74" cy="74" r="3.5" fill="#f5c563"/>
+        <circle cx="92" cy="92" r="2" fill="#f5c563"/>
+        <circle cx="65" cy="0" r="2.5" fill="#f5c563"/>
+        <circle cx="0" cy="65" r="2.5" fill="#f5c563"/>
+        <circle cx="105" cy="0" r="3" fill="#f5c563"/>
+        <circle cx="0" cy="105" r="3" fill="#f5c563"/>
+        <circle cx="82" cy="32" r="2.2" fill="#ffffff" stroke="url(#corner-grad)" stroke-width="0.8"/>
+        <circle cx="32" cy="82" r="2.2" fill="#ffffff" stroke="url(#corner-grad)" stroke-width="0.8"/>
       `;
 
     default:

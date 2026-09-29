@@ -94,7 +94,9 @@ const { effect } = Astro.props;
     function rand(min: number, max: number) { return Math.random() * (max - min) + min; }
 
     const particles: Particle[] = [];
-    const MAX = effect === 'starlight' || effect === 'bokeh' || effect === 'fireflies' ? 30 : 22;
+    const MAX = effect === 'starlight' || effect === 'bokeh' || effect === 'fireflies' || effect === 'champagne-dust'
+      ? 30
+      : (effect === 'aurora-mist' ? 10 : 22);
 
     // ── Offscreen Sprite Cache (60 FPS Mobile GPU Acceleration) ──
 
@@ -333,6 +335,171 @@ const { effect } = Astro.props;
       return cvs;
     }
 
+    function createChampagneDustSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(48, 48);
+      const cx = 24, cy = 24;
+      const grad = c.createRadialGradient(cx, cy, 0, cx, cy, 22);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.2, 'rgba(254, 240, 138, 0.95)');
+      grad.addColorStop(0.5, 'rgba(245, 158, 11, 0.45)');
+      grad.addColorStop(0.8, 'rgba(217, 119, 6, 0.12)');
+      grad.addColorStop(1, 'rgba(180, 83, 9, 0)');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(cx, cy, 22, 0, Math.PI * 2);
+      c.fill();
+
+      // Sharp central sparkle glint cross
+      c.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      c.lineWidth = 1.2;
+      c.beginPath();
+      c.moveTo(cx - 8, cy);
+      c.lineTo(cx + 8, cy);
+      c.moveTo(cx, cy - 8);
+      c.lineTo(cx, cy + 8);
+      c.stroke();
+
+      return cvs;
+    }
+
+    function createPrismGlowSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      const cx = 32, cy = 32;
+
+      // Multicolored specular aura
+      const grad = c.createRadialGradient(cx, cy, 1, cx, cy, 28);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.25, 'rgba(103, 232, 249, 0.7)');
+      grad.addColorStop(0.5, 'rgba(244, 114, 182, 0.4)');
+      grad.addColorStop(0.75, 'rgba(253, 224, 71, 0.18)');
+      grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(cx, cy, 28, 0, Math.PI * 2);
+      c.fill();
+
+      // Diamond polygon specular star
+      c.save();
+      c.translate(cx, cy);
+      c.beginPath();
+      c.moveTo(0, -22);
+      c.bezierCurveTo(4, -8, 8, -4, 22, 0);
+      c.bezierCurveTo(8, 4, 4, 8, 0, 22);
+      c.bezierCurveTo(-4, 8, -8, 4, -22, 0);
+      c.bezierCurveTo(-8, -4, -4, -8, 0, -22);
+      c.closePath();
+      c.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      c.shadowColor = '#67e8f9';
+      c.shadowBlur = 8;
+      c.fill();
+      c.restore();
+
+      return cvs;
+    }
+
+    function createSakuraPetalSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      c.save();
+      c.translate(32, 32);
+
+      // Authentic cherry blossom petal with notched apex cleft
+      c.beginPath();
+      c.moveTo(0, 22);
+      c.bezierCurveTo(-15, 18, -22, 4, -20, -10);
+      c.bezierCurveTo(-18, -22, -8, -25, -2, -18);
+      c.lineTo(0, -14);
+      c.lineTo(2, -18);
+      c.bezierCurveTo(8, -25, 18, -22, 20, -10);
+      c.bezierCurveTo(22, 4, 15, 18, 0, 22);
+      c.closePath();
+
+      const grad = c.createLinearGradient(0, 22, 0, -22);
+      grad.addColorStop(0, '#db2777');
+      grad.addColorStop(0.3, '#f472b6');
+      grad.addColorStop(0.7, '#fbcfe8');
+      grad.addColorStop(1, '#fff1f2');
+      c.fillStyle = grad;
+      c.fill();
+
+      // Organic petal crease
+      c.beginPath();
+      c.moveTo(0, 20);
+      c.lineTo(0, -12);
+      c.strokeStyle = 'rgba(219, 39, 119, 0.25)';
+      c.lineWidth = 0.8;
+      c.stroke();
+
+      c.restore();
+      return cvs;
+    }
+
+    function createPearlSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(64, 64);
+      const cx = 32, cy = 32;
+      const r = 24;
+
+      // Soft ambient pearl glow
+      const halo = c.createRadialGradient(cx, cy, r * 0.8, cx, cy, r * 1.25);
+      halo.addColorStop(0, 'rgba(254, 240, 138, 0.25)');
+      halo.addColorStop(1, 'rgba(254, 240, 138, 0)');
+      c.fillStyle = halo;
+      c.beginPath();
+      c.arc(cx, cy, r * 1.25, 0, Math.PI * 2);
+      c.fill();
+
+      // 3D Spherical pearl luster
+      const grad = c.createRadialGradient(cx - 7, cy - 7, 2, cx, cy, r);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.18, '#fef9c3');
+      grad.addColorStop(0.5, '#fef08a');
+      grad.addColorStop(0.78, '#d4c4a8');
+      grad.addColorStop(0.94, '#a38f6c');
+      grad.addColorStop(1, '#786546');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(cx, cy, r, 0, Math.PI * 2);
+      c.fill();
+
+      // Subtle bottom-right bounce reflection
+      c.save();
+      c.beginPath();
+      c.arc(cx, cy, r, 0, Math.PI * 2);
+      c.clip();
+      const bounce = c.createRadialGradient(cx + 12, cy + 12, 1, cx + 12, cy + 12, 14);
+      bounce.addColorStop(0, 'rgba(254, 249, 195, 0.45)');
+      bounce.addColorStop(1, 'rgba(254, 249, 195, 0)');
+      c.fillStyle = bounce;
+      c.beginPath();
+      c.arc(cx + 12, cy + 12, 14, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+
+      // Specular gleam dot
+      c.fillStyle = '#ffffff';
+      c.beginPath();
+      c.arc(cx - 7, cy - 7, 1.8, 0, Math.PI * 2);
+      c.fill();
+
+      return cvs;
+    }
+
+    function createAuroraWaveSprite(): HTMLCanvasElement {
+      const { cvs, c } = createOffscreen(128, 128);
+      const cx = 64, cy = 64;
+
+      const grad = c.createRadialGradient(cx, cy, 4, cx, cy, 60);
+      grad.addColorStop(0, 'rgba(254, 240, 138, 0.28)');
+      grad.addColorStop(0.35, 'rgba(244, 114, 182, 0.22)');
+      grad.addColorStop(0.68, 'rgba(192, 132, 252, 0.12)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(cx, cy, 60, 0, Math.PI * 2);
+      c.fill();
+
+      return cvs;
+    }
+
     // Lazy sprite cache dictionary
     const spriteCache: Record<string, HTMLCanvasElement> = {};
     function getSprite(key: string, creator: () => HTMLCanvasElement): HTMLCanvasElement {
@@ -533,6 +700,59 @@ const { effect } = Astro.props;
           base.maxLife = rand(250, 500);
           base.phase = rand(0, Math.PI * 2);
           break;
+        case 'champagne-dust':
+          base.x = rand(0, W());
+          base.y = H() + rand(5, 30);
+          base.vy = rand(-0.65, -0.25);
+          base.vx = rand(-0.15, 0.15);
+          base.size = rand(3, 7);
+          base.opacity = 0;
+          base.maxLife = rand(280, 520);
+          base.phase = rand(0, Math.PI * 2);
+          break;
+        case 'prism-glow':
+          base.x = rand(0, W());
+          base.y = rand(0, H());
+          base.vy = rand(-0.06, 0.06);
+          base.vx = rand(-0.06, 0.06);
+          base.size = rand(9, 20);
+          base.opacity = 0;
+          base.maxLife = rand(180, 360);
+          base.phase = rand(0, Math.PI * 2);
+          base.rotSpeed = rand(-0.008, 0.008);
+          break;
+        case 'sakura-drift':
+          base.y = -15;
+          base.x = rand(0, W());
+          base.vy = rand(0.4, 0.95);
+          base.vx = rand(0.1, 0.5);
+          base.size = rand(10, 18);
+          base.opacity = rand(0.7, 0.95);
+          base.maxLife = rand(350, 650);
+          base.pitchSpeed = rand(0.018, 0.04) * (Math.random() > 0.5 ? 1 : -1);
+          base.rollSpeed = rand(0.015, 0.035) * (Math.random() > 0.5 ? 1 : -1);
+          base.rotSpeed = rand(-0.015, 0.015);
+          break;
+        case 'floating-pearls':
+          base.x = rand(0, W());
+          base.y = H() + rand(10, 40);
+          base.vy = rand(-0.45, -0.15);
+          base.vx = rand(-0.1, 0.1);
+          base.size = rand(6, 15);
+          base.opacity = 0;
+          base.maxLife = rand(360, 680);
+          base.phase = rand(0, Math.PI * 2);
+          break;
+        case 'aurora-mist':
+          base.x = rand(-50, W() + 50);
+          base.y = rand(0, H());
+          base.vy = rand(-0.08, 0.08);
+          base.vx = rand(-0.12, 0.12);
+          base.size = rand(80, 160);
+          base.opacity = 0;
+          base.maxLife = rand(420, 840);
+          base.phase = rand(0, Math.PI * 2);
+          break;
       }
       return base;
     }
@@ -661,7 +881,7 @@ const { effect } = Astro.props;
 
         // Lifecycle opacity envelope
         const progress = p.life / p.maxLife;
-        if (effect === 'golden-sparkles' || effect === 'starlight' || effect === 'sparklers' || effect === 'bokeh' || effect === 'keraton-glow' || effect === 'fireflies') {
+        if (effect === 'golden-sparkles' || effect === 'starlight' || effect === 'sparklers' || effect === 'bokeh' || effect === 'keraton-glow' || effect === 'fireflies' || effect === 'champagne-dust' || effect === 'prism-glow' || effect === 'floating-pearls' || effect === 'aurora-mist') {
           if (progress < 0.2) {
             p.opacity = (progress / 0.2) * 0.85;
           } else if (progress > 0.75) {
@@ -805,6 +1025,55 @@ const { effect } = Astro.props;
             ctx.save();
             ctx.globalAlpha = flyAlpha;
             ctx.drawImage(sprite, p.x - flySize, p.y - flySize, flySize * 2, flySize * 2);
+            ctx.restore();
+            break;
+          }
+          case 'champagne-dust': {
+            p.vx = Math.sin(p.life * 0.02 + p.phase) * 0.25;
+            const pulse = 0.75 + 0.25 * Math.sin(p.life * 0.06 + p.phase);
+            const sprite = getSprite('champagneDust', createChampagneDustSprite);
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity * pulse));
+            ctx.drawImage(sprite, p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
+            ctx.restore();
+            break;
+          }
+          case 'prism-glow': {
+            p.vx += Math.sin(p.life * 0.01 + p.phase) * 0.02;
+            p.vy += Math.cos(p.life * 0.01 + p.phase) * 0.02;
+            const shimmer = 0.8 + 0.25 * Math.sin(p.life * 0.06 + p.phase);
+            const sprite = getSprite('prismGlow', createPrismGlowSprite);
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity * shimmer));
+            ctx.drawImage(sprite, -p.size, -p.size, p.size * 2, p.size * 2);
+            ctx.restore();
+            break;
+          }
+          case 'sakura-drift': {
+            p.vx = 0.25 + Math.sin(p.life * 0.018 + p.phase) * 0.5;
+            const sprite = getSprite('sakuraPetal', createSakuraPetalSprite);
+            draw3DSprite(p, sprite);
+            break;
+          }
+          case 'floating-pearls': {
+            p.vx = Math.sin(p.life * 0.01 + p.phase) * 0.2;
+            const sprite = getSprite('pearl', createPearlSprite);
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity));
+            ctx.drawImage(sprite, p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
+            ctx.restore();
+            break;
+          }
+          case 'aurora-mist': {
+            p.vx += Math.sin(p.life * 0.005 + p.phase) * 0.015;
+            p.vy += Math.cos(p.life * 0.004 + p.phase) * 0.01;
+            const wave = 0.7 + 0.3 * Math.sin(p.life * 0.012 + p.phase);
+            const sprite = getSprite('auroraWave', createAuroraWaveSprite);
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, Math.min(0.65, p.opacity * wave));
+            ctx.drawImage(sprite, p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
             ctx.restore();
             break;
           }

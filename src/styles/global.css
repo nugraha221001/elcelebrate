@@ -919,6 +919,7 @@ body {
   z-index: 10;
   width: 95px;
   height: 95px;
+  color: var(--color-primary, #f5c563);
   will-change: transform, opacity;
   animation: corner-sway 6s ease-in-out infinite, corner-glow 5s ease-in-out infinite;
 }
@@ -964,6 +965,7 @@ body {
   z-index: 10;
   width: 54px;
   height: 54px;
+  color: var(--color-primary, #f5c563);
   will-change: transform, opacity;
   animation: corner-sway 6s ease-in-out infinite, corner-glow 5s ease-in-out infinite;
 }
