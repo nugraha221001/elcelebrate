@@ -62,6 +62,73 @@ const unboxingStyle = (theme as any).unboxingStyle || theme.unboxStyle || 'gate-
 const weddingHeaderTitle = (theme as any).weddingHeaderTitle || "Walimatul 'Urs";
 const cornerOrnament = (theme as any).cornerOrnament || (isWedding ? 'botanical' : 'none');
 
+// Anniversary relationship time computation
+let anniversaryTime: { years: number; months: number; days: number; isTogether: boolean } | null = null;
+if (typedCard.category === 'anniversary' && typedCard.event_date) {
+  const start = new Date(typedCard.event_date + (typedCard.event_date.includes('T') ? '' : 'T00:00:00'));
+  if (!isNaN(start.getTime())) {
+    const now = new Date();
+    let y = now.getFullYear() - start.getFullYear();
+    let m = now.getMonth() - start.getMonth();
+    let d = now.getDate() - start.getDate();
+    if (d < 0) {
+      m -= 1;
+      const prev = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+      d += prev;
+    }
+    if (m < 0) {
+      y -= 1;
+      m += 12;
+    }
+    anniversaryTime = {
+      years: Math.max(0, y),
+      months: Math.max(0, m),
+      days: Math.max(0, d),
+      isTogether: start.getTime() <= now.getTime(),
+    };
+  }
+}
+
+function formatGoogleCalendarUrl(event: {
+  title: string;
+  date?: string;
+  timeStart?: string;
+  timeEnd?: string;
+  venue?: string;
+  address?: string;
+  description?: string;
+}): string {
+  if (!event.date) return '#';
+  const rawDate = event.date.replace(/-/g, '');
+  let startStr = rawDate;
+  let endStr = rawDate;
+
+  if (event.timeStart) {
+    const sTime = event.timeStart.replace(/:/g, '').padEnd(4, '0') + '00';
+    startStr = `${rawDate}T${sTime}`;
+    if (event.timeEnd) {
+      const eTime = event.timeEnd.replace(/:/g, '').padEnd(4, '0') + '00';
+      endStr = `${rawDate}T${eTime}`;
+    } else {
+      const [sh, sm] = event.timeStart.split(':').map(Number);
+      const eh = String(((sh || 0) + 2) % 24).padStart(2, '0');
+      const em = String(sm || 0).padStart(2, '0');
+      endStr = `${rawDate}T${eh}${em}00`;
+    }
+  }
+
+  const location = [event.venue, event.address].filter(Boolean).join(', ');
+  const query = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: event.title,
+    dates: `${startStr}/${endStr}`,
+    ...(location ? { location } : {}),
+    ...(event.description ? { details: event.description } : {}),
+  });
+
+  return `https://calendar.google.com/calendar/render?${query.toString()}`;
+}
+
 // Pattern SVGs
 const primaryHex = theme.primaryColor.slice(1);
 const secondaryHex = theme.secondaryColor.slice(1);
@@ -407,7 +474,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         )}
 
         <!-- ── Couple Profile Section ── -->
-        <section id="mempelai" class="py-10 sm:py-16 max-w-2xl mx-auto">
+        <section id="mempelai" class="py-10 sm:py-16 pb-28 sm:pb-32 max-w-2xl mx-auto scroll-mt-24">
           <span id="couple" class="sr-only"></span>
         {weddingData.openingGreeting ? (
           <div class="wedding-reveal reveal-heading text-center mb-8">
@@ -461,11 +528,31 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           </div>
         </section>
 
+        <!-- ── Sacred Quote / Ayat Suci ── -->
+        {weddingData.sacredQuote?.quote && weddingData.sacredQuote?.enabled !== false && (
+          <section class="pb-28 sm:pb-32 max-w-2xl mx-auto overflow-hidden px-4">
+            <div
+              class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden border border-white/10 backdrop-blur-md"
+              style={`background: ${theme.primaryColor}08;`}
+            >
+              <p class="text-slate-100 font-serif italic text-sm md:text-base leading-relaxed max-w-lg mx-auto whitespace-pre-line" style={`font-family: ${fontFamily};`}>
+                "{weddingData.sacredQuote.quote}"
+              </p>
+              <div class="champagne-divider my-3"></div>
+              {weddingData.sacredQuote.source && (
+                <p class="text-xs md:text-sm font-semibold tracking-wider text-amber-300 uppercase">
+                  — {weddingData.sacredQuote.source}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
         <!-- ── Invitation Message ── -->
-        <section class="pb-12 max-w-2xl mx-auto overflow-hidden">
+        <section class="pb-28 sm:pb-32 max-w-2xl mx-auto overflow-hidden px-4">
           <div
-            class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden"
-            style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}
+            class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden border border-white/10 backdrop-blur-md"
+            style={`background: ${theme.primaryColor}08;`}
           >
             <p class="wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden text-slate-100 text-sm md:text-base font-medium leading-relaxed" style={`font-family: ${fontFamily};`}>
               {typedCard.message}
@@ -475,8 +562,11 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
         <!-- ── Love Story / Quote ── -->
         {weddingData.loveStory && (
-          <section class="pb-12 max-w-2xl mx-auto overflow-hidden">
-            <div class="wedding-reveal reveal-card text-center w-full max-w-lg mx-auto overflow-hidden">
+          <section id="love-story" class="pb-28 sm:pb-32 max-w-2xl mx-auto overflow-hidden px-4 scroll-mt-24">
+            <div
+              class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg mx-auto overflow-hidden border border-white/10 backdrop-blur-md"
+              style={`background: ${theme.primaryColor}08;`}
+            >
               <div class="text-4xl mb-4" style={`color: ${theme.primaryColor}30;`}>❝</div>
               <p class="text-slate-100 font-normal leading-relaxed text-center max-w-lg mx-auto drop-shadow-xs italic wrap-anywhere whitespace-pre-wrap overflow-hidden text-sm md:text-base" style={`font-family: ${fontFamily};`}>
                 {weddingData.loveStory}
@@ -486,9 +576,54 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           </section>
         )}
 
+        <!-- ── Love Story Timeline ── -->
+        {weddingData.loveStoryTimeline && Array.isArray(weddingData.loveStoryTimeline) && weddingData.loveStoryTimeline.some(t => t && (t.year || t.title || t.story)) && (
+          <section class="pb-28 sm:pb-32 max-w-2xl mx-auto px-4 scroll-mt-24">
+            <div class="wedding-reveal reveal-heading text-center mb-8">
+              <p class="text-xs uppercase tracking-[0.3em] font-semibold text-pink-300 mb-1">OUR JOURNEY</p>
+              <h2 class="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight">Kisah Cinta & Perjalanan</h2>
+              <div class="champagne-divider"></div>
+            </div>
+
+            <div class="relative border-l-2 border-amber-300/30 ml-4 sm:ml-8 space-y-6 my-6">
+              {weddingData.loveStoryTimeline.map((item, idx) => {
+                if (!item || (!item.year && !item.title && !item.story)) return null;
+                return (
+                  <div class="relative pl-6 sm:pl-8">
+                    <!-- Milestone Node -->
+                    <div class="absolute -left-2.75 top-4 h-5 w-5 rounded-full bg-amber-400 border-3 border-surface-900 shadow-md flex items-center justify-center text-[10px] ring-2 ring-amber-300/30">
+                      ✨
+                    </div>
+                    <div
+                      class="wedding-reveal reveal-card rounded-2xl p-4 sm:p-5 border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden"
+                      style={`transition-delay: ${idx * 120}ms;`}
+                    >
+                      {item.year && (
+                        <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/30 text-amber-200 text-xs font-bold tracking-wider mb-1.5">
+                          {item.year}
+                        </span>
+                      )}
+                      {item.title && (
+                        <h3 class="text-base sm:text-lg font-bold font-serif text-white tracking-wide">
+                          {item.title}
+                        </h3>
+                      )}
+                      {item.story && (
+                        <p class="text-slate-200 text-xs sm:text-sm leading-relaxed mt-1 whitespace-pre-line font-light">
+                          {item.story}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         <!-- ── Countdown Timer ── -->
         {weddingData.akadEvent.date && (
-          <section id="countdown" class="pb-12 max-w-2xl mx-auto">
+          <section id="countdown" class="pb-28 sm:pb-32 max-w-2xl mx-auto scroll-mt-24">
             <div class="text-center">
               <div class="wedding-reveal reveal-heading text-center mb-4">
                 <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Menghitung Hari</h2>
@@ -498,7 +633,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                 {['Hari', 'Jam', 'Mnt', 'Dtk'].map((unit, idx) => (
                   <div class="wedding-reveal reveal-countdown flex flex-col items-center" style={`transition-delay: ${idx * 80}ms;`}>
                     <div
-                      class="countdown-box flex h-16 w-16 items-center justify-center rounded-xl text-2xl font-bold text-white sm:h-20 sm:w-20 sm:text-3xl"
+                      class="countdown-box flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 backdrop-blur-md text-2xl font-bold text-white sm:h-20 sm:w-20 sm:text-3xl"
                       style={`background: linear-gradient(135deg, ${theme.primaryColor}40, ${theme.secondaryColor}30);`}
                       data-countdown={['days', 'hours', 'minutes', 'seconds'][idx]}
                     >
@@ -513,7 +648,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         )}
 
         <!-- ── Event Schedule ── -->
-        <section id="acara" class="pb-12 max-w-2xl mx-auto">
+        <section id="acara" class="pb-28 sm:pb-32 max-w-2xl mx-auto scroll-mt-24">
           <span id="event" class="sr-only"></span>
           <div class="wedding-reveal reveal-heading text-center mb-6">
             <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Jadwal Acara</h2>
@@ -522,7 +657,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
           <div class="space-y-4">
             <!-- Akad -->
-            <div class="wedding-reveal reveal-card reveal-card-akad rounded-2xl p-5 sm:p-6" style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}>
+            <div class="wedding-reveal reveal-card reveal-card-akad rounded-2xl p-5 sm:p-6 border border-white/10 backdrop-blur-md overflow-hidden" style={`background: ${theme.primaryColor}08;`}>
               <div class="flex items-center gap-2 mb-3">
                 <span class="text-lg">🕌</span>
                 <h3 class="text-base font-semibold" style={`color: ${theme.primaryColor};`}>Akad Nikah</h3>
@@ -541,22 +676,41 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                   <p class="text-slate-200 text-xs md:text-sm leading-normal mt-0.5">{weddingData.akadEvent.address}</p>
                 )}
               </div>
-              {weddingData.akadEvent.mapsUrl && (
-                <a
-                  href={weddingData.akadEvent.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="mt-3 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110"
-                  style={`background: ${theme.primaryColor};`}
-                >
-                  <span>📍</span> Buka Google Maps
-                </a>
-              )}
+              <div class="mt-3 flex flex-wrap gap-2">
+                {weddingData.akadEvent.mapsUrl && (
+                  <a
+                    href={weddingData.akadEvent.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110 active:scale-95"
+                    style={`background: ${theme.primaryColor};`}
+                  >
+                    <span>📍</span> Buka Google Maps
+                  </a>
+                )}
+                {weddingData.akadEvent.date && (
+                  <a
+                    href={formatGoogleCalendarUrl({
+                      title: `Akad Nikah: ${weddingData.bride.nickname || weddingData.bride.fullName} & ${weddingData.groom.nickname || weddingData.groom.fullName}`,
+                      date: weddingData.akadEvent.date,
+                      timeStart: weddingData.akadEvent.timeStart,
+                      timeEnd: weddingData.akadEvent.timeEnd,
+                      venue: weddingData.akadEvent.venue,
+                      address: weddingData.akadEvent.address,
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-slate-100 backdrop-blur-xs transition-all hover:bg-white/20 active:scale-95"
+                  >
+                    <span>🗓️</span> Simpan ke Google Calendar
+                  </a>
+                )}
+              </div>
             </div>
 
             <!-- Resepsi -->
             {(weddingData.receptionEvent.date || weddingData.receptionEvent.venue) && (
-              <div class="wedding-reveal reveal-card reveal-card-resepsi rounded-2xl p-5 sm:p-6" style={`background: ${theme.secondaryColor}08; border: 1px solid ${theme.secondaryColor}15;`}>
+              <div class="wedding-reveal reveal-card reveal-card-resepsi rounded-2xl p-5 sm:p-6 border border-white/10 backdrop-blur-md overflow-hidden" style={`background: ${theme.secondaryColor}08;`}>
                 <div class="flex items-center gap-2 mb-3">
                   <span class="text-lg">🎉</span>
                   <h3 class="text-base font-semibold" style={`color: ${theme.secondaryColor};`}>Resepsi</h3>
@@ -575,24 +729,43 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                     <p class="text-slate-200 text-xs md:text-sm leading-normal mt-0.5">{weddingData.receptionEvent.address}</p>
                   )}
                 </div>
-                {weddingData.receptionEvent.mapsUrl && (
-                  <a
-                    href={weddingData.receptionEvent.mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="mt-3 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110"
-                    style={`background: ${theme.secondaryColor};`}
-                  >
-                    <span>📍</span> Buka Google Maps
-                  </a>
-                )}
+                <div class="mt-3 flex flex-wrap gap-2">
+                  {weddingData.receptionEvent.mapsUrl && (
+                    <a
+                      href={weddingData.receptionEvent.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110 active:scale-95"
+                      style={`background: ${theme.secondaryColor};`}
+                    >
+                      <span>📍</span> Buka Google Maps
+                    </a>
+                  )}
+                  {weddingData.receptionEvent.date && (
+                    <a
+                      href={formatGoogleCalendarUrl({
+                        title: `Resepsi Pernikahan: ${weddingData.bride.nickname || weddingData.bride.fullName} & ${weddingData.groom.nickname || weddingData.groom.fullName}`,
+                        date: weddingData.receptionEvent.date,
+                        timeStart: weddingData.receptionEvent.timeStart,
+                        timeEnd: weddingData.receptionEvent.timeEnd,
+                        venue: weddingData.receptionEvent.venue,
+                        address: weddingData.receptionEvent.address,
+                      })}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-slate-100 backdrop-blur-xs transition-all hover:bg-white/20 active:scale-95"
+                    >
+                      <span>🗓️</span> Simpan ke Google Calendar
+                    </a>
+                  )}
+                </div>
               </div>
             )}
 
             <!-- Unduh Mantu -->
             {weddingData.unduhMantu?.enabled && (
               <div
-                class="wedding-reveal reveal-card reveal-card-unduh border border-white/15 bg-white/5 backdrop-blur-xs rounded-3xl p-5 sm:p-6"
+                class="wedding-reveal reveal-card reveal-card-unduh border border-white/10 bg-white/5 backdrop-blur-md rounded-2xl p-5 sm:p-6 overflow-hidden"
               >
                 <div class="flex items-center gap-2 mb-3">
                   <span class="text-lg">🏡</span>
@@ -614,25 +787,81 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                     <p class="text-slate-200 text-xs md:text-sm leading-normal mt-0.5">{weddingData.unduhMantu.address}</p>
                   )}
                 </div>
-                {weddingData.unduhMantu.mapUrl && (
-                  <a
-                    href={weddingData.unduhMantu.mapUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="mt-3 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110"
-                    style={`background: ${theme.primaryColor};`}
-                  >
-                    <span>📍</span> Buka Google Maps
-                  </a>
-                )}
+                <div class="mt-3 flex flex-wrap gap-2">
+                  {weddingData.unduhMantu.mapUrl && (
+                    <a
+                      href={weddingData.unduhMantu.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110 active:scale-95"
+                      style={`background: ${theme.primaryColor};`}
+                    >
+                      <span>📍</span> Buka Google Maps
+                    </a>
+                  )}
+                  {weddingData.unduhMantu.date && (
+                    <a
+                      href={formatGoogleCalendarUrl({
+                        title: `${weddingData.unduhMantu.title || 'Unduh Mantu'}: ${weddingData.bride.nickname || weddingData.bride.fullName} & ${weddingData.groom.nickname || weddingData.groom.fullName}`,
+                        date: weddingData.unduhMantu.date,
+                        timeStart: weddingData.unduhMantu.time,
+                        venue: weddingData.unduhMantu.locationName,
+                        address: weddingData.unduhMantu.address,
+                      })}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-slate-100 backdrop-blur-xs transition-all hover:bg-white/20 active:scale-95"
+                    >
+                      <span>🗓️</span> Simpan ke Google Calendar
+                    </a>
+                  )}
+                </div>
               </div>
             )}
           </div>
         </section>
 
+        <!-- ── Panduan Dresscode ── -->
+        {weddingData.dresscode?.enabled && ((Array.isArray(weddingData.dresscode.colors) && weddingData.dresscode.colors.length > 0) || weddingData.dresscode.note) && (
+          <section id="dresscode" class="pb-28 sm:pb-32 max-w-2xl mx-auto px-4 scroll-mt-24">
+            <div class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden">
+              <div class="flex items-center justify-center gap-2 mb-2">
+                <span class="text-xl">👗</span>
+                <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-rose-300 uppercase">
+                  Panduan Dresscode
+                </h2>
+              </div>
+              <div class="champagne-divider mb-5"></div>
+
+              {Array.isArray(weddingData.dresscode.colors) && weddingData.dresscode.colors.length > 0 && (
+                <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 mb-5">
+                  {weddingData.dresscode.colors.map((color) => (
+                    <div class="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 shadow-md backdrop-blur-xs transition-transform hover:scale-105">
+                      <div
+                        class="h-6 w-6 sm:h-7 sm:w-7 rounded-full border-2 border-white/50 shadow-inner shrink-0"
+                        style={`background-color: ${color};`}
+                        title={color}
+                      ></div>
+                      <span class="font-mono text-xs sm:text-sm font-medium uppercase text-slate-200 tracking-wider">
+                        {color}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {weddingData.dresscode.note && (
+                <p class="text-xs sm:text-sm text-slate-200 leading-relaxed italic max-w-md mx-auto">
+                  {weddingData.dresscode.note}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
         <!-- ── Photo Gallery (Slot 4-11: up to 8 photos) ── -->
         {typedCard.media_urls.slice(3, 11).filter(Boolean).length > 0 && (
-          <section id="galeri" class="pb-12 relative overflow-hidden">
+          <section id="galeri" class="pb-28 sm:pb-32 relative overflow-hidden scroll-mt-24">
             <span id="gallery" class="sr-only"></span>
 
             <!-- Misty Ambient Backdrop Behind 8 Prewedding Cards -->
@@ -688,15 +917,15 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
         <!-- ── Digital Envelope (Amplop Digital) ── -->
         {(weddingData.digitalEnvelope.bankName || weddingData.digitalEnvelope.accountNumber) && (
-          <section id="amplop" class="pb-12 max-w-2xl mx-auto">
+          <section id="amplop" class="pb-28 sm:pb-32 max-w-2xl mx-auto px-4 scroll-mt-24">
             <span id="gift" class="sr-only"></span>
             <div class="wedding-reveal reveal-heading text-center mb-4">
               <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">💰 Amplop Digital</h2>
               <div class="champagne-divider"></div>
             </div>
             <div
-              class="wedding-reveal reveal-card reveal-blur-card rounded-2xl p-5 sm:p-6 text-center"
-              style={`background: linear-gradient(135deg, ${theme.primaryColor}10, ${theme.secondaryColor}08); border: 1px solid ${theme.primaryColor}20;`}
+              class="wedding-reveal reveal-card reveal-blur-card rounded-2xl p-5 sm:p-6 text-center border border-white/10 backdrop-blur-md overflow-hidden"
+              style={`background: linear-gradient(135deg, ${theme.primaryColor}10, ${theme.secondaryColor}08);`}
             >
               {weddingData.digitalEnvelope.bankName && (
                 <p class="text-sm font-semibold text-slate-100 mb-1">{weddingData.digitalEnvelope.bankName}</p>
@@ -723,8 +952,26 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           </section>
         )}
 
+        <!-- ── Turut Mengundang ── -->
+        {weddingData.turutMengundang && weddingData.turutMengundang.trim() && (
+          <section class="pb-28 sm:pb-32 max-w-2xl mx-auto px-4">
+            <div class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center border border-white/10 bg-amber-500/5 backdrop-blur-md overflow-hidden">
+              <div class="flex items-center justify-center gap-2 mb-2">
+                <span class="text-lg">📜</span>
+                <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-amber-200 uppercase">
+                  Turut Mengundang
+                </h2>
+              </div>
+              <div class="champagne-divider mb-4"></div>
+              <p class="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-line font-serif max-w-lg mx-auto">
+                {weddingData.turutMengundang.trim()}
+              </p>
+            </div>
+          </section>
+        )}
+
         <!-- ── RSVP & Wish Wall ── -->
-        <section id="doa" class="pb-12 max-w-2xl mx-auto">
+        <section id="doa" class="pb-28 sm:pb-32 max-w-2xl mx-auto px-4 scroll-mt-24">
           <span id="wishes" class="sr-only"></span>
           <div class="wedding-reveal reveal-heading text-center mb-6">
             <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
@@ -734,59 +981,64 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           </div>
 
           <!-- Submit Wish Form with RSVP -->
-          <form id="wish-form" class="wedding-reveal reveal-card reveal-blur-card mb-8">
-            <div class="rounded-2xl p-5" style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}>
-              <input
-                type="text"
-                id="wish-sender"
-                placeholder="Nama Anda"
-                required
-                class="form-text mb-3 w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm focus-ring placeholder:text-slate-300 placeholder:opacity-80 focus:border-(--primary) focus:ring-1 focus:ring-(--primary)"
-                style={`border-color: ${theme.primaryColor}20;`}
-              />
+          <form
+            id="wish-form"
+            class="wedding-reveal reveal-card reveal-blur-card space-y-3.5 p-5 sm:p-6 rounded-2xl bg-[#181522]/80 border border-white/10 backdrop-blur-md overflow-hidden mb-8"
+          >
+            <input
+              type="text"
+              id="wish-sender"
+              placeholder="Nama Anda"
+              required
+              autocomplete="name"
+              spellcheck="false"
+              class="wish-input"
+            />
 
-              <!-- Attendance Selector -->
-              <div class="mb-3 flex gap-2">
-                <label class="flex-1">
-                  <input type="radio" name="attendance" value="hadir" class="peer sr-only" />
-                  <div class="cursor-pointer rounded-xl border px-4 py-2.5 text-center text-sm transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10! peer-checked:text-emerald-400 peer-checked:font-medium" style={`background: rgba(255, 255, 255, 0.05); border-color: ${theme.primaryColor}20;`}>
-                    ✅ Hadir
-                  </div>
-                </label>
-                <label class="flex-1">
-                  <input type="radio" name="attendance" value="berhalangan" class="peer sr-only" />
-                  <div class="cursor-pointer rounded-xl border px-4 py-2.5 text-center text-sm transition-all peer-checked:border-amber-500 peer-checked:bg-amber-500/10! peer-checked:text-amber-400 peer-checked:font-medium" style={`background: rgba(255, 255, 255, 0.05); border-color: ${theme.primaryColor}20;`}>
-                    🙏 Berhalangan
-                  </div>
-                </label>
-              </div>
-
-              <textarea
-                id="wish-message"
-                placeholder="Tulis ucapan & doa untuk kedua mempelai..."
-                required
-                rows="3"
-                class="form-text mb-3 w-full resize-none rounded-xl border bg-white/5 px-4 py-3 text-sm focus-ring placeholder:text-slate-300 placeholder:opacity-80 focus:border-(--primary) focus:ring-1 focus:ring-(--primary)"
-                style={`border-color: ${theme.primaryColor}20;`}
-              ></textarea>
-              <button
-                type="submit"
-                id="wish-submit-btn"
-                class="text-white font-semibold shadow-lg shadow-primary/25 hover:brightness-110 active:scale-95 transition-all duration-200 px-6 py-2.5 rounded-full flex items-center justify-center gap-2 cursor-pointer border-0"
-                style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
-              >
-                <span>Kirim Ucapan</span>
-                <span>✨</span>
-              </button>
+            <!-- Attendance Selector -->
+            <div class="grid grid-cols-2 gap-3 w-full">
+              <label class="cursor-pointer">
+                <input type="radio" name="attendance" value="hadir" class="sr-only" checked />
+                <div class="rsvp-toggle-btn">
+                  <span>✅</span>
+                  <span>Hadir</span>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="attendance" value="berhalangan" class="sr-only" />
+                <div class="rsvp-toggle-btn">
+                  <span>🙏</span>
+                  <span>Berhalangan</span>
+                </div>
+              </label>
             </div>
+
+            <textarea
+              id="wish-message"
+              placeholder="Tulis ucapan & doa untuk kedua mempelai..."
+              required
+              rows="3"
+              spellcheck="false"
+              autocomplete="off"
+              class="wish-input resize-none"
+            ></textarea>
+
+            <button
+              type="submit"
+              id="wish-submit-btn"
+              class="w-full py-3.5 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 text-[#0f0d15] bg-linear-to-r from-[#f5c563] to-[#e07a93] hover:brightness-110 active:scale-[0.99] transition-transform shadow-lg shadow-black/20 cursor-pointer"
+            >
+              <span>Kirim Ucapan</span>
+              <span>✨</span>
+            </button>
           </form>
 
           <!-- Wishes List -->
           <div id="wishes-container" class="space-y-3 max-w-full overflow-hidden">
             {typedWishes.map((wish, index) => (
               <div
-                class="wedding-reveal reveal-card reveal-blur-card rounded-xl p-4 max-w-full overflow-hidden"
-                style={`background: ${theme.primaryColor}06; border: 1px solid ${theme.primaryColor}10; transition-delay: calc(${index % 5} * 80ms);`}
+                class="wedding-reveal reveal-card reveal-blur-card rounded-2xl border border-white/10 backdrop-blur-md overflow-hidden p-4 sm:p-5 max-w-full"
+                style={`background: ${theme.primaryColor}06; transition-delay: calc(${index % 5} * 80ms);`}
               >
                 <div class="flex items-baseline justify-between gap-2 max-w-full">
                   <span class="text-sm font-semibold text-white wrap-anywhere min-w-0">{wish.sender_name}</span>
@@ -806,7 +1058,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         </section>
 
         <!-- Footer -->
-        <footer class="pb-24 text-center">
+        <footer class="pb-36 sm:pb-40 text-center">
           <a
             href="/"
             class="group inline-flex items-center gap-2 rounded-full border border-white/8 bg-surface-900/60 backdrop-blur-md px-4 py-2 text-xs font-medium text-surface-400 transition-all duration-300 hover:border-purple-500/30 hover:bg-surface-800/80 hover:shadow-glow-sm"
@@ -1016,61 +1268,211 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           </p>
         </header>
 
-        {/* Category-Specific Milestone / Event Chips */}
-        {typedCard.category === 'birthday' && theme.ageMilestone && (
-          <div class="mt-4 flex justify-center" data-reveal="zoom-in" data-reveal-delay="250">
-            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-pink-500/15 border border-pink-500/30 text-pink-300 shadow-sm backdrop-blur-sm">
-              <span>🎂</span>
-              <span>Milestone: {theme.ageMilestone}</span>
-            </span>
-          </div>
-        )}
+        {/* Category-Specific Staging & Interactive Mechanics */}
 
-        {typedCard.category === 'anniversary' && theme.anniversaryMilestone && (
-          <div class="mt-4 flex justify-center" data-reveal="zoom-in" data-reveal-delay="250">
-            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 border border-rose-500/30 text-rose-300 shadow-sm backdrop-blur-sm">
-              <span>💍</span>
-              <span>{theme.anniversaryMilestone}</span>
-            </span>
-          </div>
-        )}
-
-        {typedCard.category === 'graduation' && (theme.degreeMajor || theme.schoolCampus) && (
-          <div class="mt-4 flex flex-col items-center gap-1" data-reveal="zoom-in" data-reveal-delay="250">
-            {theme.degreeMajor && (
-              <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-blue-500/15 border border-blue-500/30 text-blue-300 shadow-sm backdrop-blur-sm">
-                <span>🎓</span>
-                <span>{theme.degreeMajor}</span>
-              </span>
-            )}
-            {theme.schoolCampus && (
-              <span class="text-xs text-surface-400 font-medium">
-                🏛️ {theme.schoolCampus}
-              </span>
-            )}
-          </div>
-        )}
-
-        {typedCard.category === 'invitation' && (theme.invitationEventType || theme.invitationTime || theme.invitationVenue) && (
-          <div class="mt-6 mx-auto max-w-md rounded-2xl p-4 text-center border backdrop-blur-sm" style={`background: ${theme.primaryColor}0d; border-color: ${theme.primaryColor}25;`} data-reveal="fade-up" data-reveal-delay="250">
-            {theme.invitationEventType && (
-              <div class="text-sm font-bold text-surface-100 flex items-center justify-center gap-1.5">
-                <span>✉️</span> <span>{theme.invitationEventType}</span>
+        {/* 1. Birthday: Milestone Gold Medal + Interactive Cake & Candle */}
+        {typedCard.category === 'birthday' && (
+          <div class="my-6 text-center" data-reveal="fade-up">
+            {theme.ageMilestone && (
+              <div class="mb-4 flex justify-center" data-reveal="zoom-in" data-reveal-delay="200">
+                <div class="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-linear-to-r from-amber-500/20 via-yellow-400/25 to-amber-500/20 border border-amber-400/50 text-amber-200 shadow-[0_0_20px_rgba(245,197,99,0.35)] backdrop-blur-md">
+                  <div class="relative flex items-center justify-center w-7 h-7 rounded-full bg-linear-to-br from-yellow-300 via-amber-400 to-amber-600 text-amber-950 font-black text-xs shadow-md border border-white/40 shrink-0">
+                    <span>{theme.ageMilestone}</span>
+                  </div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-amber-200 drop-shadow-sm">
+                    Special Milestone · {theme.ageMilestone}th Celebration
+                  </span>
+                </div>
               </div>
             )}
-            {theme.invitationTime && (
-              <div class="mt-1 text-xs text-surface-300">
-                ⏰ {theme.invitationTime}
+
+            <!-- Interactive Cake & Candle -->
+            <div class="birthday-cake-container mx-auto text-center select-none cursor-pointer group inline-block" id="birthday-cake-trigger">
+              <div class="relative inline-block">
+                <!-- Candle & Flame -->
+                <div class="relative mx-auto w-4 flex flex-col items-center">
+                  <div class="candle-flame-wrapper relative h-7 w-7 flex items-center justify-center">
+                    <span class="candle-flame text-2xl transition-all duration-300 filter drop-shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse">🔥</span>
+                    <span class="candle-smoke text-base hidden transition-all duration-700 opacity-0 transform -translate-y-3">💨</span>
+                  </div>
+                  <div class="w-2.5 h-6 rounded-sm bg-linear-to-b from-amber-200 via-pink-400 to-indigo-500 shadow-sm border border-white/30"></div>
+                </div>
+                <!-- Cake Tier 1 -->
+                <div class="relative -mt-1 mx-auto w-28 h-9 rounded-t-xl bg-linear-to-r from-pink-300 via-rose-200 to-amber-200 shadow-md border-t-2 border-white/50 flex items-center justify-center overflow-hidden">
+                  <div class="absolute top-0 inset-x-0 h-2.5 flex justify-around">
+                    <span class="w-3.5 h-2.5 bg-white/80 rounded-b-full"></span>
+                    <span class="w-3.5 h-3.5 bg-white/80 rounded-b-full"></span>
+                    <span class="w-3.5 h-2 bg-white/80 rounded-b-full"></span>
+                    <span class="w-3.5 h-3 bg-white/80 rounded-b-full"></span>
+                  </div>
+                  <span class="text-[10px] font-bold text-rose-800 tracking-widest uppercase mt-0.5">Make a Wish</span>
+                </div>
+                <!-- Cake Tier 2 -->
+                <div class="relative -mt-0.5 mx-auto w-40 h-11 rounded-t-2xl rounded-b-lg bg-linear-to-r from-amber-300 via-pink-400 to-purple-400 shadow-xl border-t border-white/30 flex items-center justify-center overflow-hidden">
+                  <div class="text-xs font-bold text-white tracking-widest uppercase drop-shadow">Happy Birthday</div>
+                </div>
+                <!-- Cake Plate -->
+                <div class="mx-auto w-48 h-2 bg-linear-to-r from-slate-400 via-white to-slate-400 rounded-full shadow-lg border-t border-white/70"></div>
               </div>
-            )}
-            {theme.invitationVenue && (
-              <div class="mt-1 text-xs text-surface-400">
-                📍 {theme.invitationVenue}
+              <p class="candle-hint mt-2 text-xs text-amber-300/90 font-medium tracking-wide transition-all group-hover:text-amber-200">
+                ✨ Ketuk lilin untuk tiup lilin & buat permohonan!
+              </p>
+              <div class="candle-wish-banner hidden mt-2.5 py-1.5 px-4 rounded-full bg-linear-to-r from-amber-400/25 via-pink-500/25 to-purple-500/25 border border-amber-300/50 text-amber-200 text-xs font-bold shadow-xl animate-fade-in-up">
+                🎉 Make a Wish! Semoga semua impianmu terwujud! ✨
               </div>
-            )}
+            </div>
           </div>
         )}
 
+        {/* 2. Anniversary: Live Relationship Counter with Heartbeat + Milestone */}
+        {typedCard.category === 'anniversary' && (
+          <div class="anniversary-counter-box my-6 mx-auto max-w-md p-5 rounded-2xl border border-rose-500/30 bg-linear-to-b from-rose-950/40 via-surface-900/60 to-rose-950/30 backdrop-blur-md shadow-2xl text-center relative overflow-hidden" data-reveal="fade-up">
+            <div class="flex items-center justify-center gap-2 mb-2 text-rose-400">
+              <span class="inline-block text-lg animate-pulse">❤️</span>
+              <span class="text-[11px] font-bold uppercase tracking-widest text-rose-300">Kisah Cinta & Perjalanan Bersama</span>
+              <span class="inline-block text-lg animate-pulse">❤️</span>
+            </div>
+            {theme.anniversaryMilestone && (
+              <div class="mb-3 text-sm font-semibold text-rose-200">
+                💍 {theme.anniversaryMilestone}
+              </div>
+            )}
+            <div class="anniversary-live-timer grid grid-cols-3 gap-2.5 max-w-xs mx-auto" data-anniversary-date={typedCard.event_date || ''}>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                <div class="text-xl font-bold text-rose-300 font-mono anniversary-years">
+                  {anniversaryTime ? anniversaryTime.years : (typedCard.event_date ? '0' : '--')}
+                </div>
+                <div class="text-[10px] text-surface-400 uppercase mt-0.5">Tahun</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                <div class="text-xl font-bold text-rose-300 font-mono anniversary-months">
+                  {anniversaryTime ? anniversaryTime.months : (typedCard.event_date ? '0' : '--')}
+                </div>
+                <div class="text-[10px] text-surface-400 uppercase mt-0.5">Bulan</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                <div class="text-xl font-bold text-rose-300 font-mono anniversary-days">
+                  {anniversaryTime ? anniversaryTime.days : (typedCard.event_date ? '0' : '--')}
+                </div>
+                <div class="text-[10px] text-surface-400 uppercase mt-0.5">Hari</div>
+              </div>
+            </div>
+            <p class="mt-3 text-[11px] text-rose-300/70 italic">"Setiap detik bersamamu adalah anugerah terindah"</p>
+          </div>
+        )}
+
+        {/* 3. Graduation: Royal Diploma Framing + Mortarboard Toss Animation */}
+        {typedCard.category === 'graduation' && (
+          <div class="graduation-diploma-frame relative my-6 mx-auto max-w-lg rounded-2xl p-6 sm:p-8 bg-linear-to-b from-[#241e17] via-[#1a1612] to-[#221a14] border-2 border-[#d4af37] shadow-[0_0_30px_rgba(212,175,55,0.2)] text-center overflow-hidden" data-reveal="fade-up">
+            <!-- Gold corner accent flourishes -->
+            <div class="absolute top-2 left-2 text-[#d4af37]/60 text-xs select-none">⚜️</div>
+            <div class="absolute top-2 right-2 text-[#d4af37]/60 text-xs select-none">⚜️</div>
+            <div class="absolute bottom-2 left-2 text-[#d4af37]/60 text-xs select-none">⚜️</div>
+            <div class="absolute bottom-2 right-2 text-[#d4af37]/60 text-xs select-none">⚜️</div>
+
+            <!-- Floating Mortarboard Toss Animation -->
+            <div class="floating-mortarboards pointer-events-none absolute inset-0 overflow-hidden z-10" aria-hidden="true">
+              <span class="mortarboard-particle absolute bottom-0 left-[15%] text-xl animate-toss-1">🎓</span>
+              <span class="mortarboard-particle absolute bottom-0 left-[48%] text-lg animate-toss-2">✨</span>
+              <span class="mortarboard-particle absolute bottom-0 left-[78%] text-xl animate-toss-3">🎓</span>
+            </div>
+
+            <!-- Diploma Content -->
+            <div class="relative z-11">
+              <div class="text-[9px] tracking-[0.3em] uppercase text-[#d4af37] font-semibold mb-1">
+                ACADEMIC DEGREE & COMMENCEMENT
+              </div>
+              <div class="text-3xl my-1.5 animate-bounce" style="animation-duration: 2.5s;">🎓</div>
+              {theme.degreeMajor && (
+                <h3 class="text-xl sm:text-2xl font-serif font-bold text-[#fef08a] tracking-wide mt-1">
+                  {theme.degreeMajor}
+                </h3>
+              )}
+              {theme.schoolCampus && (
+                <p class="text-xs sm:text-sm font-serif text-amber-200/80 mt-1 italic">
+                  {theme.schoolCampus}
+                </p>
+              )}
+              <div class="my-3 mx-auto w-28 h-0.5 bg-linear-to-r from-transparent via-[#d4af37] to-transparent"></div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/40 text-[#fef08a] text-[10px] sm:text-[11px] font-medium">
+                <span>🏆</span> <span>Honors & Distinction</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 4. Invitation: VIP Pass / Golden Ticket Format */}
+        {typedCard.category === 'invitation' && (
+          <div class="mt-6 mx-auto max-w-md rounded-2xl border border-amber-400/40 bg-linear-to-b from-[#1c182a] to-[#120f1c] shadow-2xl overflow-hidden relative" data-reveal="fade-up">
+            <!-- Notch cutout at top -->
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#181522] border-b border-amber-400/40"></div>
+            <!-- Header Bar -->
+            <div class="bg-linear-to-r from-amber-500/20 via-yellow-400/25 to-amber-500/20 border-b border-amber-400/30 px-5 py-2.5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🎟️</span>
+                <span class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-amber-200">VIP ACCESS PASS</span>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-black/40 border border-white/10 text-amber-300">#INV-VIP</span>
+            </div>
+            <!-- Ticket Body -->
+            <div class="p-5 sm:p-6 text-center space-y-3">
+              {theme.invitationEventType && (
+                <h3 class="text-lg sm:text-xl font-bold text-white tracking-wide">
+                  {theme.invitationEventType}
+                </h3>
+              )}
+              {theme.invitationTime && (
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-amber-300">
+                  <span>⏰</span> <span>{theme.invitationTime}</span>
+                </div>
+              )}
+              {theme.invitationVenue && (
+                <p class="text-xs text-surface-300 flex items-center justify-center gap-1.5">
+                  <span>📍</span> <span>{theme.invitationVenue}</span>
+                </p>
+              )}
+              
+              <!-- Perforated Coupon Divider Line with side notches -->
+              <div class="relative my-4">
+                <div class="border-b-2 border-dashed border-white/20"></div>
+                <div class="absolute -left-7 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#181522] border-r border-amber-400/40"></div>
+                <div class="absolute -right-7 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#181522] border-l border-amber-400/40"></div>
+              </div>
+
+              <!-- Direct 1-tap Actions -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                {typedCard.event_date && (
+                  <a
+                    href={formatGoogleCalendarUrl({
+                      title: theme.invitationEventType || `Undangan Spesial untuk ${recipientName}`,
+                      date: typedCard.event_date,
+                      timeStart: theme.invitationTime?.split('-')[0]?.trim() || '10:00',
+                      venue: theme.invitationVenue,
+                      description: typedCard.message,
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-[#0f0d15] bg-[#f5c563] hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
+                  >
+                    <span>🗓️</span> <span>Simpan ke Google Calendar</span>
+                  </a>
+                )}
+                {theme.invitationVenue && (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(theme.invitationVenue)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/15 active:scale-[0.98] transition-all shadow-md"
+                  >
+                    <span>📍</span> <span>Buka Google Maps</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 5. Greetings Occasion Badge */}
         {typedCard.category === 'greetings' && theme.occasion && (
           <div class="mt-4 flex justify-center" data-reveal="zoom-in" data-reveal-delay="250">
             <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300 shadow-sm backdrop-blur-sm">
@@ -1088,28 +1490,37 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           </div>
         )}
 
-        <!-- Message -->
+        <!-- Message Section (with 3D bifold depth for greetings) -->
         <section class="mt-10 max-w-full overflow-hidden" data-reveal="fade-up">
           <div
-            class="rounded-2xl p-6 sm:p-8 max-w-full overflow-hidden"
+            class:list={[
+              'rounded-2xl p-6 sm:p-8 max-w-full overflow-hidden relative',
+              typedCard.category === 'greetings' ? 'shadow-2xl border border-white/15' : '',
+            ]}
             style={`background: ${theme.primaryColor}10; border: 1px solid ${theme.primaryColor}20;`}
           >
-            <p class="wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden text-base leading-relaxed text-surface-200 sm:text-lg">
-              {typedCard.message}
-            </p>
-            {typedCard.sender_name && (
-              <p class="mt-6 text-right text-sm italic text-surface-400 wrap-anywhere max-w-full">
-                With love, <span class="font-medium text-surface-300 wrap-anywhere">{typedCard.sender_name}</span>
+            {/* 3D Bifold Card Center Crease Shadow */}
+            {typedCard.category === 'greetings' && (
+              <div class="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 w-8 bg-linear-to-r from-black/0 via-black/40 to-black/0 z-10"></div>
+            )}
+            <div class="relative z-11">
+              <p class="wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden text-base leading-relaxed text-surface-200 sm:text-lg">
+                {typedCard.message}
               </p>
-            )}
-            {theme.signature && (
-              <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-end gap-2 text-surface-300">
-                <span class="text-[11px] uppercase tracking-wider text-surface-400">Salam hangat:</span>
-                <span class="font-serif italic text-base sm:text-lg font-medium" style={`color: ${theme.primaryColor}; font-family: ${fontFamily};`}>
-                  {theme.signature}
-                </span>
-              </div>
-            )}
+              {typedCard.sender_name && (
+                <p class="mt-6 text-right text-sm italic text-surface-400 wrap-anywhere max-w-full">
+                  With love, <span class="font-medium text-surface-300 wrap-anywhere">{typedCard.sender_name}</span>
+                </p>
+              )}
+              {theme.signature && (
+                <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-end gap-2 text-surface-300">
+                  <span class="text-[11px] uppercase tracking-wider text-surface-400">Salam hangat:</span>
+                  <span class="font-serif italic text-base sm:text-lg font-medium" style={`color: ${theme.primaryColor}; font-family: ${fontFamily};`}>
+                    {theme.signature}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
@@ -1190,32 +1601,107 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           </section>
         )}
 
-        <!-- Photo Gallery -->
+        <!-- Photo Gallery (Custom Staged by Category) -->
         {typedCard.media_urls.length > 0 && (
-          <section class="mt-10" data-reveal="fade-up">
-            <h2 class="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">Memories</h2>
-            <div class:list={[
-              'grid gap-3',
-              typedCard.media_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2',
-            ]}>
-              {typedCard.media_urls.map((url, i) => (
-                <div
-                  class="group overflow-hidden rounded-2xl bg-surface-800 cursor-pointer gallery-item"
-                  style={`border: 1px solid ${theme.primaryColor}20;`}
-                  data-gallery-src={resolveMediaUrl(url)}
-                  data-reveal="zoom-in"
-                  data-reveal-delay={`${(i % 4) * 100}`}
-                >
-                  <img
-                    src={resolveMediaUrl(url)}
-                    alt={`Photo ${i + 1}`}
-                    loading="lazy"
-                    decoding="async"
-                    class="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+          <section class="mt-10 max-w-full overflow-hidden" data-reveal="fade-up">
+            {typedCard.category === 'birthday' ? (
+              <div>
+                <h2 class="mb-4 text-center text-xs font-semibold uppercase tracking-[0.25em] text-pink-300">
+                  📸 Polaroid Memories
+                </h2>
+                <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-6 py-3">
+                  {typedCard.media_urls.map((url, i) => {
+                    const rots = ['-rotate-3', 'rotate-2', '-rotate-2', 'rotate-3'];
+                    const rot = rots[i % 4];
+                    return (
+                      <div
+                        class={`group relative bg-white p-2.5 pb-7 rounded-sm shadow-xl transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 hover:shadow-2xl cursor-pointer ${rot} w-36 sm:w-44 gallery-item`}
+                        data-gallery-src={resolveMediaUrl(url)}
+                      >
+                        <div class="aspect-square w-full overflow-hidden rounded-xs bg-slate-100">
+                          <img
+                            src={resolveMediaUrl(url)}
+                            alt={`Moment ${i + 1}`}
+                            loading="lazy"
+                            class="h-full w-full object-cover"
+                          />
+                        </div>
+                        <div class="mt-2 text-center text-[10px] sm:text-xs text-slate-600 font-medium italic select-none">
+                          Memories #{i + 1} ✨
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
+              </div>
+            ) : typedCard.category === 'anniversary' ? (
+              <div>
+                <h2 class="mb-4 text-center text-xs font-semibold uppercase tracking-[0.25em] text-rose-300">
+                  🎞️ Vintage Filmstrip
+                </h2>
+                <div class="mx-auto max-w-lg rounded-2xl bg-[#0c0a0f] border-2 border-white/15 p-3 sm:p-4 shadow-2xl">
+                  <!-- Top Sprockets -->
+                  <div class="flex justify-between items-center gap-1.5 mb-3 px-1 overflow-hidden opacity-60">
+                    {Array.from({ length: 14 }).map(() => (
+                      <span class="h-2 w-3 rounded-xs bg-white/25 border border-white/10 shrink-0"></span>
+                    ))}
+                  </div>
+                  <!-- Photo Frames -->
+                  <div class="grid grid-cols-2 gap-3">
+                    {typedCard.media_urls.map((url, i) => (
+                      <div
+                        class="group relative overflow-hidden rounded-lg bg-black border border-white/20 shadow-md gallery-item cursor-pointer"
+                        data-gallery-src={resolveMediaUrl(url)}
+                      >
+                        <div class="aspect-4/3 overflow-hidden">
+                          <img
+                            src={resolveMediaUrl(url)}
+                            alt={`Film ${i + 1}`}
+                            loading="lazy"
+                            class="h-full w-full object-cover sepia-[0.2] contrast-105 transition-all duration-500 group-hover:scale-105 group-hover:sepia-0"
+                          />
+                        </div>
+                        <div class="absolute bottom-1 right-2 text-[8px] font-mono text-amber-300/80 drop-shadow">
+                          EXP {String(i + 1).padStart(2, '0')}A
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <!-- Bottom Sprockets -->
+                  <div class="flex justify-between items-center gap-1.5 mt-3 px-1 overflow-hidden opacity-60">
+                    {Array.from({ length: 14 }).map(() => (
+                      <span class="h-2 w-3 rounded-xs bg-white/25 border border-white/10 shrink-0"></span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h2 class="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-surface-400">Memories</h2>
+                <div class:list={[
+                  'grid gap-3',
+                  typedCard.media_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2',
+                ]}>
+                  {typedCard.media_urls.map((url, i) => (
+                    <div
+                      class="group overflow-hidden rounded-2xl bg-surface-800 cursor-pointer gallery-item"
+                      style={`border: 1px solid ${theme.primaryColor}20;`}
+                      data-gallery-src={resolveMediaUrl(url)}
+                      data-reveal="zoom-in"
+                      data-reveal-delay={`${(i % 4) * 100}`}
+                    >
+                      <img
+                        src={resolveMediaUrl(url)}
+                        alt={`Photo ${i + 1}`}
+                        loading="lazy"
+                        decoding="async"
+                        class="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </section>
         )}
 
@@ -1228,6 +1714,24 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           <!-- Submit Wish Form -->
           <form id="wish-form" class="mb-8" data-reveal="fade-up">
             <div class="rounded-2xl p-5" style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}>
+              {typedCard.category === 'invitation' && (
+                <div class="grid grid-cols-2 gap-3 mb-3 w-full">
+                  <label class="cursor-pointer">
+                    <input type="radio" name="attendance" value="hadir" class="sr-only" checked />
+                    <div class="rsvp-toggle-btn">
+                      <span>✅</span>
+                      <span>Hadir</span>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="attendance" value="berhalangan" class="sr-only" />
+                    <div class="rsvp-toggle-btn">
+                      <span>🙏</span>
+                      <span>Berhalangan</span>
+                    </div>
+                  </label>
+                </div>
+              )}
               <input
                 type="text"
                 id="wish-sender"
@@ -1828,6 +2332,75 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   }
 
   // ═══════════════════════════════════════════════════════
+  // Birthday Cake & Candle Interactive Blow
+  // ═══════════════════════════════════════════════════════
+  const cakeTrigger = document.getElementById('birthday-cake-trigger');
+  if (cakeTrigger) {
+    let isExtinguished = false;
+    cakeTrigger.addEventListener('click', () => {
+      const flame = cakeTrigger.querySelector<HTMLElement>('.candle-flame');
+      const smoke = cakeTrigger.querySelector<HTMLElement>('.candle-smoke');
+      const hint = cakeTrigger.querySelector<HTMLElement>('.candle-hint');
+      const banner = cakeTrigger.querySelector<HTMLElement>('.candle-wish-banner');
+
+      if (!isExtinguished) {
+        // Extinguish flame with smoke puff and celebratory banner
+        isExtinguished = true;
+        if (flame) flame.classList.add('hidden');
+        if (smoke) {
+          smoke.classList.remove('hidden');
+          smoke.style.opacity = '1';
+          setTimeout(() => { smoke.style.opacity = '0'; }, 1000);
+        }
+        if (hint) hint.classList.add('hidden');
+        if (banner) banner.classList.remove('hidden');
+        triggerConfetti();
+      } else {
+        // Relight candle on next tap
+        isExtinguished = false;
+        if (flame) flame.classList.remove('hidden');
+        if (smoke) smoke.classList.add('hidden');
+        if (hint) hint.classList.remove('hidden');
+        if (banner) banner.classList.add('hidden');
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Anniversary Live Timer Sync
+  // ═══════════════════════════════════════════════════════
+  const annTimer = document.querySelector<HTMLElement>('.anniversary-live-timer');
+  if (annTimer) {
+    const rawDate = annTimer.dataset.anniversaryDate;
+    if (rawDate) {
+      const updateAnniversary = () => {
+        const start = new Date(rawDate + (rawDate.includes('T') ? '' : 'T00:00:00'));
+        if (isNaN(start.getTime())) return;
+        const now = new Date();
+        let y = now.getFullYear() - start.getFullYear();
+        let m = now.getMonth() - start.getMonth();
+        let d = now.getDate() - start.getDate();
+        if (d < 0) {
+          m -= 1;
+          const prev = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+          d += prev;
+        }
+        if (m < 0) {
+          y -= 1;
+          m += 12;
+        }
+        const yEl = annTimer.querySelector('.anniversary-years');
+        const mEl = annTimer.querySelector('.anniversary-months');
+        const dEl = annTimer.querySelector('.anniversary-days');
+        if (yEl) yEl.textContent = String(Math.max(0, y));
+        if (mEl) mEl.textContent = String(Math.max(0, m));
+        if (dEl) dEl.textContent = String(Math.max(0, d));
+      };
+      updateAnniversary();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════
   // Web Audio Synthesizers for PIN Chime & Celebration Fanfare
   // ═══════════════════════════════════════════════════════
   function getAudioCtx(): AudioContext | null {
@@ -2319,12 +2892,10 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     const sender_name = sender.value;
     let wish_message = message.value;
 
-    // For wedding cards, prepend attendance status
-    if (isWedding) {
-      const attendance = (document.querySelector('input[name="attendance"]:checked') as HTMLInputElement | null)?.value;
-      if (attendance) {
-        wish_message = `[${attendance === 'hadir' ? '✅ Hadir' : '🙏 Berhalangan'}] ${wish_message}`;
-      }
+    // For wedding or invitation cards, prepend attendance status
+    const attendance = (document.querySelector('input[name="attendance"]:checked') as HTMLInputElement | null)?.value;
+    if (attendance) {
+      wish_message = `[${attendance === 'hadir' ? '✅ Hadir' : '🙏 Berhalangan'}] ${wish_message}`;
     }
 
     try {
@@ -2555,6 +3126,52 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   }
 
   /* ── Form styling ── */
+  .wish-input {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #ffffff;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .wish-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+  .wish-input:focus {
+    outline: none;
+    border-color: #f5c563 !important;
+    box-shadow: 0 0 0 1px #f5c563 !important;
+  }
+
+  .rsvp-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 3rem;
+    min-height: 3rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+  }
+  .rsvp-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  input[name="attendance"]:checked + .rsvp-toggle-btn {
+    border-color: #f5c563;
+    color: #f5c563;
+    background-color: rgba(245, 197, 99, 0.1);
+    box-shadow: 0 0 12px rgba(245, 197, 99, 0.15);
+  }
+
   #wish-sender,
   #wish-message {
     color: #ffffff;
@@ -2562,7 +3179,9 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
   #wish-sender:focus,
   #wish-message:focus {
-    border-color: var(--primary) !important;
+    border-color: var(--primary, #f5c563) !important;
+    box-shadow: 0 0 0 1px var(--primary, #f5c563) !important;
+    outline: none !important;
   }
 
   /* ── Shake animation for Passcode error ── */
@@ -2864,6 +3483,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
   /* 3. Event Schedule Cards (#acara) */
   .wedding-reveal.reveal-card {
+    border-radius: 1rem;
     opacity: 0;
     transform: translate3d(0, 36px, 0);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -3006,16 +3626,26 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     }
   }
 
-  .floating-music-note {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    font-size: 1.25rem;
-    color: #fef08a;
-    text-shadow: 0 0 10px rgba(234, 179, 8, 0.7), 0 0 20px rgba(212, 175, 55, 0.5);
-    pointer-events: none;
-    user-select: none;
-    will-change: transform, opacity;
-    animation: float-music-note 2.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* Floating Mortarboard Toss Animation */
+  @keyframes mortarboard-toss-1 {
+    0% { transform: translateY(60px) rotate(0deg) scale(0.6); opacity: 0; }
+    30% { opacity: 0.9; }
+    80% { opacity: 0.9; }
+    100% { transform: translateY(-120px) rotate(45deg) scale(1.1); opacity: 0; }
   }
+  @keyframes mortarboard-toss-2 {
+    0% { transform: translateY(70px) rotate(0deg) scale(0.5); opacity: 0; }
+    35% { opacity: 0.9; }
+    85% { opacity: 0.9; }
+    100% { transform: translateY(-140px) rotate(-40deg) scale(1); opacity: 0; }
+  }
+  @keyframes mortarboard-toss-3 {
+    0% { transform: translateY(65px) rotate(0deg) scale(0.6); opacity: 0; }
+    25% { opacity: 0.9; }
+    75% { opacity: 0.9; }
+    100% { transform: translateY(-130px) rotate(35deg) scale(1.1); opacity: 0; }
+  }
+  .animate-toss-1 { animation: mortarboard-toss-1 5s cubic-bezier(0.2, 0.8, 0.4, 1) infinite; }
+  .animate-toss-2 { animation: mortarboard-toss-2 6s 1.2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite; }
+  .animate-toss-3 { animation: mortarboard-toss-3 5.5s 0.6s cubic-bezier(0.2, 0.8, 0.4, 1) infinite; }
 </style>

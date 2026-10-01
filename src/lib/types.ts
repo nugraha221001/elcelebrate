@@ -51,6 +51,22 @@ export interface WeddingData {
   digitalEnvelope: WeddingDigitalEnvelope;
   loveStory: string;  // Optional love story / quote
   openingGreeting: string;  // Opening greeting / Salam Pembuka
+  sacredQuote?: {
+    enabled?: boolean;
+    quote?: string;
+    source?: string;
+  };
+  loveStoryTimeline?: Array<{
+    year?: string;
+    title?: string;
+    story?: string;
+  }>;
+  dresscode?: {
+    enabled?: boolean;
+    colors?: string[];
+    note?: string;
+  };
+  turutMengundang?: string;
 }
 
 export type WeddingConfig = WeddingData;
