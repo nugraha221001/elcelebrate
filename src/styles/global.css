@@ -1035,5 +1035,86 @@ input[type="datetime-local"] {
 .animate-toss-2 { animation: mortarboard-toss-2 6s 1.2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite; }
 .animate-toss-3 { animation: mortarboard-toss-3 5.5s 0.6s cubic-bezier(0.2, 0.8, 0.4, 1) infinite; }
 
+/* ══════════════════════════════════════════════════════════════
+   Thematic Category Unboxing Styles & Embossed Medallion
+   ══════════════════════════════════════════════════════════════ */
+
+.thematic-medallion {
+  background: linear-gradient(135deg, rgba(245, 197, 99, 0.25) 0%, rgba(27, 23, 40, 0.95) 100%);
+  border: 1.5px solid rgba(245, 197, 99, 0.6);
+  box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.6),
+              0 0 20px -2px rgba(245, 197, 99, 0.25),
+              inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  position: relative;
+  will-change: transform, opacity;
+}
+
+@keyframes thematic-medallion-breathe {
+  0%, 100% {
+    box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.6),
+                0 0 16px -2px rgba(245, 197, 99, 0.25),
+                inset 0 1px 2px rgba(255, 255, 255, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 14px 30px -2px rgba(0, 0, 0, 0.7),
+                0 0 26px 4px rgba(245, 197, 99, 0.5),
+                inset 0 1px 3px rgba(255, 255, 255, 0.6);
+    transform: scale(1.03);
+  }
+}
+
+.thematic-medallion-pulse {
+  animation: thematic-medallion-breathe 3.2s ease-in-out infinite;
+}
+
+.thematic-medallion-pulse:hover {
+  animation-play-state: paused;
+}
+
+@keyframes radial-gold-flash-anim {
+  0% { transform: scale(0.6); opacity: 0; }
+  40% { opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.radial-gold-flash {
+  position: absolute;
+  inset: -20px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(245, 197, 99, 0.9) 0%, rgba(245, 197, 99, 0.3) 40%, transparent 70%);
+  pointer-events: none;
+  animation: radial-gold-flash-anim 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes jewel-shine-sweep {
+  0% {
+    transform: translateX(-160%) rotate(25deg);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.85;
+  }
+  70%, 100% {
+    transform: translateX(260%) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+.jewel-shine-sweeper {
+  animation: jewel-shine-sweep 1.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* 3D Perspective Containers */
+.unboxing-perspective-800 {
+  perspective: 800px;
+}
+.unboxing-perspective-1000 {
+  perspective: 1000px;
+}
+.unboxing-perspective-1200 {
+  perspective: 1200px;
+}
+
 
 

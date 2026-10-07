@@ -59,11 +59,29 @@ const { effect } = Astro.props;
       });
     }
 
+    if ((canvas as any)._ambientInitialized) return;
+    (canvas as any)._ambientInitialized = true;
+
     // Battery-saving: pause when tab is hidden
     document.addEventListener('visibilitychange', () => {
       paused = document.hidden;
       if (!paused && animId === 0) loop();
     });
+
+    // Cleanup listeners on unmount/pagehide to prevent animation frame memory leaks
+    const cleanup = () => {
+      paused = true;
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = 0;
+      }
+      if (resizeTimer) {
+        clearTimeout(resizeTimer);
+        resizeTimer = null;
+      }
+    };
+    window.addEventListener('pagehide', cleanup);
+    window.addEventListener('beforeunload', cleanup);
 
     // ── Particle system ─────────────────────────────────
 

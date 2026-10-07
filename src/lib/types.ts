@@ -6,6 +6,22 @@ export type CardCategory = 'birthday' | 'anniversary' | 'graduation' | 'invitati
 
 export type UnboxStyle = 'envelope' | 'giftbox' | 'ribbon';
 
+export type ThematicUnboxStyle =
+  | 'gate-split'
+  | 'curtain-lift'
+  | 'wax-seal'
+  | 'giftbox-pop'
+  | 'ribbon-untie'
+  | 'wax-seal-letter'
+  | 'folded-note'
+  | 'diploma-scroll'
+  | 'folder-reveal'
+  | 'vip-sleeve'
+  | 'gold-envelope'
+  | 'jewelry-box'
+  | 'bifold-card'
+  | 'festive-envelope';
+
 export type AmbientEffectType = 'petals' | 'golden-sparkles' | 'hearts' | 'confetti-float' | 'starlight' | 'lanterns' | 'butterflies' | 'bokeh' | 'sparklers' | 'snowfall' | 'hearts-petals' | 'jasmine' | 'beras-kuning' | 'keraton-glow' | 'fireflies' | 'champagne-dust' | 'prism-glow' | 'sakura-drift' | 'floating-pearls' | 'aurora-mist' | 'none';
 
 export type CornerOrnamentType = 'none' | 'botanical' | 'keraton' | 'melati' | 'pucukrebung' | 'artdeco' | 'baroque' | 'diamond-frame' | 'celestial' | 'gunungan' | 'mandala';
@@ -93,7 +109,7 @@ export interface ThemeConfig {
   audioStartTime?: number;
   ambientEffect?: AmbientEffectType;
   cornerOrnament?: CornerOrnamentType;
-  unboxingStyle?: 'gate-split' | 'curtain-lift' | 'wax-seal' | string;
+  unboxingStyle?: ThematicUnboxStyle | string;
   weddingHeaderTitle?: string;
   weddingData?: WeddingData;
   passcode?: string;
@@ -206,3 +222,77 @@ export const CATEGORY_META: Record<CardCategory, { label: string; emoji: string;
     description: 'Send warm wishes for any occasion',
   },
 };
+
+export interface UnboxingOption {
+  id: ThematicUnboxStyle;
+  emoji: string;
+  label: string;
+  desc: string;
+}
+
+export const CATEGORY_UNBOXING_OPTIONS: Record<CardCategory, UnboxingOption[]> = {
+  wedding: [
+    { id: 'gate-split', emoji: '🏛️', label: 'Royal Gate Split', desc: 'Splits laterally' },
+    { id: 'curtain-lift', emoji: '✨', label: 'Curtain Lift', desc: 'Upward silk glide' },
+    { id: 'wax-seal', emoji: '💌', label: 'Wax Seal Envelope', desc: 'Breaking seal flap' },
+  ],
+  birthday: [
+    { id: 'giftbox-pop', emoji: '🎁', label: 'Luxury Gift Box Pop', desc: 'Lid lifts with pop' },
+    { id: 'ribbon-untie', emoji: '🎀', label: 'Satin Ribbon Untie', desc: 'Silky ribbon unbind' },
+  ],
+  love: [
+    { id: 'wax-seal-letter', emoji: '💌', label: 'Wax Seal Love Letter', desc: '3D stamp & unfold' },
+    { id: 'folded-note', emoji: '📜', label: 'Romantic Folded Note', desc: 'Unfolds tender note' },
+  ],
+  graduation: [
+    { id: 'diploma-scroll', emoji: '📜', label: 'Royal Diploma Scroll', desc: 'Gold ring unroll' },
+    { id: 'folder-reveal', emoji: '🎓', label: 'Honor Folder Reveal', desc: 'Embossed folder open' },
+  ],
+  invitation: [
+    { id: 'vip-sleeve', emoji: '🎟️', label: 'VIP Pass Sleeve Reveal', desc: 'Velvet pocket slide' },
+    { id: 'gold-envelope', emoji: '✉️', label: 'Black & Gold Envelope', desc: 'Gold-lined flap flip' },
+  ],
+  anniversary: [
+    { id: 'jewelry-box', emoji: '💍', label: 'Velvet Keepsake Box', desc: 'Hinged jewel shine' },
+    { id: 'ribbon-untie', emoji: '🎀', label: 'Satin Ribbon Untie', desc: 'Silky ribbon unbind' },
+  ],
+  greetings: [
+    { id: 'bifold-card', emoji: '📖', label: '3D Bifold Card Open', desc: 'Booklet gatefold swing' },
+    { id: 'festive-envelope', emoji: '✨', label: 'Festive Envelope', desc: 'Glowing flap reveal' },
+  ],
+};
+
+export function resolveUnboxingStyle(
+  category: CardCategory | string,
+  unboxingStyle?: string | null,
+  legacyUnboxStyle?: string | null
+): ThematicUnboxStyle {
+  const cat = (category || 'birthday') as CardCategory;
+  const options = CATEGORY_UNBOXING_OPTIONS[cat] || CATEGORY_UNBOXING_OPTIONS.birthday;
+  const validIds = options.map((o) => o.id);
+
+  if (unboxingStyle && validIds.includes(unboxingStyle as ThematicUnboxStyle)) {
+    return unboxingStyle as ThematicUnboxStyle;
+  }
+
+  // Graceful fallback from legacy unboxStyle or category defaults
+  if (legacyUnboxStyle === 'giftbox') {
+    if (cat === 'anniversary') return 'jewelry-box';
+    return 'giftbox-pop';
+  }
+  if (legacyUnboxStyle === 'ribbon') {
+    return 'ribbon-untie';
+  }
+  if (legacyUnboxStyle === 'envelope') {
+    if (cat === 'wedding') return 'gate-split';
+    if (cat === 'love') return 'wax-seal-letter';
+    if (cat === 'graduation') return 'diploma-scroll';
+    if (cat === 'invitation') return 'gold-envelope';
+    if (cat === 'greetings') return 'festive-envelope';
+    if (cat === 'birthday') return 'giftbox-pop';
+    if (cat === 'anniversary') return 'jewelry-box';
+  }
+
+  // Fallback to the first curated option for this category
+  return options[0].id;
+}

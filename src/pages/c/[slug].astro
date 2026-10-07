@@ -3,7 +3,7 @@ import BaseLayout from '../../components/layout/BaseLayout.astro';
 import AmbientEffect from '../../components/ui/AmbientEffect.astro';
 import CornerOrnaments from '../../components/ui/CornerOrnaments.astro';
 import type { Card, Wish, ThemeConfig } from '../../lib/types';
-import { CATEGORY_META } from '../../lib/types';
+import { CATEGORY_META, resolveUnboxingStyle } from '../../lib/types';
 import { getTrackById, getTrackUrl } from '../../lib/audio-tracks';
 import { resolveMediaUrl } from '../../lib/r2';
 
@@ -59,6 +59,7 @@ const recipientParam = Astro.url.searchParams.get('to');
 const recipientName = recipientParam || typedCard.recipient_name;
 const guestName = recipientParam || 'Tamu Undangan';
 const unboxingStyle = (theme as any).unboxingStyle || theme.unboxStyle || 'gate-split';
+const currentUnboxStyle = resolveUnboxingStyle(typedCard.category, (theme as any).unboxingStyle, theme.unboxStyle);
 const weddingHeaderTitle = (theme as any).weddingHeaderTitle || "Walimatul 'Urs";
 const cornerOrnament = (theme as any).cornerOrnament || (isWedding ? 'botanical' : 'none');
 
@@ -218,6 +219,12 @@ const resolvedAmbientEffect = (theme as any).ambientEffect && (theme as any).amb
           : 'none'));
 
 const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && theme.passcode.trim().length === 4);
+
+// Birthday milestone – sanitize to pure numeric age (strip suffixes like "th", "Tahun", etc.)
+const rawMilestone = (theme.ageMilestone || '') as string;
+const birthdayAgeNum = parseInt(rawMilestone.replace(/[^0-9]/g, ''), 10);
+const birthdayAge = isNaN(birthdayAgeNum) ? rawMilestone.trim() : String(birthdayAgeNum);
+const hasBirthdayAge = birthdayAge.length > 0;
 ---
 
 <BaseLayout
@@ -232,7 +239,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     data-audio-url={audioUrl || ''}
     data-track-id={trackId}
     data-has-audio={hasAudio ? 'true' : 'false'}
-    data-unbox-style={theme.unboxStyle}
+    data-unbox-style={isWedding ? unboxingStyle : currentUnboxStyle}
     data-is-wedding={isWedding ? 'true' : 'false'}
     data-category={typedCard.category}
     data-passcode={theme.passcode || ''}
@@ -444,8 +451,8 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         <a href="#acara" title="Acara">📅</a>
         <a href="#countdown" title="Hitung Mundur">⏳</a>
         <a href="#galeri" title="Galeri">🖼️</a>
-        <a href="#amplop" title="Amplop Digital">🎁</a>
-        <a href="#doa" title="Ucapan">💬</a>
+        <a href="#amplop" title="Kirim Tanda Kasih">🎁</a>
+        <a href="#doa" title="Buku Tamu & Doa Restu">💬</a>
       </nav>
 
       <div class="mx-auto max-w-4xl px-4">
@@ -530,7 +537,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
         <!-- ── Sacred Quote / Ayat Suci ── -->
         {weddingData.sacredQuote?.quote && weddingData.sacredQuote?.enabled !== false && (
-          <section class="pb-28 sm:pb-32 max-w-2xl mx-auto overflow-hidden px-4">
+          <section class="py-8 sm:py-12 max-w-2xl mx-auto overflow-hidden px-4">
             <div
               class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden border border-white/10 backdrop-blur-md"
               style={`background: ${theme.primaryColor}08;`}
@@ -548,17 +555,65 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           </section>
         )}
 
-        <!-- ── Invitation Message ── -->
-        <section class="pb-28 sm:pb-32 max-w-2xl mx-auto overflow-hidden px-4">
+        <!-- ── Ornamental Golden Filigree Connector Divider (Above Message) ── -->
+        <div class="wedding-reveal reveal-heading flex items-center justify-center gap-3 sm:gap-4 max-w-xs sm:max-w-sm mx-auto my-2 sm:my-3 px-4" aria-hidden="true">
+          <div class="h-px flex-1 bg-linear-to-r from-transparent via-[#f5c563]/40 to-[#f5c563]/70"></div>
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#f5c563] shrink-0 drop-shadow-[0_0_8px_rgba(245,197,99,0.55)]" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.2" />
+            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <circle cx="4" cy="12" r="1" fill="currentColor" fill-opacity="0.7" />
+            <circle cx="20" cy="12" r="1" fill="currentColor" fill-opacity="0.7" />
+          </svg>
+          <div class="h-px flex-1 bg-linear-to-l from-transparent via-[#f5c563]/40 to-[#f5c563]/70"></div>
+        </div>
+
+        <!-- ── Invitation Message (Untaian Harapan & Doa) ── -->
+        <section class="py-8 sm:py-12 max-w-2xl mx-auto overflow-hidden px-4">
+          <!-- Royal Double-Bordered Glass Card -->
           <div
-            class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden border border-white/10 backdrop-blur-md"
-            style={`background: ${theme.primaryColor}08;`}
+            class="wedding-reveal reveal-card wedding-shimmer-card bg-linear-to-b from-[#1b1728]/90 to-[#120f1d]/90 border border-[#f5c563]/30 rounded-2xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-md shadow-2xl"
           >
-            <p class="wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden text-slate-100 text-sm md:text-base font-medium leading-relaxed" style={`font-family: ${fontFamily};`}>
-              {typedCard.message}
-            </p>
+            <!-- Inner Decorative Inset Ring -->
+            <div class="pointer-events-none absolute inset-2.5 sm:inset-3 rounded-xl ring-1 ring-inset ring-[#f5c563]/15 z-0" aria-hidden="true"></div>
+
+            <!-- Subtle Oversized Watermark Quotation Mark SVG -->
+            <div class="pointer-events-none absolute -top-3 -left-2 sm:-top-2 sm:left-2 select-none opacity-10 text-[#f5c563] z-0" aria-hidden="true">
+              <svg class="w-24 h-24 sm:w-32 sm:h-32 fill-current" viewBox="0 0 24 24">
+                <path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.57-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/>
+              </svg>
+            </div>
+
+            <!-- Formal Section Header Inside Card -->
+            <div class="relative z-10 text-center mb-5 sm:mb-6">
+              <h2 class="font-serif text-lg sm:text-xl font-bold tracking-wider text-[#f5c563] drop-shadow-[0_0_12px_rgba(245,197,99,0.35)]">
+                Untaian Harapan & Doa
+              </h2>
+              <div class="champagne-divider mt-2"></div>
+            </div>
+
+            <!-- Message Typography -->
+            <div class="relative z-10">
+              <p
+                class="wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden font-serif italic text-sm md:text-base leading-relaxed font-light text-white/90 text-center tracking-wide"
+                style={`font-family: ${fontFamily};`}
+              >
+                {typedCard.message}
+              </p>
+            </div>
           </div>
         </section>
+
+        <!-- ── Ornamental Golden Filigree Connector Divider (After Message) ── -->
+        <div class="wedding-reveal reveal-heading flex items-center justify-center gap-3 sm:gap-4 max-w-xs sm:max-w-sm mx-auto my-2 sm:my-3 px-4" aria-hidden="true">
+          <div class="h-px flex-1 bg-linear-to-r from-transparent via-[#f5c563]/40 to-[#f5c563]/70"></div>
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#f5c563] shrink-0 drop-shadow-[0_0_8px_rgba(245,197,99,0.55)]" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.2" />
+            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <circle cx="4" cy="12" r="1" fill="currentColor" fill-opacity="0.7" />
+            <circle cx="20" cy="12" r="1" fill="currentColor" fill-opacity="0.7" />
+          </svg>
+          <div class="h-px flex-1 bg-linear-to-l from-transparent via-[#f5c563]/40 to-[#f5c563]/70"></div>
+        </div>
 
         <!-- ── Love Story / Quote ── -->
         {weddingData.loveStory && (
@@ -702,7 +757,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                     rel="noopener noreferrer"
                     class="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-slate-100 backdrop-blur-xs transition-all hover:bg-white/20 active:scale-95"
                   >
-                    <span>🗓️</span> Simpan ke Google Calendar
+                    <span>🗓️</span> Save to Google Calendar
                   </a>
                 )}
               </div>
@@ -755,7 +810,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                       rel="noopener noreferrer"
                       class="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-slate-100 backdrop-blur-xs transition-all hover:bg-white/20 active:scale-95"
                     >
-                      <span>🗓️</span> Simpan ke Google Calendar
+                      <span>🗓️</span> Save to Google Calendar
                     </a>
                   )}
                 </div>
@@ -812,7 +867,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                       rel="noopener noreferrer"
                       class="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-slate-100 backdrop-blur-xs transition-all hover:bg-white/20 active:scale-95"
                     >
-                      <span>🗓️</span> Simpan ke Google Calendar
+                      <span>🗓️</span> Save to Google Calendar
                     </a>
                   )}
                 </div>
@@ -920,7 +975,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           <section id="amplop" class="pb-28 sm:pb-32 max-w-2xl mx-auto px-4 scroll-mt-24">
             <span id="gift" class="sr-only"></span>
             <div class="wedding-reveal reveal-heading text-center mb-4">
-              <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">💰 Amplop Digital</h2>
+              <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">🎁 Kirim Tanda Kasih</h2>
               <div class="champagne-divider"></div>
             </div>
             <div
@@ -954,20 +1009,108 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
         <!-- ── Turut Mengundang ── -->
         {weddingData.turutMengundang && weddingData.turutMengundang.trim() && (
-          <section class="pb-28 sm:pb-32 max-w-2xl mx-auto px-4">
-            <div class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center border border-white/10 bg-amber-500/5 backdrop-blur-md overflow-hidden">
-              <div class="flex items-center justify-center gap-2 mb-2">
-                <span class="text-lg">📜</span>
-                <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-amber-200 uppercase">
-                  Turut Mengundang
-                </h2>
-              </div>
-              <div class="champagne-divider mb-4"></div>
-              <p class="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-line font-serif max-w-lg mx-auto">
-                {weddingData.turutMengundang.trim()}
-              </p>
+          <>
+            <!-- Ornamental Golden Filigree Connector Divider (Before Turut Mengundang) -->
+            <div class="wedding-reveal reveal-heading flex items-center justify-center gap-3 sm:gap-4 max-w-xs sm:max-w-sm mx-auto my-2 sm:my-3 px-4" aria-hidden="true">
+              <div class="h-px flex-1 bg-linear-to-r from-transparent via-[#f5c563]/40 to-[#f5c563]/70"></div>
+              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#f5c563] shrink-0 drop-shadow-[0_0_8px_rgba(245,197,99,0.55)]" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.2" />
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
+                <circle cx="4" cy="12" r="1" fill="currentColor" fill-opacity="0.7" />
+                <circle cx="20" cy="12" r="1" fill="currentColor" fill-opacity="0.7" />
+              </svg>
+              <div class="h-px flex-1 bg-linear-to-l from-transparent via-[#f5c563]/40 to-[#f5c563]/70"></div>
             </div>
-          </section>
+
+            <section class="py-8 sm:py-12 max-w-2xl mx-auto px-4">
+              <!-- Royal Double-Bordered Glass Card with Corner Flourishes -->
+              <div
+                class="wedding-reveal reveal-card wedding-shimmer-card bg-linear-to-b from-[#1b1728]/90 to-[#120f1d]/90 border border-[#f5c563]/30 rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden backdrop-blur-md shadow-2xl"
+              >
+                <!-- Inner Decorative Inset Ring -->
+                <div class="pointer-events-none absolute inset-2.5 sm:inset-3 rounded-xl ring-1 ring-inset ring-[#f5c563]/15 z-0" aria-hidden="true"></div>
+
+                <!-- Corner Bracket Flourishes -->
+                <div class="pointer-events-none absolute top-3 left-3 sm:top-4 sm:left-4 z-0 text-[#f5c563]/60" aria-hidden="true">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                    <path d="M2 18V6a4 4 0 0 1 4-4h12" stroke-width="1.5" stroke-linecap="round" />
+                    <circle cx="5" cy="5" r="1.5" fill="currentColor" />
+                  </svg>
+                </div>
+                <div class="pointer-events-none absolute top-3 right-3 sm:top-4 sm:right-4 z-0 text-[#f5c563]/60" aria-hidden="true">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5 rotate-90" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                    <path d="M2 18V6a4 4 0 0 1 4-4h12" stroke-width="1.5" stroke-linecap="round" />
+                    <circle cx="5" cy="5" r="1.5" fill="currentColor" />
+                  </svg>
+                </div>
+                <div class="pointer-events-none absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-0 text-[#f5c563]/60" aria-hidden="true">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5 -rotate-90" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                    <path d="M2 18V6a4 4 0 0 1 4-4h12" stroke-width="1.5" stroke-linecap="round" />
+                    <circle cx="5" cy="5" r="1.5" fill="currentColor" />
+                  </svg>
+                </div>
+                <div class="pointer-events-none absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-0 text-[#f5c563]/60" aria-hidden="true">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5 rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                    <path d="M2 18V6a4 4 0 0 1 4-4h12" stroke-width="1.5" stroke-linecap="round" />
+                    <circle cx="5" cy="5" r="1.5" fill="currentColor" />
+                  </svg>
+                </div>
+
+                <!-- Royal Golden Cultural Insignia (Keraton Floral Crest) -->
+                <div class="mx-auto mb-3 flex items-center justify-center relative z-10" aria-hidden="true">
+                  <svg class="w-8 h-8 sm:w-9 sm:h-9 text-[#f5c563] drop-shadow-[0_0_10px_rgba(245,197,99,0.5)]" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                    <path d="M24 4C24 4 28 10 28 14C28 16.5 26.2 18 24 18C21.8 18 20 16.5 20 14C20 10 24 4 24 4Z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M24 44C24 44 28 38 28 34C28 31.5 26.2 30 24 30C21.8 30 20 31.5 20 34C20 38 24 44 24 44Z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M4 24C4 24 10 28 14 28C16.5 28 18 26.2 18 24C18 21.8 16.5 20 14 20C10 20 4 24 4 24Z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M44 24C44 24 38 28 34 28C31.5 28 30 26.2 30 24C30 21.8 31.5 20 34 20C38 20 44 24 44 24Z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.5" />
+                    <circle cx="24" cy="24" r="3.5" fill="currentColor" stroke="currentColor" stroke-width="1.2" />
+                    <circle cx="24" cy="24" r="7.5" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" />
+                    <path d="M13 13L16 16M35 13L32 16M13 35L16 32M35 35L32 32" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                  </svg>
+                </div>
+
+                <!-- Header Styling -->
+                <h2 class="relative z-10 text-xs sm:text-sm font-semibold tracking-[0.25em] text-[#f5c563] uppercase drop-shadow-[0_0_12px_rgba(245,197,99,0.45)]">
+                  TURUT MENGUNDANG
+                </h2>
+                <div class="champagne-divider mb-5 sm:mb-6"></div>
+
+                <!-- Family List Layout -->
+                <div class="relative z-10 space-y-3 sm:space-y-4 max-w-lg mx-auto">
+                  {weddingData.turutMengundang
+                    .split(/\r?\n/)
+                    .map((l: string) => l.trim())
+                    .filter(Boolean)
+                    .map((line: string, idx: number) => (
+                      <div>
+                        {idx > 0 && (
+                          <div class="flex items-center justify-center gap-2.5 py-1.5 opacity-70" aria-hidden="true">
+                            <div class="h-px w-10 sm:w-16 bg-linear-to-r from-transparent to-[#f5c563]/40"></div>
+                            <span class="text-[9px] text-[#f5c563] drop-shadow-[0_0_4px_rgba(245,197,99,0.6)]">✦</span>
+                            <div class="h-px w-10 sm:w-16 bg-linear-to-l from-transparent to-[#f5c563]/40"></div>
+                          </div>
+                        )}
+                        <p class="font-serif text-sm sm:text-base text-white/80 leading-relaxed text-center tracking-wide">
+                          {line}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </section>
+
+            <!-- Ornamental Golden Filigree Connector Divider (Leading to Doa/RSVP) -->
+            <div class="wedding-reveal reveal-heading flex items-center justify-center gap-3 sm:gap-4 max-w-xs sm:max-w-sm mx-auto my-2 sm:my-3 px-4" aria-hidden="true">
+              <div class="h-px flex-1 bg-linear-to-r from-transparent via-[#f5c563]/40 to-[#f5c563]/70"></div>
+              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#f5c563] shrink-0 drop-shadow-[0_0_8px_rgba(245,197,99,0.55)]" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.2" />
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
+                <circle cx="4" cy="12" r="1" fill="currentColor" fill-opacity="0.7" />
+                <circle cx="20" cy="12" r="1" fill="currentColor" fill-opacity="0.7" />
+              </svg>
+              <div class="h-px flex-1 bg-linear-to-l from-transparent via-[#f5c563]/40 to-[#f5c563]/70"></div>
+            </div>
+          </>
         )}
 
         <!-- ── RSVP & Wish Wall ── -->
@@ -975,7 +1118,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           <span id="wishes" class="sr-only"></span>
           <div class="wedding-reveal reveal-heading text-center mb-6">
             <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
-              💬 Ucapan & Doa
+              💬 Buku Tamu & Doa Restu
             </h2>
             <div class="champagne-divider"></div>
           </div>
@@ -1015,7 +1158,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
             <textarea
               id="wish-message"
-              placeholder="Tulis ucapan & doa untuk kedua mempelai..."
+              placeholder="Tuliskan untaian doa & restu untuk kedua mempelai..."
               required
               rows="3"
               spellcheck="false"
@@ -1028,7 +1171,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
               id="wish-submit-btn"
               class="w-full py-3.5 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 text-[#0f0d15] bg-linear-to-r from-[#f5c563] to-[#e07a93] hover:brightness-110 active:scale-[0.99] transition-transform shadow-lg shadow-black/20 cursor-pointer"
             >
-              <span>Kirim Ucapan</span>
+              <span>Kirim Doa & Restu</span>
               <span>✨</span>
             </button>
           </form>
@@ -1051,7 +1194,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
             ))}
             {typedWishes.length === 0 && (
               <p class="text-slate-200 text-sm font-medium tracking-wide text-center py-4 drop-shadow-xs">
-                Jadilah yang pertama mengirim ucapan! 🎉
+                Jadilah yang pertama mengirimkan doa restu! ✨
               </p>
             )}
           </div>
@@ -1143,63 +1286,220 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
       </div>
     )}
 
-    <!-- Envelope Unboxing Overlay -->
+    <!-- Envelope Unboxing Overlay (Thematic Category Interactions) -->
     <div
       id="unbox-overlay"
-      class="fixed inset-0 z-50 flex items-center justify-center"
-      style={`background: linear-gradient(135deg, ${theme.primaryColor}30, ${theme.secondaryColor}20, ${theme.backgroundColor});`}
+      data-unboxing-style={currentUnboxStyle}
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 select-none cursor-pointer"
+      style={`background: linear-gradient(135deg, ${theme.primaryColor}30, ${theme.secondaryColor}20, ${theme.backgroundColor}); font-family: ${fontFamily};`}
     >
-      <div class="text-center">
-        {theme.unboxStyle === 'envelope' && (
-          <div id="envelope-container" class="relative cursor-pointer mx-auto" style="width: 280px; height: 200px;">
-            <div class="absolute inset-0 rounded-2xl shadow-elevated" style={`background: linear-gradient(135deg, ${theme.primaryColor}80, ${theme.secondaryColor}60);`}>
-              <div class="flex h-full items-center justify-center">
-                <span class="text-6xl">{meta?.emoji || '🎉'}</span>
+      <div class="text-center max-w-sm w-full mx-auto">
+        <!-- 1. Luxury Gift Box Pop (Birthday) -->
+        {currentUnboxStyle === 'giftbox-pop' && (
+          <div id="giftbox-pop-container" class="relative mx-auto unboxing-perspective-800" style="width: 260px; height: 260px;">
+            <div class="absolute inset-0 rounded-3xl border border-white/15 shadow-2xl flex flex-col items-center justify-center overflow-visible" style={`background: linear-gradient(135deg, ${theme.primaryColor}35, ${theme.secondaryColor}25, ${theme.backgroundColor});`}>
+              <div id="giftbox-ribbon-v" class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-6 shadow-sm pointer-events-none" style={`background: linear-gradient(180deg, ${theme.secondaryColor}, ${theme.primaryColor});`}></div>
+              <div id="giftbox-ribbon-h" class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-6 shadow-sm pointer-events-none" style={`background: linear-gradient(90deg, ${theme.secondaryColor}, ${theme.primaryColor});`}></div>
+              
+              <!-- 3D Lid Pop Element -->
+              <div id="giftbox-lid" class="absolute -top-4 -inset-x-2 h-20 rounded-2xl border border-[#f5c563]/60 shadow-2xl flex items-center justify-center z-10 transition-transform duration-700" style={`background: linear-gradient(135deg, #2a243c, #1a1726);`}>
+                <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-5 bg-linear-to-r from-[#f5c563] via-[#ffd885] to-[#f5c563]"></div>
+                <!-- Unified Center Medallion Clasp -->
+                <div id="giftbox-medallion" class="thematic-medallion thematic-medallion-pulse relative z-10 flex h-18 w-18 items-center justify-center rounded-full border border-[#f5c563]/70 bg-linear-to-br from-[#f5c563]/25 to-[#1b1728] shadow-xl ring-2 ring-[#f5c563]/30">
+                  <div class="absolute inset-1 rounded-full border border-[#f5c563]/30 pointer-events-none"></div>
+                  <span class="text-3xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">{meta?.emoji || '🎂'}</span>
+                </div>
               </div>
-            </div>
-            <div
-              id="envelope-flap"
-              class="absolute left-0 right-0 top-0 h-1/2 origin-top rounded-t-2xl"
-              style={`background: linear-gradient(180deg, ${theme.primaryColor}90, ${theme.primaryColor}70); clip-path: polygon(0 0, 50% 100%, 100% 0);`}
-            ></div>
-          </div>
-        )}
 
-        {theme.unboxStyle === 'giftbox' && (
-          <div id="giftbox-container" class="relative cursor-pointer mx-auto" style="width: 220px; height: 240px;">
-            <div class="absolute bottom-0 left-2.5 right-2.5 h-40 rounded-xl" style={`background: linear-gradient(135deg, ${theme.primaryColor}80, ${theme.secondaryColor}60);`}>
-              <div class="absolute left-1/2 top-0 h-full w-6 -translate-x-1/2" style={`background: ${theme.secondaryColor}90;`}></div>
-              <div class="flex h-full items-center justify-center relative z-10">
-                <span class="text-5xl">{meta?.emoji || '🎉'}</span>
+              <div class="relative z-5 mt-14 px-3 text-center pointer-events-none">
+                <span class="text-[10px] text-[#f5c563] tracking-widest uppercase font-semibold">Special Gift</span>
+                <p class="text-xs font-bold text-white truncate max-w-44 mt-0.5">{recipientName || 'Kamu'}</p>
               </div>
-            </div>
-            <div
-              id="gift-lid"
-              class="absolute left-0 right-0 top-15 h-12.5 rounded-xl origin-bottom"
-              style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
-            >
-              <div class="absolute left-1/2 top-0 h-full w-6 -translate-x-1/2" style={`background: ${theme.secondaryColor};`}></div>
-              <div class="absolute left-1/2 -top-5 -translate-x-1/2 text-3xl">🎀</div>
             </div>
           </div>
         )}
 
-        {theme.unboxStyle === 'ribbon' && (
-          <div id="ribbon-container" class="relative cursor-pointer mx-auto" style="width: 260px; height: 260px;">
-            <div class="absolute inset-0 rounded-2xl shadow-elevated overflow-hidden" style={`background: linear-gradient(135deg, ${theme.primaryColor}80, ${theme.secondaryColor}60);`}>
-              <div class="flex h-full items-center justify-center">
-                <span class="text-6xl">{meta?.emoji || '🎉'}</span>
+        <!-- 2. Satin Ribbon Untie (Birthday / Anniversary) -->
+        {currentUnboxStyle === 'ribbon-untie' && (
+          <div id="ribbon-untie-container" class="relative mx-auto" style="width: 270px; height: 270px;">
+            <div class="absolute inset-0 rounded-3xl border border-[#f5c563]/40 shadow-2xl p-6 flex flex-col justify-center items-center overflow-hidden" style={`background: linear-gradient(135deg, ${theme.primaryColor}40, ${theme.secondaryColor}25, ${theme.backgroundColor});`}>
+              <div id="ribbon-band-v" class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-9 origin-center shadow-lg" style={`background: linear-gradient(180deg, ${theme.secondaryColor}, #ffd885, ${theme.secondaryColor});`}></div>
+              <div id="ribbon-band-h" class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-9 origin-center shadow-lg" style={`background: linear-gradient(90deg, ${theme.secondaryColor}, #ffd885, ${theme.secondaryColor});`}></div>
+              <!-- Unified Center Medallion Clasp -->
+              <div id="ribbon-medallion" class="thematic-medallion thematic-medallion-pulse relative z-10 flex h-20 w-20 items-center justify-center rounded-full border border-[#f5c563]/80 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-2xl ring-2 ring-[#f5c563]/30">
+                <div class="absolute inset-1 rounded-full border border-[#f5c563]/30 pointer-events-none"></div>
+                <span class="text-3xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">{meta?.emoji || '🎀'}</span>
               </div>
+              <p class="text-xs font-semibold text-white/95 relative z-10 mt-3 truncate max-w-44 drop-shadow-md">{recipientName || 'Someone Special'}</p>
             </div>
-            <div id="ribbon-v" class="absolute left-1/2 top-0 h-full w-8 -translate-x-1/2 origin-top" style={`background: ${theme.secondaryColor}90;`}></div>
-            <div id="ribbon-h" class="absolute left-0 top-1/2 h-8 w-full -translate-y-1/2 origin-left" style={`background: ${theme.secondaryColor}90;`}></div>
-            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl z-10">🎀</div>
           </div>
         )}
 
-        <p class="mt-8 text-base font-medium text-surface-200 animate-pulse">
-          Tap to open
-        </p>
+        <!-- 3. Wax Seal Love Letter (Love) -->
+        {currentUnboxStyle === 'wax-seal-letter' && (
+          <div id="wax-seal-letter-container" class="relative mx-auto unboxing-perspective-1000" style="width: 290px; height: 210px;">
+            <div class="absolute inset-0 rounded-3xl border border-rose-500/35 shadow-2xl p-4 flex flex-col justify-between overflow-visible" style={`background: linear-gradient(135deg, #251a2d, #17111e);`}>
+              <!-- 3D Folding Flap -->
+              <div id="envelope-flap" class="absolute top-0 inset-x-0 h-28 border-b border-rose-400/40 rounded-t-3xl origin-top z-10 transition-transform duration-800 flex items-end justify-center pb-1" style={`background: linear-gradient(180deg, #2f213b, #1e1526); clip-path: polygon(0 0, 100% 0, 50% 100%);`}>
+                <div id="wax-seal-stamp" class="thematic-medallion thematic-medallion-pulse relative translate-y-10 z-20 flex h-18 w-18 items-center justify-center rounded-full border-2 border-[#f5c563]/90 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-2xl ring-2 ring-[#f5c563]/40">
+                  <div class="absolute inset-1 rounded-full border border-[#f5c563]/40 pointer-events-none"></div>
+                  <span class="text-3xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">💌</span>
+                </div>
+              </div>
+              <div id="inner-letter-preview" class="pt-12 text-center transition-transform duration-600">
+                <p class="text-xs text-rose-300 font-serif italic">Surat Cinta Tersegel</p>
+                <p class="text-sm font-bold text-white truncate mt-0.5">{recipientName || 'Kekasih Hati'}</p>
+              </div>
+              <div class="text-[10px] text-[#f5c563] italic text-right">{typedCard.sender_name ? `Dari: ${typedCard.sender_name}` : 'Dengan Cinta 💕'}</div>
+            </div>
+          </div>
+        )}
+
+        <!-- 4. Romantic Folded Note (Love) -->
+        {currentUnboxStyle === 'folded-note' && (
+          <div id="folded-note-container" class="relative mx-auto unboxing-perspective-800" style="width: 270px; height: 230px;">
+            <div class="absolute inset-0 rounded-2xl border border-white/20 shadow-2xl p-6 flex flex-col justify-center items-center overflow-visible bg-linear-to-b from-[#fdfbf7] via-[#f7f3ea] to-[#efe9db] text-surface-900">
+              <div id="folded-top-flap" class="absolute top-0 inset-x-0 h-1/2 bg-white/40 border-b border-amber-800/20 origin-top rounded-t-2xl transition-transform duration-700"></div>
+              <div id="folded-note-seal" class="thematic-medallion thematic-medallion-pulse relative z-10 flex h-18 w-18 items-center justify-center rounded-full border border-[#f5c563]/80 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-xl">
+                <span class="text-3xl">📜</span>
+              </div>
+              <p class="text-xs font-serif italic text-amber-950 font-bold mt-3 relative z-10">{recipientName || 'Untukmu'}</p>
+            </div>
+          </div>
+        )}
+
+        <!-- 5. Royal Diploma Scroll (Graduation) -->
+        {currentUnboxStyle === 'diploma-scroll' && (
+          <div id="diploma-scroll-container" class="relative mx-auto flex items-center justify-center" style="width: 290px; height: 210px;">
+            <div id="diploma-scroll-body" class="relative w-64 h-32 rounded-xl border-y-2 border-[#f5c563] shadow-2xl flex flex-col items-center justify-center p-4 bg-linear-to-r from-[#d4af37]/35 via-[#fdfbf7] to-[#d4af37]/35 transition-transform duration-700">
+              <div class="absolute inset-y-1.5 left-2.5 w-1.5 rounded bg-[#f5c563]/60"></div>
+              <div class="absolute inset-y-1.5 right-2.5 w-1.5 rounded bg-[#f5c563]/60"></div>
+              <span class="text-[10px] font-serif tracking-widest text-amber-900 uppercase font-semibold">Ijazah Kehormatan</span>
+              <p class="text-sm font-bold text-amber-950 truncate max-w-44 mt-1">{recipientName || 'Wisudawan'}</p>
+            </div>
+            <div id="diploma-ribbon-ring" class="absolute inset-y-1 left-1/2 -translate-x-1/2 w-20 flex items-center justify-center z-10 transition-transform duration-700">
+              <div class="absolute inset-0 bg-linear-to-r from-[#f5c563] via-[#ffd885] to-[#f5c563] rounded-lg shadow-xl opacity-95"></div>
+              <div id="diploma-medallion" class="thematic-medallion thematic-medallion-pulse relative z-10 flex h-18 w-18 items-center justify-center rounded-full border border-[#f5c563]/80 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-xl">
+                <span class="text-3xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">🎓</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <!-- 6. Honor Folder Reveal (Graduation) -->
+        {currentUnboxStyle === 'folder-reveal' && (
+          <div id="folder-reveal-container" class="relative mx-auto unboxing-perspective-1000" style="width: 260px; height: 280px;">
+            <div class="absolute inset-0 rounded-2xl border-2 border-[#f5c563]/40 shadow-2xl p-5 flex flex-col justify-center items-center overflow-hidden bg-linear-to-b from-[#1b263b] to-[#0d1b2a]">
+              <div id="folder-cover-flap" class="absolute inset-0 border-r-2 border-[#f5c563]/60 origin-left z-10 flex flex-col items-center justify-center p-4 bg-linear-to-br from-[#1b263b] via-[#23314d] to-[#0d1b2a] transition-transform duration-800">
+                <div id="folder-medallion" class="thematic-medallion thematic-medallion-pulse relative flex h-20 w-20 items-center justify-center rounded-full border border-[#f5c563]/80 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-xl">
+                  <span class="text-3xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">🎓</span>
+                </div>
+                <p class="text-xs font-semibold text-[#f5c563] mt-3 tracking-wider uppercase">Map Kehormatan</p>
+              </div>
+              <p class="text-sm font-bold text-white relative z-5">{recipientName || 'Wisudawan'}</p>
+            </div>
+          </div>
+        )}
+
+        <!-- 7. VIP Pass Sleeve Reveal (Invitation) -->
+        {currentUnboxStyle === 'vip-sleeve' && (
+          <div id="vip-sleeve-container" class="relative mx-auto flex flex-col items-center justify-end" style="width: 270px; height: 260px;">
+            <div id="vip-ticket-card" class="absolute top-0 w-60 h-36 rounded-2xl border border-[#f5c563]/60 shadow-xl p-3 text-center flex flex-col justify-between transition-transform duration-700 z-5" style={`background: linear-gradient(135deg, #2a243c, #181522);`}>
+              <div class="flex items-center justify-between text-[9px] text-[#f5c563] font-mono border-b border-white/10 pb-1">
+                <span>VIP PASS</span>
+                <span>NO. 001</span>
+              </div>
+              <p class="text-xs font-bold text-white truncate">{recipientName || 'VIP Guest'}</p>
+              <div class="text-[9px] text-surface-400">ADMITS ONE ✨</div>
+            </div>
+            <div id="vip-pocket-sleeve" class="relative w-68 h-36 rounded-2xl border-2 border-[#f5c563]/50 shadow-2xl flex flex-col items-center justify-center p-3 z-10" style={`background: linear-gradient(180deg, #181522, #0f0d15);`}>
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-5 rounded-b-full bg-[#0f0d15] border-b border-[#f5c563]/40"></div>
+              <div id="vip-medallion" class="thematic-medallion thematic-medallion-pulse relative mt-1 flex h-16 w-16 items-center justify-center rounded-full border border-[#f5c563]/70 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-xl">
+                <span class="text-2xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">🎟️</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <!-- 8. Black & Gold Envelope (Invitation) -->
+        {currentUnboxStyle === 'gold-envelope' && (
+          <div id="gold-envelope-container" class="relative mx-auto unboxing-perspective-1000" style="width: 290px; height: 210px;">
+            <div class="absolute inset-0 rounded-3xl border-2 border-[#f5c563]/50 shadow-2xl p-4 flex flex-col justify-between overflow-visible" style={`background: linear-gradient(135deg, #1b1728, #120f1d);`}>
+              <div id="gold-envelope-flap" class="absolute top-0 inset-x-0 h-28 border-b-2 border-[#f5c563]/60 rounded-t-3xl origin-top z-10 transition-transform duration-800 flex items-end justify-center pb-1" style={`background: linear-gradient(180deg, #251f36, #181522); clip-path: polygon(0 0, 100% 0, 50% 100%);`}>
+                <div id="gold-envelope-seal" class="thematic-medallion thematic-medallion-pulse relative translate-y-10 z-20 flex h-18 w-18 items-center justify-center rounded-full border border-[#f5c563]/80 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-2xl ring-2 ring-[#f5c563]/30">
+                  <span class="text-3xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">✉️</span>
+                </div>
+              </div>
+              <div class="pt-12 text-center">
+                <p class="text-[10px] text-[#f5c563]/80 font-serif uppercase tracking-wider">Undangan Eksklusif</p>
+                <p class="text-sm font-bold text-white truncate mt-0.5">{recipientName || 'Tamu Undangan'}</p>
+              </div>
+              <div class="text-[10px] text-[#f5c563]/80 italic text-right">{typedCard.sender_name ? `Dari: ${typedCard.sender_name}` : '✨'}</div>
+            </div>
+          </div>
+        )}
+
+        <!-- 9. Velvet Keepsake Box (Anniversary) -->
+        {currentUnboxStyle === 'jewelry-box' && (
+          <div id="jewelry-box-container" class="relative mx-auto unboxing-perspective-800" style="width: 260px; height: 260px;">
+            <div class="absolute inset-0 rounded-3xl border-2 border-[#f5c563]/50 shadow-2xl flex flex-col items-center justify-center overflow-visible" style={`background: linear-gradient(135deg, #2e1c2b, #140b15);`}>
+              <div id="jewelry-box-lid" class="absolute -top-2 inset-x-0 h-28 rounded-t-3xl border-b-2 border-[#f5c563]/70 origin-top z-10 transition-transform duration-800 flex items-end justify-center pb-2" style={`background: linear-gradient(180deg, #3d2539, #251623);`}>
+                <div id="jewelry-box-clasp" class="thematic-medallion thematic-medallion-pulse relative translate-y-10 z-20 flex h-18 w-18 items-center justify-center rounded-full border border-[#f5c563]/80 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-2xl ring-2 ring-[#f5c563]/30">
+                  <span class="text-3xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">💍</span>
+                </div>
+              </div>
+              <div id="jewelry-shine-sweep" class="opacity-0 absolute inset-0 bg-linear-to-r from-transparent via-[#ffd700]/30 to-transparent pointer-events-none transition-opacity duration-500"></div>
+              <div class="mt-14 text-center">
+                <span class="text-[10px] text-[#f5c563] font-serif">Kenangan Spesial</span>
+                <p class="text-xs font-bold text-white truncate max-w-40 mt-0.5">{recipientName || 'Kamu'}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <!-- 10. 3D Bifold Card Open (Greetings) -->
+        {currentUnboxStyle === 'bifold-card' && (
+          <div id="bifold-card-container" class="relative mx-auto unboxing-perspective-1200" style="width: 290px; height: 220px;">
+            <div class="absolute inset-0 rounded-3xl border border-white/15 shadow-2xl flex overflow-hidden" style={`background: linear-gradient(90deg, #181522, #201c2e);`}>
+              <div class="w-1/2 h-full p-3 flex flex-col items-center justify-center text-center">
+                <span class="text-[9px] text-[#f5c563] font-serif">Selamat!</span>
+                <p class="text-xs font-bold text-white truncate max-w-24 mt-1">{recipientName || 'Sahabat'}</p>
+              </div>
+              <div id="bifold-front-cover" class="absolute inset-y-0 left-0 w-1/2 border-r border-[#f5c563]/40 origin-left z-10 flex flex-col items-center justify-center p-3 transition-transform duration-800 shadow-2xl" style={`background: linear-gradient(135deg, #2a243c, #1c182c);`}>
+                <div id="bifold-medallion" class="thematic-medallion thematic-medallion-pulse relative flex h-18 w-18 items-center justify-center rounded-full border border-[#f5c563]/80 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-xl">
+                  <span class="text-3xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">{meta?.emoji || '📖'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <!-- 11. Festive Envelope (Greetings) -->
+        {currentUnboxStyle === 'festive-envelope' && (
+          <div id="festive-envelope-container" class="relative mx-auto unboxing-perspective-1000" style="width: 290px; height: 210px;">
+            <div class="absolute inset-0 rounded-3xl border border-[#f5c563]/40 shadow-2xl p-4 flex flex-col justify-between overflow-visible" style={`background: linear-gradient(135deg, #1b2820, #111914);`}>
+              <div id="festive-envelope-flap" class="absolute top-0 inset-x-0 h-28 border-b border-[#f5c563]/50 rounded-t-3xl origin-top z-10 transition-transform duration-800 flex items-end justify-center pb-1" style={`background: linear-gradient(180deg, #24352b, #16211b); clip-path: polygon(0 0, 100% 0, 50% 100%);`}>
+                <div id="festive-envelope-seal" class="thematic-medallion thematic-medallion-pulse relative translate-y-10 z-20 flex h-18 w-18 items-center justify-center rounded-full border border-[#f5c563]/80 bg-linear-to-br from-[#f5c563]/30 to-[#1b1728] shadow-2xl ring-2 ring-[#f5c563]/30">
+                  <span class="text-3xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">{meta?.emoji || '✨'}</span>
+                </div>
+              </div>
+              <div class="pt-12 text-center">
+                <p class="text-[10px] text-emerald-300 font-serif">Selamat Merayakan</p>
+                <p class="text-sm font-bold text-white truncate mt-0.5">{recipientName || 'Keluarga Tercinta'}</p>
+              </div>
+              <div class="text-[10px] text-[#f5c563] italic text-right">{typedCard.sender_name ? `Dari: ${typedCard.sender_name}` : '✨ Berkah & Damai'}</div>
+            </div>
+          </div>
+        )}
+
+        <button
+          type="button"
+          id="tap-to-open-btn"
+          class="mt-8 group inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-semibold text-[#0f0d15] bg-linear-to-r from-[#f5c563] via-[#ffd885] to-[#f5c563] shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer border border-[#f5c563]/60 shadow-[#f5c563]/20"
+        >
+          <span>{typedCard.category === 'invitation' ? 'Buka Undangan' : 'Buka Kartu Ucapan'}</span>
+          <span class="text-sm transition-transform group-hover:translate-x-0.5">✨</span>
+        </button>
       </div>
     </div>
 
@@ -1273,25 +1573,30 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         {/* 1. Birthday: Milestone Gold Medal + Interactive Cake & Candle */}
         {typedCard.category === 'birthday' && (
           <div class="my-6 text-center" data-reveal="fade-up">
-            {theme.ageMilestone && (
-              <div class="mb-4 flex justify-center" data-reveal="zoom-in" data-reveal-delay="200">
-                <div class="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-linear-to-r from-amber-500/20 via-yellow-400/25 to-amber-500/20 border border-amber-400/50 text-amber-200 shadow-[0_0_20px_rgba(245,197,99,0.35)] backdrop-blur-md">
-                  <div class="relative flex items-center justify-center w-7 h-7 rounded-full bg-linear-to-br from-yellow-300 via-amber-400 to-amber-600 text-amber-950 font-black text-xs shadow-md border border-white/40 shrink-0">
-                    <span>{theme.ageMilestone}</span>
+            {hasBirthdayAge && (
+              <div class="mb-5 flex flex-col items-center gap-2" data-reveal="zoom-in" data-reveal-delay="200">
+                {/* Top subtitle pill */}
+                <span class="text-[10px] tracking-[0.2em] text-[#f5c563]/80 uppercase font-medium">SPECIAL MILESTONE ✦</span>
+                {/* Main badge row */}
+                <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-linear-to-r from-amber-500/20 via-yellow-400/25 to-amber-500/20 border border-amber-400/50 text-amber-200 shadow-[0_0_22px_rgba(245,197,99,0.35)] backdrop-blur-md">
+                  {/* Clean 3D gold medal coin */}
+                  <div class="h-10 w-10 min-w-10 rounded-full bg-linear-to-br from-[#f5c563] via-[#d4af37] to-[#996515] shadow-[inset_0_1px_2px_rgba(255,255,255,0.4),0_2px_8px_rgba(0,0,0,0.4)] flex items-center justify-center shrink-0">
+                    <span class="font-black text-sm text-[#181522] leading-none">{birthdayAge}</span>
                   </div>
-                  <span class="text-xs font-bold uppercase tracking-wider text-amber-200 drop-shadow-sm">
-                    Special Milestone · {theme.ageMilestone}th Celebration
+                  {/* Bottom title */}
+                  <span class="text-sm sm:text-base font-semibold text-white tracking-wide">
+                    Perayaan Ulang Tahun Ke-{birthdayAge}
                   </span>
                 </div>
               </div>
             )}
 
             <!-- Interactive Cake & Candle -->
-            <div class="birthday-cake-container mx-auto text-center select-none cursor-pointer group inline-block" id="birthday-cake-trigger">
+            <div class="birthday-cake-container mx-auto text-center select-none cursor-pointer group inline-block" id="birthday-cake-trigger" role="button" tabindex="0">
               <div class="relative inline-block">
                 <!-- Candle & Flame -->
                 <div class="relative mx-auto w-4 flex flex-col items-center">
-                  <div class="candle-flame-wrapper relative h-7 w-7 flex items-center justify-center">
+                  <div class="candle-flame-wrapper relative h-7 w-7 flex items-center justify-center cursor-pointer">
                     <span class="candle-flame text-2xl transition-all duration-300 filter drop-shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse">🔥</span>
                     <span class="candle-smoke text-base hidden transition-all duration-700 opacity-0 transform -translate-y-3">💨</span>
                   </div>
@@ -1454,7 +1759,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                     rel="noopener noreferrer"
                     class="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-[#0f0d15] bg-[#f5c563] hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                   >
-                    <span>🗓️</span> <span>Simpan ke Google Calendar</span>
+                    <span>🗓️</span> <span>Save to Google Calendar</span>
                   </a>
                 )}
                 {theme.invitationVenue && (
@@ -1606,32 +1911,74 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           <section class="mt-10 max-w-full overflow-hidden" data-reveal="fade-up">
             {typedCard.category === 'birthday' ? (
               <div>
-                <h2 class="mb-4 text-center text-xs font-semibold uppercase tracking-[0.25em] text-pink-300">
+                <h2 class="mb-5 text-center text-xs font-semibold uppercase tracking-[0.25em] text-pink-300">
                   📸 Polaroid Memories
                 </h2>
-                <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-6 py-3">
+                {/* Interactive Polaroid Stack Deck */}
+                <div
+                  id="polaroid-stack"
+                  class="relative mx-auto w-full max-w-75 select-none"
+                  style="height: 370px; perspective: 1000px;"
+                >
                   {typedCard.media_urls.map((url, i) => {
-                    const rots = ['-rotate-3', 'rotate-2', '-rotate-2', 'rotate-3'];
+                    const captions = ['Momen Spesial ✨', 'Kenangan Indah 💕', 'Ingatan Manis 🎂', 'Cerita Kita 🌟'];
+                    const rots = [-3, 4, -2, 2];
+                    const translateZs = [30, 20, 10, 0];
                     const rot = rots[i % 4];
+                    const tz = translateZs[i % 4];
                     return (
                       <div
-                        class={`group relative bg-white p-2.5 pb-7 rounded-sm shadow-xl transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 hover:shadow-2xl cursor-pointer ${rot} w-36 sm:w-44 gallery-item`}
+                        class="polaroid-card absolute inset-x-0 top-0 mx-auto cursor-pointer gallery-item"
+                        data-index={i}
                         data-gallery-src={resolveMediaUrl(url)}
+                        style={`
+                          width: 260px;
+                          transform: rotate(${rot}deg) translateZ(${tz}px);
+                          z-index: ${typedCard.media_urls.length - i};
+                          transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease, z-index 0s;
+                        `}
                       >
-                        <div class="aspect-square w-full overflow-hidden rounded-xs bg-slate-100">
-                          <img
-                            src={resolveMediaUrl(url)}
-                            alt={`Moment ${i + 1}`}
-                            loading="lazy"
-                            class="h-full w-full object-cover"
-                          />
+                        <div class="bg-[#fdfbf7] p-3 pb-9 rounded-sm shadow-2xl border border-black/10">
+                          <div class="aspect-square w-full overflow-hidden rounded-xs bg-slate-100">
+                            <img
+                              src={resolveMediaUrl(url)}
+                              alt={`Moment ${i + 1}`}
+                              loading={i === 0 ? 'eager' : 'lazy'}
+                              class="h-full w-full object-cover"
+                            />
+                          </div>
+                          <div class="mt-2.5 text-center text-xs text-neutral-700 font-serif italic select-none">
+                            {captions[i % 4]}
+                          </div>
                         </div>
-                        <div class="mt-2 text-center text-[10px] sm:text-xs text-slate-600 font-medium italic select-none">
-                          Memories #{i + 1} ✨
-                        </div>
+                        {i === 0 && (
+                          <button
+                            type="button"
+                            class="polaroid-lightbox-btn absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center text-xs shadow-md transition-opacity opacity-0 group-hover:opacity-100 z-10"
+                            aria-label="Open fullscreen"
+                          >
+                            🔍
+                          </button>
+                        )}
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Stack controls */}
+                <div class="mt-4 text-center space-y-2">
+                  <p class="text-[11px] text-surface-400">
+                    Tap foto untuk membalik
+                    <span id="polaroid-counter" class="ml-1 font-semibold text-pink-300">1/{typedCard.media_urls.length}</span>
+                  </p>
+                  <div id="polaroid-dots" class="flex items-center justify-center gap-1.5">
+                    {typedCard.media_urls.map((_, i) => (
+                      <span
+                        class={`polaroid-dot inline-block rounded-full transition-all duration-300 ${i === 0 ? 'w-3 h-2 bg-pink-400' : 'w-2 h-2 bg-white/25'}`}
+                        data-dot={i}
+                      ></span>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : typedCard.category === 'anniversary' ? (
@@ -1708,7 +2055,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         <!-- Wish Wall / Guestbook -->
         <section class="mt-12" data-reveal="fade-up">
           <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
-            💬 Wish Wall
+            💬 Untaian Doa & Pesan Kasih
           </h2>
 
           <!-- Submit Wish Form -->
@@ -1735,14 +2082,14 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
               <input
                 type="text"
                 id="wish-sender"
-                placeholder="Your name"
+                placeholder="Nama Anda"
                 required
                 class="form-text mb-3 w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm focus-ring placeholder:text-slate-300 placeholder:opacity-80 focus:border-(--primary) focus:ring-1 focus:ring-(--primary)"
                 style={`border-color: ${theme.primaryColor}20;`}
               />
               <textarea
                 id="wish-message"
-                placeholder="Write your congratulations..."
+                placeholder="Tuliskan ucapan dan doa terbaikmu..."
                 required
                 rows="3"
                 class="form-text mb-3 w-full resize-none rounded-xl border bg-white/5 px-4 py-3 text-sm focus-ring placeholder:text-slate-300 placeholder:opacity-80 focus:border-(--primary) focus:ring-1 focus:ring-(--primary)"
@@ -1754,7 +2101,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
                 class="text-white font-semibold shadow-lg shadow-primary/25 hover:brightness-110 active:scale-95 transition-all duration-200 px-6 py-2.5 rounded-full flex items-center justify-center gap-2 cursor-pointer border-0"
                 style={`background: linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor});`}
               >
-                <span>Send Wishes</span>
+                <span>Kirim Ucapan</span>
                 <span>✨</span>
               </button>
             </div>
@@ -1775,7 +2122,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
             ))}
             {typedWishes.length === 0 && (
               <p class="text-slate-200 text-sm font-medium tracking-wide text-center py-4 drop-shadow-xs">
-                Be the first to send your wishes! 🎉
+                Jadilah yang pertama mengirimkan ucapan dan doa! 🎉
               </p>
             )}
           </div>
@@ -1828,7 +2175,23 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 </BaseLayout>
 
 <script>
+  import confetti from 'canvas-confetti';
   import { startSynth, stopSynth } from '../../lib/synth-audio';
+
+  function triggerBirthdayCelebration(originX = 0.5, originY = 0.6) {
+    try {
+      confetti({
+        particleCount: 90,
+        spread: 75,
+        origin: { x: originX, y: originY },
+        colors: ['#f5c563', '#e07a93', '#b6e3a8', '#ffffff', '#ffd166'],
+        disableForReducedMotion: true,
+        zIndex: 9999,
+      });
+    } catch {
+      // Confetti fallback
+    }
+  }
 
   // ═══════════════════════════════════════════════════════
   // Recipient Route — Interactions
@@ -2066,40 +2429,308 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     }
   });
 
-  // Standard Unboxing Animation (non-wedding)
+  // ═══════════════════════════════════════════════════════
+  // Birthday Polaroid Stack Deck – Tap-to-Shuffle Engine
+  // ═══════════════════════════════════════════════════════
+  (function initPolaroidStack() {
+    const stack = document.getElementById('polaroid-stack');
+    if (!stack) return;
+
+    const cards = Array.from(stack.querySelectorAll<HTMLElement>('.polaroid-card'));
+    if (cards.length === 0) return;
+
+    const counter = document.getElementById('polaroid-counter');
+    const dotsEl = document.getElementById('polaroid-dots');
+    const dots = dotsEl ? Array.from(dotsEl.querySelectorAll<HTMLElement>('.polaroid-dot')) : [];
+
+    const rots = [-3, 4, -2, 2];
+    const tzs = [30, 20, 10, 0];
+
+    let topIndex = 0; // which card is currently on top
+    let isAnimating = false;
+
+    function updateDots(activeIdx: number) {
+      dots.forEach((d, i) => {
+        if (i === activeIdx) {
+          d.classList.remove('w-2', 'h-2', 'bg-white/25');
+          d.classList.add('w-3', 'h-2', 'bg-pink-400');
+        } else {
+          d.classList.remove('w-3', 'bg-pink-400');
+          d.classList.add('w-2', 'h-2', 'bg-white/25');
+        }
+      });
+      if (counter) counter.textContent = `${activeIdx + 1}/${cards.length}`;
+    }
+
+    function layoutCards() {
+      cards.forEach((card, i) => {
+        const posInStack = ((i - topIndex) + cards.length) % cards.length;
+        const rot = rots[posInStack % 4];
+        const tz = tzs[posInStack % 4];
+        card.style.transform = `rotate(${rot}deg) translateZ(${tz}px)`;
+        card.style.zIndex = String(cards.length - posInStack);
+        card.style.opacity = '1';
+      });
+    }
+
+    function shuffleTop(card: HTMLElement) {
+      if (isAnimating) return;
+      isAnimating = true;
+
+      // Fling the top card off to the right
+      card.style.transition = 'transform 0.42s cubic-bezier(0.55, 0, 1, 0.45), opacity 0.35s ease';
+      card.style.transform = 'translateX(130%) rotate(18deg)';
+      card.style.opacity = '0';
+
+      setTimeout(() => {
+        // Move top index forward
+        topIndex = (topIndex + 1) % cards.length;
+        updateDots(topIndex);
+
+        // Instantly reset the flung card to bottom-of-stack position
+        card.style.transition = 'none';
+        const bottomRot = rots[(cards.length - 1) % 4];
+        const bottomTz = tzs[(cards.length - 1) % 4];
+        card.style.transform = `rotate(${bottomRot}deg) translateZ(${bottomTz}px) translateX(-30px)`;
+        card.style.opacity = '0.6';
+        card.style.zIndex = '1';
+
+        // Force reflow then animate all cards into new positions
+        void (card as HTMLElement).offsetWidth;
+        requestAnimationFrame(() => {
+          card.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease';
+          layoutCards();
+          isAnimating = false;
+        });
+      }, 380);
+    }
+
+    // Attach listener to top card (each card at its moment of being on top)
+    stack.addEventListener('click', (e) => {
+      const target = (e.target as HTMLElement).closest('.polaroid-card') as HTMLElement | null;
+      if (!target) return;
+
+      // Lightbox trigger (🔍 button)
+      const lightboxBtn = target.querySelector('.polaroid-lightbox-btn');
+      if (lightboxBtn && (e.target as HTMLElement).closest('.polaroid-lightbox-btn')) {
+        const src = target.dataset.gallerySrc;
+        if (src) {
+          const lightbox = document.getElementById('gallery-lightbox');
+          const img = lightbox?.querySelector<HTMLImageElement>('img');
+          if (img && lightbox) {
+            img.src = src;
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            requestAnimationFrame(() => { lightbox.style.opacity = '1'; });
+          }
+        }
+        return;
+      }
+
+      // Only shuffle the topmost card
+      const topCard = cards.reduce((top, c) => {
+        return parseInt(c.style.zIndex || '0') > parseInt(top.style.zIndex || '0') ? c : top;
+      }, cards[0]);
+
+      if (target === topCard) {
+        shuffleTop(topCard);
+      }
+    });
+
+    // Initial layout
+    layoutCards();
+    updateDots(topIndex);
+  })();
+
+  // Standard Unboxing Animation (Thematic Category Engine)
+
+  let isUnboxingActive = false;
   function triggerUnbox() {
     if (!overlay || !content) return;
+    if (isUnboxingActive) return;
     if (hasPasscode && passcodeGate && passcodeGate.style.display !== 'none') return;
+    isUnboxingActive = true;
 
-    if (unboxStyle === 'envelope') {
-      const flap = document.getElementById('envelope-flap');
-      if (flap) {
-        flap.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        flap.style.transform = 'perspective(800px) rotateX(-180deg)';
-      }
-    } else if (unboxStyle === 'giftbox') {
-      const lid = document.getElementById('gift-lid');
-      if (lid) {
-        lid.style.transition = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        lid.style.transform = 'perspective(600px) rotateX(-110deg) translateY(-60px)';
-        lid.style.opacity = '0';
-      }
-    } else if (unboxStyle === 'ribbon') {
-      const rv = document.getElementById('ribbon-v');
-      const rh = document.getElementById('ribbon-h');
+    // Autoplay-compliant audio start immediately on initial user gesture
+    if (hasAudio) startAudio(true);
+
+    // 1. Luxury Gift Box Pop: ribbons peel, 3D box lid lifts upward with rotation, delayed confetti
+    if (unboxStyle === 'giftbox-pop' || unboxStyle === 'giftbox') {
+      const lid = document.getElementById('giftbox-lid');
+      const rv = document.getElementById('giftbox-ribbon-v');
+      const rh = document.getElementById('giftbox-ribbon-h');
       if (rv) {
-        rv.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        rv.style.transform = 'translateX(-50%) scaleY(0) translateY(-40px)';
+        rv.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        rv.style.transform = 'scaleY(0)';
         rv.style.opacity = '0';
       }
       if (rh) {
-        rh.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s';
-        rh.style.transform = 'translateY(-50%) scaleX(0)';
+        rh.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        rh.style.transform = 'scaleX(0)';
+        rh.style.opacity = '0';
+      }
+      if (lid) {
+        lid.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.7s ease';
+        lid.style.transform = 'translateY(-80px) rotate(-4deg)';
+        lid.style.opacity = '0';
+      }
+      setTimeout(() => {
+        triggerBirthdayCelebration(0.5, 0.45);
+      }, 250);
+    }
+
+    // 2. Satin Ribbon Untie: center clasp twists & unbinds, ribbon bands contract
+    else if (unboxStyle === 'ribbon-untie' || unboxStyle === 'ribbon') {
+      const medallion = document.getElementById('ribbon-medallion');
+      const rv = document.getElementById('ribbon-band-v');
+      const rh = document.getElementById('ribbon-band-h');
+      if (medallion) {
+        medallion.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        medallion.style.transform = 'scale(1.15) rotate(15deg)';
+        medallion.style.opacity = '0';
+      }
+      if (rv) {
+        rv.style.transition = 'transform 0.5s ease 0.05s, opacity 0.5s ease';
+        rv.style.transform = 'scaleY(0)';
+        rv.style.opacity = '0';
+      }
+      if (rh) {
+        rh.style.transition = 'transform 0.5s ease 0.15s, opacity 0.5s ease';
+        rh.style.transform = 'scaleX(0)';
         rh.style.opacity = '0';
       }
     }
 
-    // Fade out overlay and show card
+    // 3. Wax Seal Love Letter: seal breaks with golden radial flash, flap flips upward in 3D
+    else if (unboxStyle === 'wax-seal-letter') {
+      const stamp = document.getElementById('wax-seal-stamp');
+      const flap = document.getElementById('envelope-flap');
+      const letter = document.getElementById('inner-letter-preview');
+      if (stamp) {
+        stamp.classList.add('radial-gold-flash');
+        stamp.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+        stamp.style.transform = 'scale(1.35) rotate(20deg)';
+        stamp.style.opacity = '0';
+      }
+      if (flap) {
+        flap.style.transition = 'transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        flap.style.transform = 'perspective(1000px) rotateX(-180deg)';
+      }
+      if (letter) {
+        letter.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s';
+        letter.style.transform = 'translateY(-35px)';
+      }
+    }
+
+    // 4. Romantic Folded Note: top fold opens in 3D perspective
+    else if (unboxStyle === 'folded-note') {
+      const seal = document.getElementById('folded-note-seal');
+      const topFlap = document.getElementById('folded-top-flap');
+      if (seal) {
+        seal.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        seal.style.transform = 'scale(1.2) rotate(12deg)';
+        seal.style.opacity = '0';
+      }
+      if (topFlap) {
+        topFlap.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        topFlap.style.transform = 'perspective(900px) rotateX(180deg)';
+      }
+    }
+
+    // 5. Royal Diploma Scroll: golden ribbon ring slides off, parchment unrolls
+    else if (unboxStyle === 'diploma-scroll') {
+      const ring = document.getElementById('diploma-ribbon-ring');
+      const body = document.getElementById('diploma-scroll-body');
+      if (ring) {
+        ring.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease';
+        ring.style.transform = 'translateX(200px) rotate(22deg)';
+        ring.style.opacity = '0';
+      }
+      if (body) {
+        body.style.transition = 'transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, opacity 0.7s ease';
+        body.style.transform = 'scale(1.15)';
+        body.style.opacity = '0';
+      }
+    }
+
+    // 6. Honor Folder Reveal: hinged diploma folder cover swings open to the left in 3D
+    else if (unboxStyle === 'folder-reveal') {
+      const flap = document.getElementById('folder-cover-flap');
+      if (flap) {
+        flap.style.transition = 'transform 0.9s cubic-bezier(0.16, 1, 0.3, 1)';
+        flap.style.transform = 'perspective(1200px) rotateY(-130deg)';
+      }
+    }
+
+    // 7. VIP Pass Sleeve: gold-trimmed VIP ticket slides smoothly upward out of velvet pocket
+    else if (unboxStyle === 'vip-sleeve') {
+      const ticket = document.getElementById('vip-ticket-card');
+      const pocket = document.getElementById('vip-pocket-sleeve');
+      if (ticket) {
+        ticket.style.transition = 'transform 0.85s cubic-bezier(0.16, 1, 0.3, 1)';
+        ticket.style.transform = 'translateY(-120px)';
+      }
+      if (pocket) {
+        pocket.style.transition = 'opacity 0.6s ease 0.25s';
+        pocket.style.opacity = '0.35';
+      }
+    }
+
+    // 8. Black & Gold Envelope: flap flips upward in 3D perspective
+    else if (unboxStyle === 'gold-envelope' || unboxStyle === 'envelope') {
+      const seal = document.getElementById('gold-envelope-seal');
+      const flap = document.getElementById('gold-envelope-flap') || document.getElementById('envelope-flap');
+      if (seal) {
+        seal.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        seal.style.transform = 'scale(1.2) rotate(15deg)';
+        seal.style.opacity = '0';
+      }
+      if (flap) {
+        flap.style.transition = 'transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        flap.style.transform = 'perspective(1000px) rotateX(-180deg)';
+      }
+    }
+
+    // 9. Velvet Keepsake Box: upper hinged lid opens in 3D with specular jewel shine
+    else if (unboxStyle === 'jewelry-box') {
+      const lid = document.getElementById('jewelry-box-lid');
+      const shine = document.getElementById('jewelry-shine-sweep');
+      if (lid) {
+        lid.style.transition = 'transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease';
+        lid.style.transform = 'perspective(900px) rotateX(75deg)';
+        lid.style.opacity = '0.15';
+      }
+      if (shine) {
+        shine.style.opacity = '1';
+        shine.classList.add('jewel-shine-sweeper');
+      }
+    }
+
+    // 10. 3D Bifold Card Open: front cover card swings open to the left in 3D
+    else if (unboxStyle === 'bifold-card') {
+      const front = document.getElementById('bifold-front-cover');
+      if (front) {
+        front.style.transition = 'transform 0.9s cubic-bezier(0.16, 1, 0.3, 1)';
+        front.style.transform = 'perspective(1200px) rotateY(-120deg)';
+      }
+    }
+
+    // 11. Festive Envelope: festive flap flips upward in 3D
+    else if (unboxStyle === 'festive-envelope') {
+      const seal = document.getElementById('festive-envelope-seal');
+      const flap = document.getElementById('festive-envelope-flap');
+      if (seal) {
+        seal.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        seal.style.transform = 'scale(1.2) rotate(15deg)';
+        seal.style.opacity = '0';
+      }
+      if (flap) {
+        flap.style.transition = 'transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        flap.style.transform = 'perspective(1000px) rotateX(-180deg)';
+      }
+    }
+
+    // Fade out overlay and reveal card content
     setTimeout(() => {
       overlay.style.transition = 'opacity 0.5s ease';
       overlay.style.opacity = '0';
@@ -2111,18 +2742,26 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         // Trigger confetti
         triggerConfetti();
 
-        // Start audio with smooth fade-in (autoplay-compliant: user has interacted)
-        if (hasAudio) startAudio(true);
+        // Fade in ambient canvas smoothly
+        const ambientCanvas = document.getElementById('ambient-canvas');
+        if (ambientCanvas) {
+          ambientCanvas.style.transition = 'opacity 1s ease-in';
+          ambientCanvas.style.opacity = '1';
+        }
 
         // Observe scroll-reveal elements
         setTimeout(() => {
           observeRevealElements();
         }, 100);
       }, 500);
-    }, 900);
+    }, 800);
   }
 
   overlay?.addEventListener('click', triggerUnbox);
+  document.getElementById('tap-to-open-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    triggerUnbox();
+  });
 
   // ═══════════════════════════════════════════════════════
   // Passcode Verification Gate
@@ -2337,31 +2976,66 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   const cakeTrigger = document.getElementById('birthday-cake-trigger');
   if (cakeTrigger) {
     let isExtinguished = false;
-    cakeTrigger.addEventListener('click', () => {
+    let relightCooldownTimer: number | null = null;
+
+    const relightCandle = () => {
+      if (relightCooldownTimer) {
+        clearTimeout(relightCooldownTimer);
+        relightCooldownTimer = null;
+      }
+      isExtinguished = false;
+      const flame = cakeTrigger.querySelector<HTMLElement>('.candle-flame');
+      const smoke = cakeTrigger.querySelector<HTMLElement>('.candle-smoke');
+      const hint = cakeTrigger.querySelector<HTMLElement>('.candle-hint');
+      const banner = cakeTrigger.querySelector<HTMLElement>('.candle-wish-banner');
+
+      if (flame) flame.classList.remove('hidden');
+      if (smoke) {
+        smoke.classList.add('hidden');
+        smoke.style.opacity = '0';
+        smoke.style.transform = '';
+      }
+      if (hint) hint.classList.remove('hidden');
+      if (banner) banner.classList.add('hidden');
+    };
+
+    cakeTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
       const flame = cakeTrigger.querySelector<HTMLElement>('.candle-flame');
       const smoke = cakeTrigger.querySelector<HTMLElement>('.candle-smoke');
       const hint = cakeTrigger.querySelector<HTMLElement>('.candle-hint');
       const banner = cakeTrigger.querySelector<HTMLElement>('.candle-wish-banner');
 
       if (!isExtinguished) {
-        // Extinguish flame with smoke puff and celebratory banner
+        // Extinguish flame immediately
         isExtinguished = true;
         if (flame) flame.classList.add('hidden');
         if (smoke) {
           smoke.classList.remove('hidden');
           smoke.style.opacity = '1';
-          setTimeout(() => { smoke.style.opacity = '0'; }, 1000);
+          smoke.style.transform = 'translateY(-14px) scale(1.2)';
+          setTimeout(() => {
+            smoke.style.opacity = '0';
+          }, 1000);
         }
         if (hint) hint.classList.add('hidden');
         if (banner) banner.classList.remove('hidden');
-        triggerConfetti();
+
+        // Burst celebration from candle's screen position
+        const targetEl = flame || cakeTrigger;
+        const rect = targetEl.getBoundingClientRect();
+        const originX = Math.max(0.1, Math.min(0.9, (rect.left + rect.width / 2) / (window.innerWidth || 1)));
+        const originY = Math.max(0.1, Math.min(0.9, (rect.top + rect.height / 2) / (window.innerHeight || 1)));
+        triggerBirthdayCelebration(originX, originY);
+
+        // Allow re-lighting after 3-second cooldown automatically
+        if (relightCooldownTimer) clearTimeout(relightCooldownTimer);
+        relightCooldownTimer = window.setTimeout(() => {
+          relightCandle();
+        }, 3000);
       } else {
-        // Relight candle on next tap
-        isExtinguished = false;
-        if (flame) flame.classList.remove('hidden');
-        if (smoke) smoke.classList.add('hidden');
-        if (hint) hint.classList.remove('hidden');
-        if (banner) banner.classList.add('hidden');
+        // Allow re-lighting upon clicking again
+        relightCandle();
       }
     });
   }
@@ -2493,35 +3167,35 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   // Confetti
   async function triggerConfetti() {
     try {
-      const confetti = (await import('canvas-confetti')).default;
-      const canvas = document.getElementById('confetti-canvas') as HTMLCanvasElement | null;
-      if (!canvas) return;
-
-      const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
-
       // Initial burst
-      myConfetti({
+      confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
         colors: ['#c084fc', '#f472b6', '#818cf8', '#ffc75f', '#ff6f91'],
+        disableForReducedMotion: true,
+        zIndex: 9999,
       });
 
       // Secondary burst
       setTimeout(() => {
-        myConfetti({
+        confetti({
           particleCount: 50,
           angle: 60,
           spread: 55,
           origin: { x: 0 },
           colors: ['#c084fc', '#f472b6', '#818cf8'],
+          disableForReducedMotion: true,
+          zIndex: 9999,
         });
-        myConfetti({
+        confetti({
           particleCount: 50,
           angle: 120,
           spread: 55,
           origin: { x: 1 },
           colors: ['#ffc75f', '#ff6f91', '#a3de83'],
+          disableForReducedMotion: true,
+          zIndex: 9999,
         });
       }, 300);
     } catch {
@@ -2532,15 +3206,10 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
   // Wedding Opening Seam Confetti Burst (Delayed 300ms, Radiating Outward from Opening Seam)
   async function triggerWeddingSeamConfetti() {
     try {
-      const confetti = (await import('canvas-confetti')).default;
-      const canvas = document.getElementById('confetti-canvas') as HTMLCanvasElement | null;
-      if (!canvas) return;
-
-      const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
       const luxuryPalette = ['#f5c563', '#fae09a', '#d4af37', '#ffd700', '#ffffff', '#e07a93'];
 
       // Left radiation outward directly from opening seam (x: 0.5)
-      myConfetti({
+      confetti({
         particleCount: 55,
         angle: 155,
         spread: 60,
@@ -2550,10 +3219,12 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         gravity: 0.8,
         scalar: 1.1,
         ticks: 240,
+        disableForReducedMotion: true,
+        zIndex: 9999,
       });
 
       // Right radiation outward directly from opening seam (x: 0.5)
-      myConfetti({
+      confetti({
         particleCount: 55,
         angle: 25,
         spread: 60,
@@ -2563,11 +3234,13 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         gravity: 0.8,
         scalar: 1.1,
         ticks: 240,
+        disableForReducedMotion: true,
+        zIndex: 9999,
       });
 
       // Secondary ambient gold shimmer delayed +250ms
       setTimeout(() => {
-        myConfetti({
+        confetti({
           particleCount: 40,
           angle: 90,
           spread: 95,
@@ -2577,6 +3250,8 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
           gravity: 0.7,
           scalar: 0.9,
           ticks: 200,
+          disableForReducedMotion: true,
+          zIndex: 9999,
         });
       }, 250);
     } catch {
@@ -2887,7 +3562,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
 
     const originalBtnHtml = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<span>Sending...</span>';
+    btn.innerHTML = '<span>Mengirimkan...</span>';
 
     const sender_name = sender.value;
     let wish_message = message.value;
@@ -2925,7 +3600,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
         wishEl.innerHTML = `
           <div class="flex items-baseline justify-between gap-2 max-w-full">
             <span class="text-sm font-semibold text-white wrap-anywhere min-w-0">${escapeHtml(sender.value)}</span>
-            <span class="text-xs text-surface-500 shrink-0">Just now</span>
+            <span class="text-xs text-surface-500 shrink-0">Baru saja</span>
           </div>
           <p class="mt-1.5 text-sm text-slate-200 leading-relaxed wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden">${escapeHtml(wish_message)}</p>
         `;
@@ -2935,7 +3610,7 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
       sender.value = '';
       message.value = '';
     } catch {
-      alert('Failed to send wish. Please try again.');
+      alert('Gagal mengirimkan ucapan & doa. Silakan coba beberapa saat lagi.');
     } finally {
       (btn as HTMLButtonElement).disabled = false;
       btn.innerHTML = originalBtnHtml;
@@ -3059,6 +3734,11 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     });
   }
   observeRevealElements();
+
+  window.addEventListener('pagehide', () => {
+    weddingObserver.disconnect();
+    revealObserver.disconnect();
+  });
 </script>
 
 <style define:vars={{ primary: theme.primaryColor, secondary: theme.secondaryColor }}>
@@ -3513,6 +4193,34 @@ const hasPasscode = Boolean(typedCard.category === 'love' && theme.passcode && t
     box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.45),
                 0 0 35px -5px rgba(245, 197, 99, 0.2),
                 inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  /* Hardware-accelerated gentle shimmer border glow for royal wedding cards */
+  @keyframes wedding-shimmer-glow {
+    0%, 100% {
+      box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.45),
+                  0 0 20px -2px rgba(245, 197, 99, 0.18),
+                  inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+      border-color: rgba(245, 197, 99, 0.3);
+    }
+    50% {
+      box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.55),
+                  0 0 38px 2px rgba(245, 197, 99, 0.38),
+                  inset 0 1px 2px 0 rgba(245, 197, 99, 0.25);
+      border-color: rgba(245, 197, 99, 0.6);
+    }
+  }
+
+  .wedding-shimmer-card {
+    will-change: box-shadow, border-color;
+  }
+
+  .wedding-reveal.reveal-card.wedding-shimmer-card.is-revealed {
+    animation: wedding-shimmer-glow 6s ease-in-out infinite;
+  }
+
+  .wedding-reveal.reveal-card.is-revealed .champagne-divider {
+    transform: scaleX(1);
   }
 
   /* 4. 8-Photo Gallery Grid (#galeri) */
