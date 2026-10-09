@@ -87,7 +87,7 @@ const EXTENDED_SWATCHES = [
               <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
               </svg>
-              <span>Back to Dashboard</span>
+              <span>Kembali ke Dashboard</span>
             </a>
           </div>
           <h2 class="text-xl font-bold text-surface-50">Pilih Kategori</h2>
@@ -125,10 +125,10 @@ const EXTENDED_SWATCHES = [
             <!-- Greetings Occasion Selector (Step 2) -->
             <div id="greetings-occasion-panel" class="hidden rounded-2xl border border-amber-500/20 bg-surface-900/60 p-4 space-y-3">
               <div class="flex items-center justify-between">
-                <label class="block text-sm font-semibold text-surface-200">✨ Select Occasion / Perayaan</label>
-                <span class="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-medium">Holiday & Greetings</span>
+                <label class="block text-sm font-semibold text-surface-200">✨ Pilihan Perayaan / Momen</label>
+                <span class="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-medium">Ucapan & Hari Raya</span>
               </div>
-              <p class="text-xs text-surface-400">Choose the occasion to tailor ambient effects and holiday presets:</p>
+              <p class="text-xs text-surface-400">Pilih momen perayaan untuk menyesuaikan efek suasana dan preset ucapan:</p>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5" id="occasion-grid">
                 {[
                   { id: 'idul-fitri', emoji: '🌙', label: 'Idul Fitri', effect: 'lanterns' },
@@ -699,8 +699,8 @@ const EXTENDED_SWATCHES = [
 
             <!-- Corner Ornaments (Indonesian & Luxury Motifs) -->
             <div id="corner-ornaments-container">
-              <label class="mb-2 block text-sm font-medium text-surface-200">Corner Ornaments</label>
-              <p class="mb-3 text-xs text-surface-500">Traditional Indonesian motifs & luxury accents framing all four corners</p>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Ornamen Sudut (Corner Ornaments)</label>
+              <p class="mb-3 text-xs text-surface-500">Motif budaya nusantara & aksen mewah membingkai keempat sudut kartu</p>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="corner-ornaments-grid">
                 {[
                   {
@@ -832,7 +832,7 @@ const EXTENDED_SWATCHES = [
                 <div class="h-2 flex-1 overflow-hidden rounded-full bg-surface-700">
                   <div id="upload-progress" class="h-full rounded-full bg-linear-to-r from-primary to-secondary transition-all duration-300" style="width: 0%"></div>
                 </div>
-                <span id="upload-text" class="text-xs text-surface-400">Processing...</span>
+                <span id="upload-text" class="text-xs text-surface-400">Memproses...</span>
               </div>
             </div>
           </div>
@@ -946,16 +946,16 @@ const EXTENDED_SWATCHES = [
             <!-- Birthday Details (conditionally shown for birthday) -->
             <div id="birthday-fields-panel" class="hidden rounded-2xl border border-pink-500/20 bg-pink-500/5 p-4 space-y-3">
               <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-pink-400">
-                <span>🎂</span> Birthday Milestone
+                <span>🎂</span> Momen Ulang Tahun
               </div>
               <div>
                 <label for="birthday-age" class="mb-1 block text-xs font-medium text-surface-300">
-                  Age / Milestone <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                  Usia / Momen Perayaan <span class="text-xs font-normal text-surface-500">(Opsional)</span>
                 </label>
                 <input
                   type="text"
                   id="birthday-age"
-                  placeholder="e.g. Sweet 17 / 21st / 30 Tahun"
+                  placeholder="Misal: Sweet 17, 25 Tahun"
                   class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"
                 />
                 <p class="mt-1 text-[11px] text-surface-500">Tampilkan usia atau momen spesial yang dirayakan pada kartu</p>
@@ -965,16 +965,16 @@ const EXTENDED_SWATCHES = [
             <!-- Anniversary Details (conditionally shown for anniversary) -->
             <div id="anniversary-fields-panel" class="hidden rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 space-y-3">
               <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-rose-400">
-                <span>💍</span> Anniversary Milestone
+                <span>💍</span> Momen Anniversary
               </div>
               <div>
                 <label for="anniversary-duration" class="mb-1 block text-xs font-medium text-surface-300">
-                  Duration / Milestone <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                  Durasi Kebersamaan <span class="text-xs font-normal text-surface-500">(Opsional)</span>
                 </label>
                 <input
                   type="text"
                   id="anniversary-duration"
-                  placeholder="e.g. 1st Anniversary / 5 Tahun Bersama / Perak (25th)"
+                  placeholder="Misal: 3 Tahun Bersama"
                   class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"
                 />
                 <p class="mt-1 text-[11px] text-surface-500">Durasi atau tahun perayaan perjalanan cinta bersama</p>
@@ -984,28 +984,28 @@ const EXTENDED_SWATCHES = [
             <!-- Graduation Details (conditionally shown for graduation) -->
             <div id="graduation-fields-panel" class="hidden rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 space-y-3">
               <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-400">
-                <span>🎓</span> Graduation Details
+                <span>🎓</span> Detail Wisuda
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label for="graduation-degree" class="mb-1 block text-xs font-medium text-surface-300">
-                    Degree / Major <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                    Gelar & Jurusan <span class="text-xs font-normal text-surface-500">(Opsional)</span>
                   </label>
                   <input
                     type="text"
                     id="graduation-degree"
-                    placeholder="e.g. S.Kom / B.Sc in Computer Science"
+                    placeholder="Misal: S.Kom - Teknik Informatika"
                     class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"
                   />
                 </div>
                 <div>
                   <label for="graduation-school" class="mb-1 block text-xs font-medium text-surface-300">
-                    School / Campus <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                    Nama Kampus / Sekolah <span class="text-xs font-normal text-surface-500">(Opsional)</span>
                   </label>
                   <input
                     type="text"
                     id="graduation-school"
-                    placeholder="e.g. Universitas Indonesia / ITB"
+                    placeholder="Misal: Universitas Indonesia, ITB"
                     class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"
                   />
                 </div>
@@ -1015,40 +1015,40 @@ const EXTENDED_SWATCHES = [
             <!-- Invitation Details (conditionally shown for invitation) -->
             <div id="invitation-fields-panel" class="hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 space-y-3">
               <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
-                <span>✉️</span> Event Invitation Details
+                <span>✉️</span> Detail Undangan Acara
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label for="invitation-event-type" class="mb-1 block text-xs font-medium text-surface-300">
-                    Event Type <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                    Jenis Acara <span class="text-xs font-normal text-surface-500">(Opsional)</span>
                   </label>
                   <input
                     type="text"
                     id="invitation-event-type"
-                    placeholder="e.g. Birthday Party / Housewarming / Syukuran"
+                    placeholder="Misal: Jamuan Makan Malam, Syukuran"
                     class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"
                   />
                 </div>
                 <div>
                   <label for="invitation-time" class="mb-1 block text-xs font-medium text-surface-300">
-                    Time / Schedule <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                    Waktu Acara <span class="text-xs font-normal text-surface-500">(Opsional)</span>
                   </label>
                   <input
                     type="text"
                     id="invitation-time"
-                    placeholder="e.g. 18:30 WIB — Selesai"
+                    placeholder="Misal: 18:30 WIB — Selesai"
                     class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"
                   />
                 </div>
               </div>
               <div>
                 <label for="invitation-venue" class="mb-1 block text-xs font-medium text-surface-300">
-                  Venue Location <span class="text-xs font-normal text-surface-500">(Optional)</span>
+                  Nama Tempat / Lokasi <span class="text-xs font-normal text-surface-500">(Opsional)</span>
                 </label>
                 <input
                   type="text"
                   id="invitation-venue"
-                  placeholder="e.g. Plataran Menteng / Jl. Sunset Road No. 88"
+                  placeholder="Misal: Plataran Menteng / Grand Ballroom Hotel Mulia"
                   class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"
                 />
               </div>
@@ -1058,17 +1058,17 @@ const EXTENDED_SWATCHES = [
             <div id="love-presets-panel" class="hidden rounded-2xl border border-pink-500/20 bg-pink-500/5 p-4 space-y-3">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-pink-400">
-                  <span>💌</span> Romantic Templates
+                  <span>💌</span> Template Pesan Romantis
                 </div>
-                <span class="text-[11px] text-surface-400">Select preset or click below</span>
+                <span class="text-[11px] text-surface-400">Pilih template pesan romantis</span>
               </div>
               <div>
-                <label for="love-preset-select" class="sr-only">Romantic Template Preset</label>
+                <label for="love-preset-select" class="sr-only">Pilihan Template Pesan Romantis</label>
                 <select id="love-preset-select" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3 py-2 text-xs text-surface-200 transition-all focus:ring-1 focus:ring-[#f5c563] cursor-pointer">
-                  <option value="">— Choose a romantic message template —</option>
-                  <option value="confession">💖 Confession (Maukah kamu menjadi pasanganku...)</option>
-                  <option value="appreciation">🌹 Deep Appreciation (Terima kasih telah hadir di hidupku...)</option>
-                  <option value="poetic">✨ Sweet Poetic Note (Di antara jutaan bintang...)</option>
+                  <option value="">— Pilih template pesan romantis —</option>
+                  <option value="confession">💖 Pernyataan Cinta (Maukah kamu menjadi pasanganku...)</option>
+                  <option value="appreciation">🌹 Ungkapan Kasih & Syukur (Terima kasih telah hadir di hidupku...)</option>
+                  <option value="poetic">✨ Puisi Romantis Manis (Di antara jutaan bintang...)</option>
                 </select>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -1077,7 +1077,7 @@ const EXTENDED_SWATCHES = [
                   class="romantic-preset-btn text-left p-3 rounded-xl border border-pink-500/20 bg-surface-900/60 hover:border-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer"
                   data-love-preset="confession"
                 >
-                  <div class="text-xs font-semibold text-pink-300">💖 Confession</div>
+                  <div class="text-xs font-semibold text-pink-300">💖 Pernyataan Cinta</div>
                   <div class="text-[11px] text-surface-400 mt-1 line-clamp-2">"Maukah kamu menjadi pasanganku dan melangkah bersama selamanya?..."</div>
                 </button>
                 <button
@@ -1085,7 +1085,7 @@ const EXTENDED_SWATCHES = [
                   class="romantic-preset-btn text-left p-3 rounded-xl border border-pink-500/20 bg-surface-900/60 hover:border-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer"
                   data-love-preset="appreciation"
                 >
-                  <div class="text-xs font-semibold text-pink-300">🌹 Deep Appreciation</div>
+                  <div class="text-xs font-semibold text-pink-300">🌹 Ungkapan Kasih</div>
                   <div class="text-[11px] text-surface-400 mt-1 line-clamp-2">"Terima kasih telah hadir di hidupku. Setiap detik bersamamu adalah hadiah..."</div>
                 </button>
                 <button
@@ -1093,7 +1093,7 @@ const EXTENDED_SWATCHES = [
                   class="romantic-preset-btn text-left p-3 rounded-xl border border-pink-500/20 bg-surface-900/60 hover:border-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer"
                   data-love-preset="poetic"
                 >
-                  <div class="text-xs font-semibold text-pink-300">✨ Sweet Poetic Note</div>
+                  <div class="text-xs font-semibold text-pink-300">✨ Puisi Manis</div>
                   <div class="text-[11px] text-surface-400 mt-1 line-clamp-2">"Di antara jutaan bintang, hatiku akan selalu memilihmu sebagai tempat pulang..."</div>
                 </button>
               </div>
@@ -1104,7 +1104,7 @@ const EXTENDED_SWATCHES = [
               <div class="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-2">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
-                    <span>🌙</span> Greetings Occasion
+                    <span>🌙</span> Pilihan Perayaan / Momen
                   </div>
                   <span class="text-[11px] text-surface-400">Pilih momen perayaan</span>
                 </div>
@@ -1127,9 +1127,9 @@ const EXTENDED_SWATCHES = [
             <div id="greetings-presets-panel" class="hidden rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-3">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
-                  <span>🌙</span> Holiday Message Presets
+                  <span>🌙</span> Pilihan Ucapan Siap Pakai
                 </div>
-                <span class="text-[11px] text-surface-400">Click to fill message</span>
+                <span class="text-[11px] text-surface-400">Klik untuk menyalin ke pesan</span>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="greetings-presets-list">
                 <!-- Populated dynamically based on occasion -->
@@ -1139,15 +1139,15 @@ const EXTENDED_SWATCHES = [
             <!-- Greetings Signature (conditionally shown for greetings) -->
             <div id="greetings-signature-field" class="hidden">
               <label for="greetings-signature" class="mb-1.5 block text-sm font-medium text-surface-200">
-                Family / Sender Signature <span class="text-xs font-normal text-surface-400">(Optional)</span>
+                Nama Keluarga / Pengirim <span class="text-xs font-normal text-surface-400">(Opsional)</span>
               </label>
               <input
                 type="text"
                 id="greetings-signature"
-                placeholder="e.g. Dari Keluarga Besar Bpk. Ahmad / The Hendrawan Family"
+                placeholder="Misal: Dari Keluarga Besar Bpk. Ahmad / Keluarga Hendrawan"
                 class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"
               />
-              <p class="mt-1 text-xs text-surface-500">Rendered with an elegant signature style beneath your holiday greeting</p>
+              <p class="mt-1 text-xs text-surface-500">Ditampilkan dengan gaya tanda tangan elegan di bawah kartu ucapan perayaan</p>
             </div>
 
             <div>
@@ -1163,8 +1163,8 @@ const EXTENDED_SWATCHES = [
                   <div class="flex items-center gap-2.5">
                     <span class="text-xl">💘</span>
                     <div>
-                      <div class="text-sm font-semibold text-surface-100">Interactive Confession</div>
-                      <div class="text-xs text-surface-400">Runaway "No" button & celebratory "Yes" button with confetti</div>
+                      <div class="text-sm font-semibold text-surface-100">Aktifkan Pertanyaan Interaktif</div>
+                      <div class="text-xs text-surface-400">Tombol "Nggak" kabur otomatis & tombol "Mau" rayakan dengan konfeti</div>
                     </div>
                   </div>
                   <label class="relative inline-flex cursor-pointer items-center">
@@ -1173,15 +1173,15 @@ const EXTENDED_SWATCHES = [
                   </label>
                 </div>
                 <div id="love-confession-details" class="hidden pt-3 border-t border-white/5 space-y-2">
-                  <label for="love-confession-prompt" class="block text-xs font-medium text-surface-300">Confession Target Prompt / Question</label>
+                  <label for="love-confession-prompt" class="block text-xs font-medium text-surface-300">Pertanyaan (Default: Mau jadi pacar aku?)</label>
                   <input
                     type="text"
                     id="love-confession-prompt"
-                    placeholder="Maukah kamu jadi pacarku? 💕"
-                    value="Maukah kamu jadi pacarku? 💕"
+                    placeholder="Mau jadi pacar aku? 💕"
+                    value="Mau jadi pacar aku? 💕"
                     class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"
                   />
-                  <p class="text-[11px] text-pink-300/80">✨ When hovered or tapped, the "No" button playfully runs away so they can only answer YES!</p>
+                  <p class="text-[11px] text-pink-300/80">✨ Saat didekati atau disentuh, tombol "Nggak" akan otomatis menghindar sehingga hanya jawaban "Mau" yang dapat dipilih!</p>
                 </div>
               </div>
 
@@ -1190,8 +1190,8 @@ const EXTENDED_SWATCHES = [
                 <div class="flex items-center gap-2.5">
                   <span class="text-xl">🔒</span>
                   <div>
-                    <label for="love-passcode" class="text-sm font-semibold text-surface-100">Secret 4-Digit PIN Lock (Optional)</label>
-                    <p class="text-xs text-surface-400">Lock your love letter. Recipient must enter this 4-digit PIN before unboxing.</p>
+                    <label for="love-passcode" class="text-sm font-semibold text-surface-100">Kunci PIN Rahasia (4 Digit)</label>
+                    <p class="text-xs text-surface-400">Kunci surat cintamu. Penerima harus memasukkan 4 digit PIN ini sebelum membuka kartu.</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3 pt-1">
@@ -1201,16 +1201,16 @@ const EXTENDED_SWATCHES = [
                     maxlength="4"
                     pattern="[0-9]{4}"
                     inputmode="numeric"
-                    placeholder="e.g. 1402"
+                    placeholder="Misal: 1402"
                     class="form-input w-36 rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2.5 text-center text-base tracking-[0.3em] font-mono transition-all focus:ring-1 focus:ring-[#f5c563]"
                   />
-                  <span class="text-xs text-surface-500">Leave empty for no passcode</span>
+                  <span class="text-xs text-surface-500">Kosongkan jika tanpa PIN</span>
                 </div>
               </div>
             </div>
 
             <div id="standard-event-date-field">
-              <label for="event-date" class="mb-1.5 block text-sm font-medium text-surface-200">Event Date</label>
+              <label for="event-date" id="event-date-label" class="mb-1.5 block text-sm font-medium text-surface-200">Tanggal Acara</label>
               <input type="date" id="event-date" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-4 py-2.5 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]" />
             </div>
 
@@ -1218,7 +1218,7 @@ const EXTENDED_SWATCHES = [
             <div id="wedding-fields" class="hidden space-y-6">
               <hr class="border-white/5" />
               <div class="flex items-center gap-2 text-sm font-semibold text-surface-100">
-                <span class="text-lg">💍</span> Wedding Details
+                <span class="text-lg">💍</span> Detail Pernikahan (Wedding Details)
               </div>
 
               <!-- Tajuk Acara / Header Title -->
@@ -1240,22 +1240,22 @@ const EXTENDED_SWATCHES = [
 
               <!-- Opening Greeting / Salam Pembuka -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
-                <div class="text-xs font-semibold uppercase tracking-wider text-violet-400">🙏 Salam Pembuka / Opening Greeting</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-violet-400">🙏 Salam Pembuka</div>
                 <div>
-                  <label for="w-greeting-preset" class="mb-1 block text-xs font-medium text-surface-300">Preset Greeting</label>
+                  <label for="w-greeting-preset" class="mb-1 block text-xs font-medium text-surface-300">Pilihan Salam Pembuka</label>
                   <select id="w-greeting-preset" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563] cursor-pointer">
-                    <option value="">— Select a greeting preset —</option>
+                    <option value="">— Pilih preset salam pembuka —</option>
                     <option value="islam">Islam</option>
                     <option value="kristen">Kristen / Katolik</option>
                     <option value="hindu">Hindu</option>
                     <option value="buddha">Buddha</option>
                     <option value="umum">Umum / Netral</option>
-                    <option value="custom">Custom (Tulis Sendiri)</option>
+                    <option value="custom">Kustom (Tulis Sendiri)</option>
                   </select>
                 </div>
                 <div>
-                  <label for="w-greeting-text" class="mb-1 block text-xs font-medium text-surface-300">Greeting Text</label>
-                  <textarea id="w-greeting-text" rows="3" placeholder="Greeting text will appear here..." class="form-input w-full resize-none rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]"></textarea>
+                  <label for="w-greeting-text" class="mb-1 block text-xs font-medium text-surface-300">Teks Salam Pembuka</label>
+                  <textarea id="w-greeting-text" rows="3" placeholder="Teks salam pembuka akan muncul di sini..." class="form-input w-full resize-none rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]"></textarea>
                 </div>
               </div>
 
@@ -1316,104 +1316,104 @@ const EXTENDED_SWATCHES = [
 
               <!-- Bride -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
-                <div class="text-xs font-semibold uppercase tracking-wider text-[#e07a93]">👰 Bride</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-[#e07a93]">👰 Mempelai Wanita</div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">Full Name <span class="text-confetti-pink">*</span></label>
-                    <input type="text" id="w-bride-name" placeholder="Full name" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Nama Lengkap <span class="text-confetti-pink">*</span></label>
+                    <input type="text" id="w-bride-name" placeholder="Nama lengkap" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                   </div>
                   <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">Nickname</label>
-                    <input type="text" id="w-bride-nick" placeholder="Nickname" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Nama Panggilan</label>
+                    <input type="text" id="w-bride-nick" placeholder="Nama panggilan" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                   </div>
                 </div>
                 <div>
-                  <label class="mb-1 block text-xs font-medium text-surface-300">Parents' Names</label>
-                  <input type="text" id="w-bride-parents" placeholder="e.g. Bapak Suharto & Ibu Sari" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Nama Orang Tua</label>
+                  <input type="text" id="w-bride-parents" placeholder="Misal: Bapak Suharto & Ibu Sari" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                 </div>
               </div>
 
               <!-- Groom -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
-                <div class="text-xs font-semibold uppercase tracking-wider text-blue-400">🤵 Groom</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-blue-400">🤵 Mempelai Pria</div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">Full Name <span class="text-confetti-pink">*</span></label>
-                    <input type="text" id="w-groom-name" placeholder="Full name" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Nama Lengkap <span class="text-confetti-pink">*</span></label>
+                    <input type="text" id="w-groom-name" placeholder="Nama lengkap" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                   </div>
                   <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">Nickname</label>
-                    <input type="text" id="w-groom-nick" placeholder="Nickname" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Nama Panggilan</label>
+                    <input type="text" id="w-groom-nick" placeholder="Nama panggilan" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                   </div>
                 </div>
                 <div>
-                  <label class="mb-1 block text-xs font-medium text-surface-300">Parents' Names</label>
-                  <input type="text" id="w-groom-parents" placeholder="e.g. Bapak Ahmad & Ibu Dewi" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Nama Orang Tua</label>
+                  <input type="text" id="w-groom-parents" placeholder="Misal: Bapak Ahmad & Ibu Dewi" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                 </div>
               </div>
 
               <!-- Akad / Holy Matrimony -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
-                <div class="text-xs font-semibold uppercase tracking-wider text-amber-400">🕌 Akad Nikah / Holy Matrimony</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-amber-400">🕌 Akad Nikah / Pemberkatan</div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div class="w-full min-w-0 block col-span-1 sm:col-span-1">
-                    <label for="w-akad-date" class="mb-1 block text-xs font-medium text-surface-300">Date <span class="text-confetti-pink">*</span></label>
+                    <label for="w-akad-date" class="mb-1 block text-xs font-medium text-surface-300">Tanggal <span class="text-confetti-pink">*</span></label>
                     <input type="date" id="w-akad-date" class="form-input w-full min-w-0 rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                   </div>
                   <div class="col-span-1 sm:col-span-2 flex gap-2 w-full min-w-0">
                     <div class="w-full min-w-0 flex-1 block">
-                      <label for="w-akad-start" class="mb-1 block text-xs font-medium text-surface-300">Start Time</label>
+                      <label for="w-akad-start" class="mb-1 block text-xs font-medium text-surface-300">Waktu Mulai</label>
                       <input type="time" id="w-akad-start" class="form-input w-full min-w-0 rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                     </div>
                     <div class="w-full min-w-0 flex-1 block">
-                      <label for="w-akad-end" class="mb-1 block text-xs font-medium text-surface-300">End Time</label>
+                      <label for="w-akad-end" class="mb-1 block text-xs font-medium text-surface-300">Waktu Selesai</label>
                       <input type="time" id="w-akad-end" class="form-input w-full min-w-0 rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                     </div>
                   </div>
                 </div>
                 <div>
-                  <label for="w-akad-venue" class="mb-1 block text-xs font-medium text-surface-300">Venue Name</label>
+                  <label for="w-akad-venue" class="mb-1 block text-xs font-medium text-surface-300">Nama Tempat / Gedung</label>
                   <input type="text" id="w-akad-venue" placeholder="Masjid Al-Ikhlas" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                 </div>
                 <div>
-                  <label for="w-akad-address" class="mb-1 block text-xs font-medium text-surface-300">Address</label>
+                  <label for="w-akad-address" class="mb-1 block text-xs font-medium text-surface-300">Alamat Lengkap</label>
                   <input type="text" id="w-akad-address" placeholder="Jl. Raya No. 123, Jakarta" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                 </div>
                 <div>
-                  <label for="w-akad-maps" class="mb-1 block text-xs font-medium text-surface-300">Google Maps URL</label>
+                  <label for="w-akad-maps" class="mb-1 block text-xs font-medium text-surface-300">Tautan Google Maps</label>
                   <input type="url" id="w-akad-maps" placeholder="https://maps.google.com/..." class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                 </div>
               </div>
 
               <!-- Resepsi / Reception -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
-                <div class="text-xs font-semibold uppercase tracking-wider text-emerald-400">🎉 Resepsi / Reception</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-emerald-400">🎉 Resepsi Pernikahan</div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div class="w-full min-w-0 block col-span-1 sm:col-span-1">
-                    <label for="w-resepsi-date" class="mb-1 block text-xs font-medium text-surface-300">Date</label>
+                    <label for="w-resepsi-date" class="mb-1 block text-xs font-medium text-surface-300">Tanggal</label>
                     <input type="date" id="w-resepsi-date" class="form-input w-full min-w-0 rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                   </div>
                   <div class="col-span-1 sm:col-span-2 flex gap-2 w-full min-w-0">
                     <div class="w-full min-w-0 flex-1 block">
-                      <label for="w-resepsi-start" class="mb-1 block text-xs font-medium text-surface-300">Start Time</label>
+                      <label for="w-resepsi-start" class="mb-1 block text-xs font-medium text-surface-300">Waktu Mulai</label>
                       <input type="time" id="w-resepsi-start" class="form-input w-full min-w-0 rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                     </div>
                     <div class="w-full min-w-0 flex-1 block">
-                      <label for="w-resepsi-end" class="mb-1 block text-xs font-medium text-surface-300">End Time</label>
+                      <label for="w-resepsi-end" class="mb-1 block text-xs font-medium text-surface-300">Waktu Selesai</label>
                       <input type="time" id="w-resepsi-end" class="form-input w-full min-w-0 rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                     </div>
                   </div>
                 </div>
                 <div>
-                  <label for="w-resepsi-venue" class="mb-1 block text-xs font-medium text-surface-300">Venue Name</label>
+                  <label for="w-resepsi-venue" class="mb-1 block text-xs font-medium text-surface-300">Nama Tempat / Gedung</label>
                   <input type="text" id="w-resepsi-venue" placeholder="Ballroom Grand Hotel" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                 </div>
                 <div>
-                  <label for="w-resepsi-address" class="mb-1 block text-xs font-medium text-surface-300">Address</label>
+                  <label for="w-resepsi-address" class="mb-1 block text-xs font-medium text-surface-300">Alamat Lengkap</label>
                   <input type="text" id="w-resepsi-address" placeholder="Jl. Sudirman No. 456, Jakarta" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                 </div>
                 <div>
-                  <label for="w-resepsi-maps" class="mb-1 block text-xs font-medium text-surface-300">Google Maps URL</label>
+                  <label for="w-resepsi-maps" class="mb-1 block text-xs font-medium text-surface-300">Tautan Google Maps</label>
                   <input type="url" id="w-resepsi-maps" placeholder="https://maps.google.com/..." class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                 </div>
               </div>
@@ -1567,27 +1567,27 @@ const EXTENDED_SWATCHES = [
 
               <!-- Digital Envelope -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
-                <div class="text-xs font-semibold uppercase tracking-wider text-yellow-400">💰 Digital Envelope (Amplop Digital)</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-yellow-400">💰 Amplop Digital (Digital Envelope)</div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="mb-1 block text-xs font-medium text-surface-300">Bank / E-Wallet</label>
                     <input type="text" id="w-bank-name" placeholder="BCA / GoPay / Dana" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                   </div>
                   <div>
-                    <label class="mb-1 block text-xs font-medium text-surface-300">Account Holder</label>
-                    <input type="text" id="w-bank-holder" placeholder="Account holder name" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
+                    <label class="mb-1 block text-xs font-medium text-surface-300">Nama Pemilik Rekening</label>
+                    <input type="text" id="w-bank-holder" placeholder="Nama pemilik rekening" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                   </div>
                 </div>
                 <div>
-                  <label class="mb-1 block text-xs font-medium text-surface-300">Account Number</label>
-                  <input type="text" id="w-bank-number" placeholder="1234567890" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
+                  <label class="mb-1 block text-xs font-medium text-surface-300">Nomor Rekening</label>
+                  <input type="text" id="w-bank-number" placeholder="Contoh: 1234567890" class="form-input w-full rounded-xl border border-white/10 bg-surface-800/50 px-3.5 py-2.5 text-sm focus:ring-1 focus:ring-[#f5c563]" />
                 </div>
               </div>
 
               <!-- Love Story / Quote -->
               <div>
-                <label for="w-love-story" class="mb-1.5 block text-sm font-medium text-surface-200">Love Story / Quote (Optional)</label>
-                <textarea id="w-love-story" rows="3" placeholder="Share your love story or a meaningful quote..." class="form-input w-full resize-none rounded-xl border border-white/10 bg-surface-800/50 px-4 py-3 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"></textarea>
+                <label for="w-love-story" class="mb-1.5 block text-sm font-medium text-surface-200">Kisah Cinta / Kata Mutiara (Opsional)</label>
+                <textarea id="w-love-story" rows="3" placeholder="Bagikan kisah cinta atau kata mutiara yang berkesan..." class="form-input w-full resize-none rounded-xl border border-white/10 bg-surface-800/50 px-4 py-3 text-sm transition-all focus:ring-1 focus:ring-[#f5c563]"></textarea>
               </div>
 
               <!-- Love Story Timeline -->
@@ -1654,7 +1654,7 @@ const EXTENDED_SWATCHES = [
             <!-- Audio Selector -->
             <div>
               <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-medium text-surface-200">Background Music</label>
+                <label class="block text-sm font-medium text-surface-200">Musik Latar (Background Music)</label>
                 <span class="text-xs text-surface-400">Pilih musik pengiring kartu</span>
               </div>
 
@@ -1707,7 +1707,7 @@ const EXTENDED_SWATCHES = [
                         <div class="flex-1 min-w-0">
                           <div class="flex items-center gap-2">
                             <span class="text-sm font-medium text-surface-200">{track.name}</span>
-                            <span class="audio-recommended-badge hidden text-[10px] font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5">★ Recommended</span>
+                            <span class="audio-recommended-badge hidden text-[10px] font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5">★ Rekomendasi</span>
                           </div>
                           <div class="text-xs text-surface-500">{track.mood} · {track.duration}s</div>
                         </div>
@@ -1746,7 +1746,7 @@ const EXTENDED_SWATCHES = [
                     id="custom-audio-browse-btn"
                     class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-surface-800 px-3 py-1.5 text-xs font-medium text-surface-200 hover:bg-surface-700 transition-all cursor-pointer"
                   >
-                    <span>Browse File</span>
+                    <span>Pilih Berkas</span>
                   </button>
                 </div>
 
@@ -2456,7 +2456,7 @@ const EXTENDED_SWATCHES = [
     // Validation
     if (step > currentStep) {
       if (currentStep === 1 && !state.category) {
-        (window as any).showToast({ message: 'Please select a category', type: 'warning' });
+        (window as any).showToast({ message: 'Silakan pilih kategori acara terlebih dahulu', type: 'warning' });
         return;
       }
       if (currentStep === 4) {
@@ -2464,28 +2464,28 @@ const EXTENDED_SWATCHES = [
           syncWeddingRecipientName();
           const wd = state.themeConfig.weddingData;
           if (!wd?.bride.fullName) {
-            (window as any).showToast({ message: 'Bride\'s full name is required', type: 'warning' });
+            (window as any).showToast({ message: 'Nama lengkap mempelai wanita wajib diisi', type: 'warning' });
             return;
           }
           if (!wd?.groom.fullName) {
-            (window as any).showToast({ message: 'Groom\'s full name is required', type: 'warning' });
+            (window as any).showToast({ message: 'Nama lengkap mempelai pria wajib diisi', type: 'warning' });
             return;
           }
           if (!wd?.akadEvent.date) {
-            (window as any).showToast({ message: 'Akad/ceremony date is required', type: 'warning' });
+            (window as any).showToast({ message: 'Tanggal akad/pemberkatan wajib diisi', type: 'warning' });
             return;
           }
           if (!state.message) {
-            (window as any).showToast({ message: 'Please write an invitation message', type: 'warning' });
+            (window as any).showToast({ message: 'Silakan tuliskan pesan undangan', type: 'warning' });
             return;
           }
         } else {
           if (!state.recipientName) {
-            (window as any).showToast({ message: 'Recipient name is required', type: 'warning' });
+            (window as any).showToast({ message: 'Nama penerima wajib diisi', type: 'warning' });
             return;
           }
           if (!state.message) {
-            (window as any).showToast({ message: 'Please write a message', type: 'warning' });
+            (window as any).showToast({ message: 'Silakan tuliskan pesan ucapan', type: 'warning' });
             return;
           }
         }
@@ -2760,6 +2760,11 @@ const EXTENDED_SWATCHES = [
     const loveOptionsPanel = document.getElementById('love-options-panel');
     const greetingsPresetsPanel = document.getElementById('greetings-presets-panel');
     const greetingsSignatureField = document.getElementById('greetings-signature-field');
+    const eventDateLabel = document.getElementById('event-date-label');
+
+    if (eventDateLabel) {
+      eventDateLabel.textContent = state.category === 'anniversary' ? 'Tanggal Mulai Hubungan' : 'Tanggal Acara';
+    }
 
     birthdayFieldsPanel?.classList.toggle('hidden', state.category !== 'birthday');
     anniversaryFieldsPanel?.classList.toggle('hidden', state.category !== 'anniversary');
@@ -3751,7 +3756,7 @@ const EXTENDED_SWATCHES = [
     const maxPhotos = state.category === 'wedding' ? 10 : 4;
     const remaining = maxPhotos - state.photos.length;
     if (remaining <= 0) {
-      (window as any).showToast({ message: `Maximum ${maxPhotos} photos allowed`, type: 'warning' });
+      (window as any).showToast({ message: `Maksimal ${maxPhotos} foto yang diperbolehkan`, type: 'warning' });
       return;
     }
 
@@ -3765,7 +3770,7 @@ const EXTENDED_SWATCHES = [
     renderPhotoGrid();
 
     for (let i = 0; i < toProcess.length; i++) {
-      if (textEl) textEl.textContent = `Compressing ${i + 1}/${toProcess.length}...`;
+      if (textEl) textEl.textContent = `Mengompresi ${i + 1}/${toProcess.length}...`;
       if (progressEl) progressEl.style.width = `${((i + 1) / toProcess.length) * 100}%`;
 
       try {
@@ -3779,7 +3784,7 @@ const EXTENDED_SWATCHES = [
         }
         state.photos.push({ file: result.file, previewUrl: result.previewUrl });
       } catch (err: any) {
-        (window as any).showToast({ message: err.message || 'Compression failed', type: 'error' });
+        (window as any).showToast({ message: err.message || 'Kompresi foto gagal', type: 'error' });
       } finally {
         standardPhotosLoadingCount = Math.max(0, standardPhotosLoadingCount - 1);
         renderPhotoGrid();
@@ -3898,7 +3903,7 @@ const EXTENDED_SWATCHES = [
           }
         }
 
-        (window as any).showToast?.({ message: 'Romantic template applied!', type: 'success' });
+        (window as any).showToast?.({ message: 'Template romantis berhasil diterapkan!', type: 'success' });
         updateLivePreview();
       }
     });
@@ -3959,7 +3964,7 @@ const EXTENDED_SWATCHES = [
       state.message = LOVE_TEMPLATES[val];
       const msgEl = document.getElementById('message') as HTMLTextAreaElement | null;
       if (msgEl) msgEl.value = LOVE_TEMPLATES[val];
-      (window as any).showToast?.({ message: 'Romantic template applied!', type: 'success' });
+      (window as any).showToast?.({ message: 'Template romantis berhasil diterapkan!', type: 'success' });
       updateLivePreview();
     }
   });
@@ -4158,7 +4163,7 @@ const EXTENDED_SWATCHES = [
           state.message = selected.text;
           const msgEl = document.getElementById('message') as HTMLTextAreaElement | null;
           if (msgEl) msgEl.value = selected.text;
-          (window as any).showToast?.({ message: 'Greeting template applied!', type: 'success' });
+          (window as any).showToast?.({ message: 'Template ucapan berhasil diterapkan!', type: 'success' });
           updateLivePreview();
         }
       });
@@ -7801,142 +7806,142 @@ const EXTENDED_SWATCHES = [
     if (!summary) return;
 
     const categoryEmojis: Record<string, string> = {
-      birthday: '🎂 Birthday',
-      anniversary: '💍 Anniversary',
-      graduation: '🎓 Graduation',
-      invitation: '✉️ Invitation',
-      wedding: '💒 Wedding',
-      love: '💌 Love & Confession',
-      greetings: '🌙 Holiday & Greetings',
+      birthday: '🎂 Ulang Tahun',
+      anniversary: '💍 Ulang Tahun Pernikahan / Anniversary',
+      graduation: '🎓 Wisuda / Kelulusan',
+      invitation: '✉️ Undangan Acara',
+      wedding: '💒 Undangan Pernikahan',
+      love: '💌 Surat Cinta & Ungkapan Hati',
+      greetings: '🌙 Kartu Ucapan & Hari Raya',
     };
     const unboxSummaryMap: Record<string, string> = {
-      envelope: '✉️ Envelope Flip',
-      giftbox: '🎁 Gift Box',
-      ribbon: '🎀 Ribbon Untie',
+      envelope: '✉️ Buka Amplop (Envelope)',
+      giftbox: '🎁 Kotak Kado (Gift Box)',
+      ribbon: '🎀 Buka Pita (Ribbon)',
     };
     const patternSummaryMap: Record<string, string> = {
-      none: 'None',
-      kawung: 'Kawung',
-      truntum: 'Truntum',
+      none: 'Tanpa Motif (Polos)',
+      kawung: 'Batik Kawung',
+      truntum: 'Batik Truntum',
       megamendung: 'Megamendung',
-      songket: 'Songket',
-      pucukrebung: 'Pucuk Rebung',
-      parang: 'Parang',
-      tenun: 'Tenun',
-      damask: 'Damask',
-      arabesque: 'Arabesque',
-      constellation: 'Constellation',
+      songket: 'Songket Palembang',
+      pucukrebung: 'Pucuk Rebung Melayu',
+      parang: 'Batik Parang',
+      tenun: 'Tenun Ikat Nusantara',
+      damask: 'Damask Floral Klasik',
+      arabesque: 'Arabesque Islami Geometris',
+      constellation: 'Rasi Bintang (Constellation)',
     };
     const fontSummaryMap: Record<string, string> = {
       sans: 'Modern Sans',
-      serif: 'Classic Serif',
-      handwritten: 'Handwritten',
-      display: 'Display',
+      serif: 'Klasik Serif',
+      handwritten: 'Tulisan Tangan (Handwritten)',
+      display: 'Dekoratif (Display)',
     };
 
     summary.innerHTML = `
       <div class="space-y-3 w-full min-w-0">
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Category</span>
+          <span class="text-sm text-surface-400 shrink-0">Kategori</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${categoryEmojis[state.category] || state.category}</span>
         </div>
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">${state.category === 'wedding' ? 'Couple / Mempelai' : 'Recipient'}</span>
+          <span class="text-sm text-surface-400 shrink-0">${state.category === 'wedding' ? 'Mempelai' : 'Penerima'}</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.recipientName}</span>
         </div>
         ${state.senderName ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">From</span>
+          <span class="text-sm text-surface-400 shrink-0">Pengirim</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.senderName}</span>
         </div>` : ''}
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Theme</span>
+          <span class="text-sm text-surface-400 shrink-0">Tema</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${fontSummaryMap[state.themeConfig.fontFamily] || state.themeConfig.fontFamily} · ${patternSummaryMap[state.themeConfig.backgroundPattern] || state.themeConfig.backgroundPattern}</span>
         </div>
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Photos</span>
-          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.photos.length} photo${state.photos.length !== 1 ? 's' : ''}</span>
+          <span class="text-sm text-surface-400 shrink-0">Foto</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.photos.length} foto</span>
         </div>
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Unboxing</span>
+          <span class="text-sm text-surface-400 shrink-0">Animasi Pembuka</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${unboxSummaryMap[state.themeConfig.unboxStyle] || state.themeConfig.unboxStyle}</span>
         </div>
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Ambient Effect</span>
-          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${ambientSummaryMap[state.themeConfig.ambientEffect] || state.themeConfig.ambientEffect || 'None'}</span>
+          <span class="text-sm text-surface-400 shrink-0">Efek Suasana</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${ambientSummaryMap[state.themeConfig.ambientEffect] || state.themeConfig.ambientEffect || 'Tanpa Efek'}</span>
         </div>
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Corner Ornaments</span>
-          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${cornerSummaryMap[state.themeConfig.cornerOrnament || (state.category === 'wedding' ? 'botanical' : 'none')] || 'None'}</span>
+          <span class="text-sm text-surface-400 shrink-0">Ornamen Sudut</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${cornerSummaryMap[state.themeConfig.cornerOrnament || (state.category === 'wedding' ? 'botanical' : 'none')] || 'Tanpa Ornamen'}</span>
         </div>
         ${state.category === 'love' && state.themeConfig.passcode ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Secret Passcode</span>
-          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">🔒 PIN Protected (${state.themeConfig.passcode.length}-digit)</span>
+          <span class="text-sm text-surface-400 shrink-0">Kunci PIN Rahasia</span>
+          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">🔒 Terlindungi PIN (${state.themeConfig.passcode.length} Digit)</span>
         </div>` : ''}
         ${state.category === 'love' && state.themeConfig.interactiveConfession?.enabled ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Interactive Confession</span>
-          <span class="text-sm font-medium text-pink-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">💘 Active (Runaway No)</span>
+          <span class="text-sm text-surface-400 shrink-0">Pertanyaan Interaktif</span>
+          <span class="text-sm font-medium text-pink-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">💘 Aktif (Tombol 'Nggak' Menghindar)</span>
         </div>` : ''}
         ${state.category === 'greetings' && state.themeConfig.occasion ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Occasion</span>
+          <span class="text-sm text-surface-400 shrink-0">Perayaan / Momen</span>
           <span class="text-sm font-medium text-amber-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">${occasionSummaryMap[state.themeConfig.occasion] || state.themeConfig.occasion.replace(/-/g, ' ')}</span>
         </div>` : ''}
         ${state.category === 'greetings' && state.themeConfig.signature ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Family Signature</span>
+          <span class="text-sm text-surface-400 shrink-0">Tanda Tangan Pengirim</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.signature}</span>
         </div>` : ''}
         ${state.category === 'birthday' && state.themeConfig.ageMilestone ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Milestone</span>
+          <span class="text-sm text-surface-400 shrink-0">Usia / Momen Perayaan</span>
           <span class="text-sm font-medium text-pink-300 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.ageMilestone}</span>
         </div>` : ''}
         ${state.category === 'anniversary' && state.themeConfig.anniversaryMilestone ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Anniversary Milestone</span>
+          <span class="text-sm text-surface-400 shrink-0">Durasi Kebersamaan</span>
           <span class="text-sm font-medium text-rose-300 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.anniversaryMilestone}</span>
         </div>` : ''}
         ${state.category === 'graduation' && state.themeConfig.degreeMajor ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Degree / Major</span>
+          <span class="text-sm text-surface-400 shrink-0">Gelar & Jurusan</span>
           <span class="text-sm font-medium text-blue-300 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.degreeMajor}</span>
         </div>` : ''}
         ${state.category === 'graduation' && state.themeConfig.schoolCampus ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">School / Campus</span>
+          <span class="text-sm text-surface-400 shrink-0">Nama Kampus / Sekolah</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.schoolCampus}</span>
         </div>` : ''}
         ${state.category === 'invitation' && state.themeConfig.invitationEventType ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Event Type</span>
+          <span class="text-sm text-surface-400 shrink-0">Jenis Acara</span>
           <span class="text-sm font-medium text-emerald-300 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.invitationEventType}</span>
         </div>` : ''}
         ${state.category === 'invitation' && state.themeConfig.invitationTime ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Schedule / Time</span>
+          <span class="text-sm text-surface-400 shrink-0">Waktu Acara</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.invitationTime}</span>
         </div>` : ''}
         ${state.category === 'invitation' && state.themeConfig.invitationVenue ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Venue Location</span>
+          <span class="text-sm text-surface-400 shrink-0">Nama Tempat / Lokasi</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.themeConfig.invitationVenue}</span>
         </div>` : ''}
         ${state.themeConfig.customAudioUrl ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Music</span>
-          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">🎵 Custom Upload (MP3/Opus)</span>
+          <span class="text-sm text-surface-400 shrink-0">Musik Pengiring</span>
+          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">🎵 Upload Musik Sendiri (MP3/Opus)</span>
         </div>` : (state.themeConfig.audioTrackId ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Music</span>
+          <span class="text-sm text-surface-400 shrink-0">Musik Pengiring</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">🎵 ${AUDIO_TRACKS.find(t => t.id === state.themeConfig.audioTrackId)?.name || state.themeConfig.audioTrackId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
         </div>` : '')}
         ${state.eventDate ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Event Date</span>
-          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${new Date(state.eventDate).toLocaleDateString()}</span>
+          <span class="text-sm text-surface-400 shrink-0">${state.category === 'anniversary' ? 'Tanggal Mulai Hubungan' : 'Tanggal Acara'}</span>
+          <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${new Date(state.eventDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
         </div>` : ''}
         ${state.category === 'wedding' && state.themeConfig.weddingData ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
@@ -7957,8 +7962,8 @@ const EXTENDED_SWATCHES = [
         </div>` : ''}
         <hr class="border-white/5" />
         <div class="min-w-0 w-full">
-          <span class="text-sm text-surface-400">Message Preview</span>
-          <p class="mt-1 text-sm text-surface-300 leading-relaxed break-words break-all [overflow-wrap:anywhere]">${state.message ? state.message.slice(0, 200) + (state.message.length > 200 ? '...' : '') : '<span class="italic text-surface-500">No message</span>'}</p>
+          <span class="text-sm text-surface-400">Pratinjau Pesan</span>
+          <p class="mt-1 text-sm text-surface-300 leading-relaxed break-words break-all [overflow-wrap:anywhere]">${state.message ? state.message.slice(0, 200) + (state.message.length > 200 ? '...' : '') : '<span class="italic text-surface-500">Tanpa pesan</span>'}</p>
         </div>
       </div>
     `;
@@ -7984,8 +7989,8 @@ const EXTENDED_SWATCHES = [
     const btn = document.getElementById('publish-btn') as HTMLButtonElement;
     btn.disabled = true;
     btn.innerHTML = isEditMode
-      ? '<span class="animate-spin">⏳</span> Saving...'
-      : '<span class="animate-spin">⏳</span> Publishing...';
+      ? '<span class="animate-spin">⏳</span> Menyimpan...'
+      : '<span class="animate-spin">⏳</span> Menerbitkan...';
 
     try {
       // 1. Upload photos to R2 (if any new files)
@@ -8011,8 +8016,8 @@ const EXTENDED_SWATCHES = [
             }),
           });
           if (!presignRes.ok) {
-            const errData = await presignRes.json().catch(() => ({ error: 'Failed to get upload URL' }));
-            throw new Error(errData.error || `Upload authorization failed (${presignRes.status})`);
+            const errData = await presignRes.json().catch(() => ({ error: 'Gagal mendapatkan URL upload' }));
+            throw new Error(errData.error || `Gagal otorisasi upload (${presignRes.status})`);
           }
           const { uploadUrl, publicUrl } = await presignRes.json();
           await uploadToR2(uploadUrl, slotItem.file);
@@ -8051,10 +8056,10 @@ const EXTENDED_SWATCHES = [
           if (photo.file) {
             // STRICT SIZE GUARD: Enforce strictly <= 200KB WebP before requesting R2 presigned URL
             if (photo.file.size <= 0) {
-              throw new Error('Photo file is empty (0 bytes).');
+              throw new Error('File foto tidak valid (0 bytes).');
             }
             if (photo.file.size > 200 * 1024) {
-              throw new Error(`Photo size (${Math.round(photo.file.size / 1024)}KB) exceeds the 200KB limit.`);
+              throw new Error(`Ukuran foto (${Math.round(photo.file.size / 1024)}KB) melebihi batas maksimal 200KB.`);
             }
             const presignRes = await fetch('/api/storage/presigned-url', {
               method: 'POST',
@@ -8065,8 +8070,8 @@ const EXTENDED_SWATCHES = [
               }),
             });
             if (!presignRes.ok) {
-              const errData = await presignRes.json().catch(() => ({ error: 'Failed to get upload URL' }));
-              throw new Error(errData.error || `Failed to get upload authorization (${presignRes.status})`);
+              const errData = await presignRes.json().catch(() => ({ error: 'Gagal mendapatkan URL upload' }));
+              throw new Error(errData.error || `Gagal otorisasi upload (${presignRes.status})`);
             }
             const { uploadUrl, publicUrl } = await presignRes.json();
             await uploadToR2(uploadUrl, photo.file);
@@ -8115,12 +8120,12 @@ const EXTENDED_SWATCHES = [
         });
 
         if (!res.ok) {
-          const err = await res.json().catch(() => ({ error: 'Failed to update card' }));
-          throw new Error(err.error || 'Failed to update card');
+          const err = await res.json().catch(() => ({ error: 'Gagal memperbarui kartu' }));
+          throw new Error(err.error || 'Gagal memperbarui kartu');
         }
 
         const updatedCard = await res.json();
-        (window as any).showToast({ message: 'Card updated successfully!', type: 'success' });
+        (window as any).showToast({ message: 'Kartu berhasil diperbarui!', type: 'success' });
 
         const updatedSlug = updatedCard?.slug || updatedCard?.card?.slug;
         if (newTab && !newTab.closed) {
@@ -8144,12 +8149,12 @@ const EXTENDED_SWATCHES = [
         });
 
         if (!res.ok) {
-          const err = await res.json().catch(() => ({ error: 'Failed to create card' }));
-          throw new Error(err.error || 'Failed to create card');
+          const err = await res.json().catch(() => ({ error: 'Gagal membuat kartu' }));
+          throw new Error(err.error || 'Gagal membuat kartu');
         }
 
         const card = await res.json();
-        (window as any).showToast({ message: '🎉 Card published successfully!', type: 'success' });
+        (window as any).showToast({ message: '🎉 Kartu berhasil diterbitkan!', type: 'success' });
 
         const cardSlug = card?.slug || card?.card?.slug;
         if (newTab && !newTab.closed) {
@@ -8169,7 +8174,7 @@ const EXTENDED_SWATCHES = [
       if (newTab && !newTab.closed) {
         newTab.close();
       }
-      (window as any).showToast({ message: err.message || (isEditMode ? 'Failed to update' : 'Failed to publish'), type: 'error' });
+      (window as any).showToast({ message: err.message || (isEditMode ? 'Gagal menyimpan perubahan' : 'Gagal menerbitkan kartu'), type: 'error' });
       btn.disabled = false;
       btn.innerHTML = isEditMode
         ? '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Simpan Perubahan'
@@ -8500,7 +8505,7 @@ const EXTENDED_SWATCHES = [
       }
     } catch (err) {
       console.error('Failed to load card for editing:', err);
-      (window as any).showToast?.({ message: 'Could not load card details for editing', type: 'error' });
+      (window as any).showToast?.({ message: 'Gagal memuat detail kartu untuk diedit', type: 'error' });
     }
   }
 

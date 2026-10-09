@@ -186,40 +186,40 @@ export const DEFAULT_THEME_CONFIG: ThemeConfig = {
 };
 
 export const CATEGORY_META: Record<CardCategory, { label: string; emoji: string; description: string }> = {
+  wedding: {
+    label: 'Undangan Pernikahan',
+    emoji: '💍',
+    description: 'Undangan digital mewah dengan animasi sinematik, musik latar, dan RSVP',
+  },
   birthday: {
-    label: 'Birthday',
+    label: 'Ulang Tahun',
     emoji: '🎂',
-    description: 'Celebrate another trip around the sun',
+    description: 'Rayakan momen pertambahan usia dengan kejutan interaktif penuh kesan',
   },
   anniversary: {
     label: 'Anniversary',
     emoji: '💍',
-    description: 'Honor a special milestone together',
+    description: 'Abadikan perjalanan cinta dan momen berharga bersama pasangan',
   },
   graduation: {
-    label: 'Graduation',
+    label: 'Wisuda & Kelulusan',
     emoji: '🎓',
-    description: 'Congratulate an amazing achievement',
+    description: 'Apresiasi pencapaian dan babak baru keberhasilan yang membanggakan',
   },
   invitation: {
-    label: 'Invitation',
+    label: 'Undangan Acara',
     emoji: '✉️',
-    description: 'Invite loved ones to your event',
-  },
-  wedding: {
-    label: 'Wedding Invitation',
-    emoji: '💍',
-    description: 'Luxury long-scroll invitation for your big day',
+    description: 'Undang kerabat ke jamuan, syukuran, atau perayaan istimewa',
   },
   love: {
-    label: 'Love Letter & Confession',
+    label: 'Surat Cinta & Romansa',
     emoji: '💌',
-    description: 'Express your deepest feelings',
+    description: 'Ungkapkan ketulusan perasaan dengan pesan romantis interaktif',
   },
   greetings: {
-    label: 'Holiday & Greetings',
+    label: 'Ucapan & Hari Raya',
     emoji: '🌙',
-    description: 'Send warm wishes for any occasion',
+    description: 'Kirimkan salam hangat dan doa terbaik untuk setiap perayaan hari raya',
   },
 };
 

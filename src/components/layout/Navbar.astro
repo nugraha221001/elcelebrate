@@ -52,7 +52,7 @@ const initial = (displayName || 'U').charAt(0).toUpperCase();
             href="/dashboard/create"
             class="ml-1 inline-flex items-center gap-1.5 rounded-xl bg-[#f5c563] text-[#0f0d15] px-3.5 py-2 text-sm font-semibold shadow-lg shadow-[#f5c563]/20 transition-all duration-200 hover:brightness-110 active:scale-[0.98]"
             id="nav-create"
-            aria-label="+ Buat Kartu"
+            aria-label="Buat Kartu"
           >
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -156,14 +156,14 @@ const initial = (displayName || 'U').charAt(0).toUpperCase();
             class="rounded-lg px-3.5 py-2 text-sm font-medium text-surface-300 transition-colors hover:text-white"
             id="nav-login"
           >
-            Sign In
+            Masuk
           </a>
           <a
             href="/signup"
             class="ml-2 rounded-xl bg-[#f5c563] text-[#0f0d15] px-4 py-2 text-sm font-semibold shadow-lg shadow-[#f5c563]/20 transition-all duration-200 hover:brightness-110 active:scale-[0.98]"
             id="nav-signup"
           >
-            Get Started
+            Mulai Sekarang
           </a>
         </>
       )}
@@ -205,7 +205,7 @@ const initial = (displayName || 'U').charAt(0).toUpperCase();
           Dashboard
         </a>
         <a href="/dashboard/create" class="rounded-lg px-3 py-2 text-sm font-medium text-surface-200 hover:bg-white/5">
-          + Buat Kartu
+          Buat Kartu
         </a>
         <a href="/dashboard/profile" class="rounded-lg px-3 py-2 text-sm font-medium text-surface-200 hover:bg-white/5">
           Edit Profil
@@ -218,8 +218,8 @@ const initial = (displayName || 'U').charAt(0).toUpperCase();
       </div>
     ) : (
       <div class="flex flex-col gap-2">
-        <a href="/login" class="rounded-xl px-3 py-2.5 text-sm font-medium text-surface-200 hover:bg-white/5">Sign In</a>
-        <a href="/signup" class="rounded-xl bg-[#f5c563] text-[#0f0d15] px-3 py-2.5 text-center text-sm font-semibold shadow-lg shadow-[#f5c563]/20 active:scale-[0.98]">Get Started</a>
+        <a href="/login" class="rounded-xl px-3 py-2.5 text-sm font-medium text-surface-200 hover:bg-white/5">Masuk</a>
+        <a href="/signup" class="rounded-xl bg-[#f5c563] text-[#0f0d15] px-3 py-2.5 text-center text-sm font-semibold shadow-lg shadow-[#f5c563]/20 active:scale-[0.98]">Mulai Sekarang</a>
       </div>
     )}
   </div>
