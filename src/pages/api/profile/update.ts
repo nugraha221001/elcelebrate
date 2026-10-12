@@ -12,16 +12,38 @@ export const POST: APIRoute = async ({ locals, request }) => {
   }
 
   try {
-    const { full_name, avatar_url } = await request.json();
+    const { full_name, avatar_url, phone_number } = await request.json();
 
-    if (typeof full_name !== 'string' || !full_name.trim()) {
-      return new Response(JSON.stringify({ error: 'Full name is required' }), {
+    const sanitizedName = String(full_name || '').trim().slice(0, 60);
+    if (!sanitizedName) {
+      return new Response(JSON.stringify({ error: 'Nama lengkap wajib diisi' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    const trimmedName = full_name.trim();
+    // Sanitize and validate phone number
+    let sanitizedPhone: string | null = null;
+    if (phone_number !== undefined && phone_number !== null) {
+      const rawPhone = String(phone_number).trim();
+      if (rawPhone.length > 0) {
+        // Strip spaces and dashes
+        const strippedPhone = rawPhone.replace(/[\s\-]/g, '');
+        const phoneRegex = /^\+?[0-9]{9,16}$/;
+        if (!phoneRegex.test(strippedPhone)) {
+          return new Response(
+            JSON.stringify({ error: 'Format nomor WhatsApp tidak valid (minimal 9 digit angka)' }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
+        }
+        sanitizedPhone = strippedPhone.slice(0, 16);
+      } else {
+        sanitizedPhone = null;
+      }
+    }
 
     // 1. Fetch user's current profile record to check existing avatar_url
     const { data: currentProfile } = await locals.supabase
@@ -56,10 +78,13 @@ export const POST: APIRoute = async ({ locals, request }) => {
     }
 
     const updatePayload: Record<string, any> = {
-      full_name: trimmedName,
+      full_name: sanitizedName,
     };
     if (avatar_url !== undefined) {
       updatePayload.avatar_url = newAvatarUrl;
+    }
+    if (phone_number !== undefined) {
+      updatePayload.phone_number = sanitizedPhone;
     }
 
     // 4. Update public.profiles table
@@ -79,10 +104,13 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
     // 5. Sync to Supabase auth metadata so JWT/session immediately reflects changes
     const authUpdatePayload: Record<string, any> = {
-      full_name: trimmedName,
+      full_name: sanitizedName,
     };
     if (avatar_url !== undefined) {
       authUpdatePayload.avatar_url = newAvatarUrl;
+    }
+    if (phone_number !== undefined) {
+      authUpdatePayload.phone_number = sanitizedPhone;
     }
 
     await locals.supabase.auth.updateUser({

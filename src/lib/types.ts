@@ -153,6 +153,7 @@ export interface Profile {
   email: string;
   full_name: string;
   avatar_url?: string | null;
+  phone_number?: string | null;
   created_at: string;
 }
 

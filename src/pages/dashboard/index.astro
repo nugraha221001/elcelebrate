@@ -11,7 +11,7 @@ export const prerender = false;
 // Auth guard — must run before any HTML is emitted
 const user = Astro.locals.user;
 if (!user) {
-  return Astro.redirect('/login');
+  return Astro.redirect('/signin');
 }
 
 const supabase = Astro.locals.supabase;

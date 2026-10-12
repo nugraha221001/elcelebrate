@@ -27,5 +27,5 @@ export const GET: APIRoute = async ({ locals, url, cookies, redirect }) => {
     }
   }
 
-  return redirect('/login');
+  return redirect('/signin');
 };

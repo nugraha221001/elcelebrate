@@ -1,6 +1,7 @@
 ---
 import DashboardLayout from '../../components/layout/DashboardLayout.astro';
 import Toast from '../../components/ui/Toast.astro';
+import Modal from '../../components/ui/Modal.astro';
 import type { Profile } from '../../lib/types';
 import { resolveMediaUrl } from '../../lib/r2';
 
@@ -9,7 +10,7 @@ export const prerender = false;
 // Auth guard — must run before any HTML is emitted
 const user = Astro.locals.user;
 if (!user) {
-  return Astro.redirect('/login');
+  return Astro.redirect('/signin');
 }
 
 const supabase = Astro.locals.supabase;
@@ -28,10 +29,11 @@ const fullName = profile?.full_name || (user.user_metadata?.full_name as string)
 const rawAvatarUrl = profile?.avatar_url || (user.user_metadata?.avatar_url as string) || '';
 const avatarUrl = resolveMediaUrl(rawAvatarUrl);
 const email = user.email || '';
+const phoneNumber = profile?.phone_number || (user.user_metadata?.phone_number as string) || '';
 const initial = (fullName || email || 'U').charAt(0).toUpperCase();
 ---
 
-<DashboardLayout title="Profile Settings" description="Manage your account profile and avatar">
+<DashboardLayout title="Pengaturan Profil" description="Kelola foto profil dan informasi akun Anda">
   <Toast />
 
   <div class="mx-auto max-w-2xl">
@@ -44,10 +46,10 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
         </svg>
-        Back to Cards
+        Kembali ke Kartu Saya
       </a>
-      <h1 class="text-2xl font-bold text-surface-50">Profile Settings</h1>
-      <p class="mt-1 text-sm text-surface-400">Manage your avatar and personal details</p>
+      <h1 class="text-2xl font-bold text-surface-50">Pengaturan Profil</h1>
+      <p class="mt-1 text-sm text-surface-400">Kelola foto profil dan informasi akun Anda</p>
     </div>
 
     <!-- Profile Form Card -->
@@ -55,7 +57,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
       <form id="profile-form" class="space-y-8">
         <!-- Avatar Section -->
         <div>
-          <label class="mb-3 block text-sm font-medium text-surface-200">Profile Picture</label>
+          <label class="mb-3 block text-sm font-medium text-surface-200">Foto Profil</label>
           <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
             <!-- Avatar Display / Preview -->
             <div class="relative group">
@@ -83,8 +85,8 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
                   type="button"
                   id="avatar-upload-trigger"
                   class="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
-                  title="Change avatar"
-                  aria-label="Change avatar"
+                  title="Ganti foto profil"
+                  aria-label="Ganti foto profil"
                 >
                   <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -104,7 +106,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
                   id="avatar-btn"
                   class="rounded-xl border border-white/10 bg-surface-700 px-4 py-2 text-xs font-semibold text-surface-200 transition-colors hover:bg-surface-600 hover:text-white cursor-pointer"
                 >
-                  Upload New Photo
+                  Unggah Foto Baru
                 </button>
                 <button
                   type="button"
@@ -114,15 +116,15 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
                     !avatarUrl ? 'hidden' : '',
                   ]}
                 >
-                  Remove
+                  Hapus
                 </button>
               </div>
               <p class="text-xs text-surface-400">
-                JPG, PNG or WebP. Auto-compressed to WebP (max 100KB).
+                Format JPG, PNG, atau WebP. Otomatis dikompresi ke WebP (maks. 100 KB).
               </p>
               <!-- Progress indicator -->
               <div id="avatar-status" class="hidden text-xs text-primary">
-                Processing avatar...
+                Memproses foto profil...
               </div>
             </div>
           </div>
@@ -135,14 +137,15 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
           <!-- Full Name -->
           <div>
             <label for="full-name" class="mb-1.5 block text-sm font-medium text-surface-200">
-              Full Name <span class="text-confetti-pink">*</span>
+              Nama Lengkap <span class="text-confetti-pink">*</span>
             </label>
             <input
               type="text"
               id="full-name"
               name="full_name"
               value={fullName}
-              placeholder="Your full name"
+              placeholder="Nama lengkap Anda"
+              maxlength="60"
               required
               class="form-input w-full rounded-xl border bg-surface-700/50 px-4 py-2.5 text-sm transition-all duration-200 focus-ring"
             />
@@ -152,13 +155,13 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
           <div>
             <div class="flex items-center justify-between mb-1.5">
               <label for="email" class="block text-sm font-medium text-surface-200">
-                Email Address
+                Alamat Email
               </label>
               <span class="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success">
                 <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
-                Verified
+                Terverifikasi
               </span>
             </div>
             <input
@@ -169,7 +172,27 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
               class="w-full cursor-not-allowed rounded-xl border border-white/5 bg-surface-900/60 px-4 py-2.5 text-sm text-surface-400 opacity-80 select-none"
             />
             <p class="mt-1.5 text-xs text-surface-500">
-              Your email is linked to your authentication account and cannot be changed here.
+              Email ini terhubung dengan akun login Anda dan tidak dapat diubah di sini.
+            </p>
+          </div>
+
+          <!-- WhatsApp Phone Number (Optional) -->
+          <div>
+            <label for="phone-number" class="mb-1.5 block text-sm font-medium text-surface-200">
+              Nomor WhatsApp (Opsional)
+            </label>
+            <input
+              type="tel"
+              id="phone-number"
+              name="phone_number"
+              value={phoneNumber}
+              placeholder="0812xxxxxxxx atau +62812xxxxxxxx"
+              maxlength="16"
+              inputmode="tel"
+              class="form-input w-full rounded-xl border bg-surface-700/50 px-4 py-2.5 text-sm transition-all duration-200 focus-ring"
+            />
+            <p class="mt-1.5 text-xs text-surface-500">
+              Digunakan untuk notifikasi ucapan tamu dan integrasi pembayaran QRIS.
             </p>
           </div>
         </div>
@@ -180,19 +203,92 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
             href="/dashboard"
             class="rounded-xl px-5 py-2.5 text-sm font-medium text-surface-400 transition-colors hover:text-white"
           >
-            Cancel
+            Batal
           </a>
           <button
             type="submit"
             id="save-profile-btn"
             class="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 via-fuchsia-500 to-pink-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 transition-all duration-200 hover:opacity-95 hover:shadow-fuchsia-500/30 active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
           >
-            Save Changes
+            Simpan Perubahan
           </button>
         </div>
       </form>
     </div>
+
+    <!-- Danger Zone Container -->
+    <div class="mt-8 rounded-2xl border border-red-500/20 bg-red-950/10 backdrop-blur-md p-6 sm:p-8 shadow-elevated">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <div class="space-y-1.5 max-w-xl">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center justify-center h-6 w-6 rounded-md bg-red-500/15 text-red-400">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+            </span>
+            <span class="text-xs font-bold uppercase tracking-wider text-red-400">Zona Berbahaya</span>
+          </div>
+          <h2 class="text-lg font-bold text-surface-50">Hapus Akun Permanen</h2>
+          <p class="text-xs sm:text-sm text-surface-400 leading-relaxed">
+            Menghapus akun akan menghapus seluruh data Anda secara permanen, termasuk semua kartu undangan/ucapan, foto-foto di penyimpanan, ucapan buku tamu, dan profil akun. Tindakan ini tidak dapat dibatalkan.
+          </p>
+        </div>
+        <div class="shrink-0">
+          <button
+            type="button"
+            id="open-delete-modal-btn"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/15 px-5 py-2.5 text-sm font-semibold text-red-300 transition-all duration-200 hover:bg-red-600 hover:text-white hover:border-red-600 active:scale-[0.98] cursor-pointer"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+            </svg>
+            Hapus Akun Saya
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- Delete Account Confirmation Modal -->
+  <Modal id="delete-modal" title="Hapus Akun Permanen" size="md">
+    <div class="space-y-4">
+      <div class="rounded-xl border border-red-500/20 bg-red-950/30 p-3.5 text-xs text-red-200/90 leading-relaxed">
+        <p class="font-semibold text-red-400 mb-1">Peringatan: Tindakan ini tidak dapat dibatalkan!</p>
+        <p>Seluruh kartu perayaan, berkas media foto/audio di penyimpanan awan, ucapan buku tamu, dan profil akun Anda akan dihapus secara permanen dan tidak dapat dipulihkan.</p>
+      </div>
+
+      <div>
+        <label for="delete-confirmation-input" class="block text-xs font-medium text-surface-300 mb-1.5">
+          Ketik <span class="font-bold text-red-400 font-mono tracking-wider">HAPUS</span> untuk mengonfirmasi penghapusan akun permanen
+        </label>
+        <input
+          type="text"
+          id="delete-confirmation-input"
+          placeholder="HAPUS"
+          autocomplete="off"
+          class="form-input w-full rounded-xl border bg-surface-800/80 px-4 py-2.5 text-sm uppercase tracking-wider focus-ring"
+        />
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button
+          type="button"
+          data-modal-close="delete-modal"
+          class="rounded-xl px-4 py-2 text-xs font-semibold text-surface-400 hover:text-white transition-colors cursor-pointer"
+        >
+          Batal
+        </button>
+        <button
+          type="button"
+          id="confirm-delete-account-btn"
+          disabled
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-500 text-white px-5 py-2 text-xs font-semibold shadow-lg shadow-red-950/50 transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
+        >
+          Hapus Akun Permanen
+        </button>
+      </div>
+    </div>
+  </Modal>
 </DashboardLayout>
 
 <script>
@@ -210,6 +306,18 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
   const avatarUrlInput = document.getElementById('avatar_url_input') as HTMLInputElement | null;
   const profileForm = document.getElementById('profile-form');
   const saveBtn = document.getElementById('save-profile-btn') as HTMLButtonElement;
+  const phoneInput = document.getElementById('phone-number') as HTMLInputElement | null;
+
+  // Real-time WhatsApp numeric and optional leading plus filtering
+  phoneInput?.addEventListener('input', (e) => {
+    const target = e.target as HTMLInputElement;
+    // Allow only digits and optional leading plus sign
+    let cleaned = target.value.replace(/[^\d+]/g, '');
+    if (cleaned.indexOf('+') > 0) {
+      cleaned = cleaned[0] === '+' ? '+' + cleaned.replace(/\+/g, '') : cleaned.replace(/\+/g, '');
+    }
+    target.value = cleaned;
+  });
 
   function triggerUpload() {
     avatarInput?.click();
@@ -224,7 +332,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
 
     if (avatarStatus) {
       avatarStatus.classList.remove('hidden');
-      avatarStatus.textContent = 'Compressing image...';
+      avatarStatus.textContent = 'Mengompresi gambar...';
     }
 
     try {
@@ -245,7 +353,8 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
             type="button"
             id="avatar-upload-trigger"
             class="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
-            title="Change avatar"
+            title="Ganti foto profil"
+            aria-label="Ganti foto profil"
           >
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -259,11 +368,11 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
       removeBtn?.classList.remove('hidden');
 
       if (avatarStatus) {
-        avatarStatus.textContent = `Optimized to ${Math.round(result.compressedSize / 1024)}KB (${result.compressionRatio}% smaller)`;
+        avatarStatus.textContent = `Dioptimalkan ke ${Math.round(result.compressedSize / 1024)}KB (${result.compressionRatio}% lebih kecil)`;
       }
     } catch (err: any) {
       (window as any).showToast({
-        message: err.message || 'Failed to process avatar',
+        message: err.message || 'Gagal memproses foto profil',
         type: 'error',
       });
       if (avatarStatus) avatarStatus.classList.add('hidden');
@@ -293,7 +402,8 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
           type="button"
           id="avatar-upload-trigger"
           class="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
-          title="Change avatar"
+          title="Ganti foto profil"
+          aria-label="Ganti foto profil"
         >
           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -315,8 +425,20 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
     const fullName = fullNameInput?.value.trim();
 
     if (!fullName) {
-      (window as any).showToast({ message: 'Full name is required', type: 'warning' });
+      (window as any).showToast({ message: 'Nama lengkap wajib diisi', type: 'warning' });
       return;
+    }
+
+    const phoneNumber = phoneInput?.value.trim() ?? '';
+    if (phoneNumber) {
+      const phoneRegex = /^\+?[0-9]{9,16}$/;
+      if (!phoneRegex.test(phoneNumber)) {
+        (window as any).showToast({
+          message: 'Format nomor WhatsApp tidak valid (minimal 9 digit)',
+          type: 'error',
+        });
+        return;
+      }
     }
 
     saveBtn.disabled = true;
@@ -325,7 +447,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
-      Saving...
+      Menyimpan...
     `;
 
     try {
@@ -335,7 +457,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
       if (pendingAvatarFile) {
         if (avatarStatus) {
           avatarStatus.classList.remove('hidden');
-          avatarStatus.textContent = 'Uploading avatar to cloud storage...';
+          avatarStatus.textContent = 'Mengunggah foto profil ke penyimpanan awan...';
         }
 
         const presignRes = await fetch('/api/storage/presigned-url', {
@@ -350,7 +472,7 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
 
         if (!presignRes.ok) {
           const err = await presignRes.json();
-          throw new Error(err.error || 'Failed to get upload authorization');
+          throw new Error(err.error || 'Gagal mendapatkan otorisasi unggah');
         }
 
         const { uploadUrl, publicUrl } = await presignRes.json();
@@ -364,24 +486,25 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
         finalAvatarUrl = avatarUrlInput.value || '';
       }
 
-      // 2. Send update request to server (explicitly send avatar_url)
+      // 2. Send update request to server
       const updateRes = await fetch('/api/profile/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           full_name: fullName,
           avatar_url: finalAvatarUrl,
+          phone_number: phoneNumber,
         }),
       });
 
       const updateData = await updateRes.json();
 
       if (!updateRes.ok) {
-        throw new Error(updateData.error || 'Failed to update profile');
+        throw new Error(updateData.error || 'Gagal memperbarui profil');
       }
 
       (window as any).showToast({
-        message: '✨ Profile updated successfully!',
+        message: '✨ Profil berhasil diperbarui!',
         type: 'success',
       });
 
@@ -390,12 +513,101 @@ const initial = (fullName || email || 'U').charAt(0).toUpperCase();
         window.location.reload();
       }, 1000);
     } catch (err: any) {
+      if (avatarStatus) avatarStatus.classList.add('hidden');
       (window as any).showToast({
-        message: err.message || 'An error occurred while saving',
+        message: err.message || 'Terjadi kesalahan saat menyimpan',
         type: 'error',
       });
       saveBtn.disabled = false;
-      saveBtn.textContent = 'Save Changes';
+      saveBtn.textContent = 'Simpan Perubahan';
+    }
+  });
+
+  // ── Account Deletion Logic ──
+  const deleteModal = document.getElementById('delete-modal');
+  const openDeleteModalBtn = document.getElementById('open-delete-modal-btn');
+  const deleteInput = document.getElementById('delete-confirmation-input') as HTMLInputElement | null;
+  const confirmDeleteBtn = document.getElementById('confirm-delete-account-btn') as HTMLButtonElement | null;
+
+  openDeleteModalBtn?.addEventListener('click', () => {
+    if (deleteInput) {
+      deleteInput.value = '';
+    }
+    if (confirmDeleteBtn) {
+      confirmDeleteBtn.disabled = true;
+      confirmDeleteBtn.textContent = 'Hapus Akun Permanen';
+    }
+    if (deleteModal) {
+      deleteModal.classList.remove('hidden');
+      deleteModal.classList.add('flex');
+      deleteInput?.focus();
+    }
+  });
+
+  deleteInput?.addEventListener('input', (e) => {
+    const target = e.target as HTMLInputElement;
+    target.value = target.value.toUpperCase();
+    if (confirmDeleteBtn) {
+      confirmDeleteBtn.disabled = target.value.trim().toUpperCase() !== 'HAPUS';
+    }
+  });
+
+  confirmDeleteBtn?.addEventListener('click', async () => {
+    if (!deleteInput || deleteInput.value.trim().toUpperCase() !== 'HAPUS') return;
+
+    confirmDeleteBtn.disabled = true;
+    confirmDeleteBtn.innerHTML = `
+      <svg class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Menghapus Akun...
+    `;
+
+    try {
+      const res = await fetch('/api/profile/delete-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Gagal menghapus akun');
+      }
+
+      // Close modal
+      if (deleteModal) {
+        deleteModal.classList.add('hidden');
+        deleteModal.classList.remove('flex');
+      }
+
+      // Clear local storage & session storage
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
+
+      // Trigger toast
+      (window as any).showToast({
+        message: 'Akun Anda berhasil dihapus secara permanen',
+        type: 'success',
+      });
+
+      // Redirect to homepage
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1200);
+    } catch (err: any) {
+      (window as any).showToast({
+        message: err.message || 'Terjadi kesalahan saat menghapus akun',
+        type: 'error',
+      });
+      if (confirmDeleteBtn) {
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteBtn.textContent = 'Hapus Akun Permanen';
+      }
     }
   });
 </script>

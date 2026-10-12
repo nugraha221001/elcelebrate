@@ -14,7 +14,7 @@ if (user) {
 }
 ---
 
-<BaseLayout title="Create Account" description="Join ElCelebrate for free and start creating beautiful digital greeting cards.">
+<BaseLayout title="Buat Akun — ElCelebrate" description="Bergabung dengan ElCelebrate dan mulai buat kartu perayaanmu secara gratis.">
   <Navbar />
   <Toast />
 
@@ -24,49 +24,131 @@ if (user) {
       <div class="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-accent/5 blur-3xl"></div>
     </div>
 
-    <div class="relative w-full max-w-md">
+    <div class="relative w-full max-w-md" style="animation: fade-in-up 0.5s var(--ease-smooth) forwards;">
       <div class="mb-8 text-center">
         <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-secondary/20 to-accent/20 text-3xl">
           ✨
         </div>
-        <h1 class="text-2xl font-bold text-surface-50">Create your account</h1>
-        <p class="mt-2 text-sm text-surface-400">Join ElCelebrate and start creating celebrations for free</p>
+        <h1 class="text-2xl font-bold text-surface-50">Buat Akun Baru</h1>
+        <p class="mt-2 text-sm text-surface-400 leading-relaxed">Bergabung dengan ElCelebrate dan mulai buat kartu perayaanmu secara gratis</p>
       </div>
 
       <div class="rounded-2xl border border-white/8 bg-surface-900/60 backdrop-blur-md p-6 sm:p-8 shadow-elevated">
         <form id="signup-form" class="flex flex-col gap-5">
           <Input
-            label="Full Name"
+            label="Nama Lengkap"
             name="full_name"
             type="text"
-            placeholder="Your name"
+            placeholder="Nama lengkap Anda"
             required={true}
           />
           <Input
             label="Email"
             name="email"
             type="email"
-            placeholder="you@example.com"
-            required={true}
-          />
-          <Input
-            label="Password"
-            name="password"
-            type="password"
-            placeholder="Min. 6 characters"
+            placeholder="nama@email.com"
             required={true}
           />
 
+          <!-- Password field with visibility toggle -->
+          <div class="flex flex-col gap-1.5">
+            <label for="input-password" class="text-sm font-medium text-surface-200">
+              Kata Sandi <span class="text-confetti-pink">*</span>
+            </label>
+            <div class="relative">
+              <input
+                type="password"
+                name="password"
+                id="input-password"
+                placeholder="Minimal 6 karakter"
+                required
+                minlength="6"
+                class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 pr-11 text-sm transition-all duration-200 focus-ring"
+              />
+              <button
+                type="button"
+                id="toggle-password"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-200 transition-colors cursor-pointer"
+                aria-label="Tampilkan kata sandi"
+                tabindex="-1"
+              >
+                <svg id="eye-icon-pw" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <svg id="eye-off-icon-pw" class="h-4.5 w-4.5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Password Strength Meter -->
+            <div id="pw-strength-container" class="mt-1.5 hidden">
+              <div class="flex gap-1.5">
+                <div id="pw-bar-1" class="h-1 flex-1 rounded-full bg-surface-700 transition-colors duration-300"></div>
+                <div id="pw-bar-2" class="h-1 flex-1 rounded-full bg-surface-700 transition-colors duration-300"></div>
+                <div id="pw-bar-3" class="h-1 flex-1 rounded-full bg-surface-700 transition-colors duration-300"></div>
+              </div>
+              <p id="pw-strength-label" class="mt-1 text-xs text-surface-500 transition-colors duration-300"></p>
+            </div>
+          </div>
+
+          <!-- Confirm Password field with visibility toggle -->
+          <div class="flex flex-col gap-1.5">
+            <label for="input-confirm-password" class="text-sm font-medium text-surface-200">
+              Konfirmasi Kata Sandi <span class="text-confetti-pink">*</span>
+            </label>
+            <div class="relative">
+              <input
+                type="password"
+                name="confirm_password"
+                id="input-confirm-password"
+                placeholder="Ulangi kata sandi"
+                required
+                class="form-input w-full rounded-xl border bg-surface-800/50 px-4 py-2.5 pr-11 text-sm transition-all duration-200 focus-ring"
+              />
+              <button
+                type="button"
+                id="toggle-confirm-password"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-200 transition-colors cursor-pointer"
+                aria-label="Tampilkan konfirmasi kata sandi"
+                tabindex="-1"
+              >
+                <svg id="eye-icon-cpw" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <svg id="eye-off-icon-cpw" class="h-4.5 w-4.5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
+              </button>
+            </div>
+            <p id="confirm-pw-error" class="hidden mt-0.5 text-xs text-error"></p>
+          </div>
+
           <Button type="submit" variant="primary" size="lg" fullWidth={true} id="signup-submit-btn">
-            Create Account
+            <span id="signup-btn-text">Daftar Akun</span>
+            <svg id="signup-spinner" class="hidden h-4.5 w-4.5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
           </Button>
         </form>
+
+        <!-- Legal Disclaimer -->
+        <p class="mt-4 text-center text-xs leading-relaxed text-surface-500">
+          Dengan mendaftar, Anda menyetujui
+          <a href="/terms" class="text-surface-300 underline decoration-surface-600 underline-offset-2 hover:text-primary transition-colors">Ketentuan Layanan</a>
+          dan
+          <a href="/privacy" class="text-surface-300 underline decoration-surface-600 underline-offset-2 hover:text-primary transition-colors">Kebijakan Privasi</a>
+          ElCelebrate.
+        </p>
       </div>
 
       <p class="mt-6 text-center text-sm text-surface-400">
-        Already have an account?
-        <a href="/login" class="font-medium text-primary hover:text-primary-light transition-colors">
-          Sign in
+        Sudah punya akun?
+        <a href="/signin" class="font-medium text-primary hover:text-primary-light transition-colors">
+          Masuk
         </a>
       </p>
     </div>
@@ -76,13 +158,132 @@ if (user) {
 </BaseLayout>
 
 <script>
+  // ── Password Visibility Toggles ───────────────────────────────
+  function setupPasswordToggle(
+    btnId: string,
+    inputId: string,
+    eyeId: string,
+    eyeOffId: string
+  ) {
+    const btn = document.getElementById(btnId);
+    const input = document.getElementById(inputId) as HTMLInputElement | null;
+    const eyeIcon = document.getElementById(eyeId);
+    const eyeOffIcon = document.getElementById(eyeOffId);
+
+    btn?.addEventListener('click', () => {
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      eyeIcon?.classList.toggle('hidden', isPassword);
+      eyeOffIcon?.classList.toggle('hidden', !isPassword);
+      btn.setAttribute('aria-label', isPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+    });
+  }
+
+  setupPasswordToggle('toggle-password', 'input-password', 'eye-icon-pw', 'eye-off-icon-pw');
+  setupPasswordToggle('toggle-confirm-password', 'input-confirm-password', 'eye-icon-cpw', 'eye-off-icon-cpw');
+
+  // ── Password Strength Meter ───────────────────────────────────
+  const passwordInput = document.getElementById('input-password') as HTMLInputElement | null;
+  const strengthContainer = document.getElementById('pw-strength-container');
+  const bar1 = document.getElementById('pw-bar-1');
+  const bar2 = document.getElementById('pw-bar-2');
+  const bar3 = document.getElementById('pw-bar-3');
+  const strengthLabel = document.getElementById('pw-strength-label');
+
+  function getPasswordStrength(pw: string): { level: number; label: string; color: string } {
+    if (!pw) return { level: 0, label: '', color: '' };
+
+    let score = 0;
+    if (pw.length >= 6) score++;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+    if (score <= 2) return { level: 1, label: 'Lemah', color: 'bg-red-400' };
+    if (score <= 3) return { level: 2, label: 'Cukup', color: 'bg-amber-400' };
+    return { level: 3, label: 'Kuat', color: 'bg-emerald-400' };
+  }
+
+  const strengthColors: Record<string, string> = {
+    'bg-red-400': 'text-red-400',
+    'bg-amber-400': 'text-amber-400',
+    'bg-emerald-400': 'text-emerald-400',
+  };
+
+  passwordInput?.addEventListener('input', () => {
+    const pw = passwordInput.value;
+    if (!strengthContainer || !bar1 || !bar2 || !bar3 || !strengthLabel) return;
+
+    if (!pw) {
+      strengthContainer.classList.add('hidden');
+      return;
+    }
+
+    strengthContainer.classList.remove('hidden');
+    const { level, label, color } = getPasswordStrength(pw);
+
+    // Reset bars
+    const resetClass = 'bg-surface-700';
+    [bar1, bar2, bar3].forEach((bar) => {
+      bar.className = `h-1 flex-1 rounded-full transition-colors duration-300 ${resetClass}`;
+    });
+
+    // Fill bars based on level
+    if (level >= 1) bar1.className = `h-1 flex-1 rounded-full transition-colors duration-300 ${color}`;
+    if (level >= 2) bar2.className = `h-1 flex-1 rounded-full transition-colors duration-300 ${color}`;
+    if (level >= 3) bar3.className = `h-1 flex-1 rounded-full transition-colors duration-300 ${color}`;
+
+    // Label
+    strengthLabel.textContent = label;
+    strengthLabel.className = `mt-1 text-xs transition-colors duration-300 ${strengthColors[color] || 'text-surface-500'}`;
+  });
+
+  // ── Confirm Password Validation ───────────────────────────────
+  const confirmInput = document.getElementById('input-confirm-password') as HTMLInputElement | null;
+  const confirmError = document.getElementById('confirm-pw-error');
+
+  function validatePasswordMatch(): boolean {
+    if (!passwordInput || !confirmInput || !confirmError) return true;
+    if (confirmInput.value && passwordInput.value !== confirmInput.value) {
+      confirmError.textContent = 'Kata sandi tidak cocok. Silakan periksa kembali.';
+      confirmError.classList.remove('hidden');
+      confirmInput.classList.add('form-input-error');
+      return false;
+    }
+    confirmError.classList.add('hidden');
+    confirmInput.classList.remove('form-input-error');
+    return true;
+  }
+
+  confirmInput?.addEventListener('input', validatePasswordMatch);
+  passwordInput?.addEventListener('input', () => {
+    if (confirmInput?.value) validatePasswordMatch();
+  });
+
+  // ── Signup Form Submission ────────────────────────────────────
   document.getElementById('signup-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // Client-side password match check
+    if (!validatePasswordMatch()) {
+      (window as any).showToast({
+        message: 'Kata sandi dan konfirmasi kata sandi tidak cocok.',
+        type: 'error',
+      });
+      return;
+    }
+
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     const btn = document.getElementById('signup-submit-btn') as HTMLButtonElement;
+    const btnText = document.getElementById('signup-btn-text');
+    const spinner = document.getElementById('signup-spinner');
+
     btn.disabled = true;
-    btn.textContent = 'Creating account...';
+    if (btnText) btnText.textContent = 'Mendaftarkan...';
+    spinner?.classList.remove('hidden');
 
     try {
       const res = await fetch('/api/auth/signup', {
@@ -109,16 +310,17 @@ if (user) {
             // Ignore client sync errors
           }
         }
-        (window as any).showToast({ message: 'Account created! Redirecting...', type: 'success' });
+        (window as any).showToast({ message: 'Akun berhasil dibuat! Mengalihkan...', type: 'success' });
         setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
       } else {
-        (window as any).showToast({ message: data.error || 'Signup failed', type: 'error' });
+        (window as any).showToast({ message: data.error || 'Pendaftaran gagal. Silakan coba lagi.', type: 'error' });
       }
     } catch {
-      (window as any).showToast({ message: 'Network error. Please try again.', type: 'error' });
+      (window as any).showToast({ message: 'Kesalahan jaringan. Silakan coba lagi.', type: 'error' });
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Create Account';
+      if (btnText) btnText.textContent = 'Daftar Akun';
+      spinner?.classList.add('hidden');
     }
   });
 </script>
