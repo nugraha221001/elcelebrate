@@ -61,6 +61,7 @@
   /* ── Typography ────────────────────────────────────────────── */
   --font-sans: 'Inter', 'system-ui', '-apple-system', 'Segoe UI', sans-serif;
   --font-display: 'Outfit', 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Responsive Type Scale */

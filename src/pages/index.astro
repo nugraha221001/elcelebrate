@@ -5,160 +5,796 @@ import BaseLayout from '../components/layout/BaseLayout.astro';
 import Navbar from '../components/layout/Navbar.astro';
 import Footer from '../components/layout/Footer.astro';
 import Button from '../components/ui/Button.astro';
-import { CATEGORY_META } from '../lib/types';
+import {
+  Cake,
+  Gem,
+  GraduationCap,
+  MailOpen,
+  Heart,
+  Sparkles,
+  Ticket,
+  Music,
+  Images,
+  MessageSquareHeart,
+  ArrowRight,
+  Check,
+  Copy,
+  Disc3,
+} from 'lucide-astro';
 
 const user = Astro.locals.user;
+
+interface BoutiqueCategory {
+  id: string;
+  name: string;
+  edition: string;
+  desc: string;
+  accent: 'wedding' | 'birthday' | 'anniversary' | 'graduation' | 'invitation' | 'love' | 'greetings';
+  icon: any;
+}
+
+const BOUTIQUE_CATEGORIES: BoutiqueCategory[] = [
+  {
+    id: 'wedding',
+    name: 'Undangan Pernikahan',
+    edition: 'Atelier Signature',
+    desc: 'Buku tamu digital, konfirmasi RSVP terpadu, alunan musik latar, serta pembukaan gerbang megah nan sakral.',
+    accent: 'wedding',
+    icon: Gem,
+  },
+  {
+    id: 'birthday',
+    name: 'Ulang Tahun & Milad',
+    edition: 'Polaroid Keepsake',
+    desc: 'Rayakan pertambahan usia dengan animasi kotak kado interaktif, pita satin, serta deretan foto kenangan.',
+    accent: 'birthday',
+    icon: Cake,
+  },
+  {
+    id: 'anniversary',
+    name: 'Perayaan Anniversary',
+    edition: 'Velvet Romance',
+    desc: 'Bingkai kilas balik kisah cinta abadi dalam kotak perhiasan velvet berhias kilau emas mewah.',
+    accent: 'anniversary',
+    icon: Heart,
+  },
+  {
+    id: 'graduation',
+    name: 'Wisuda & Kelulusan',
+    edition: 'Diploma Folio',
+    desc: 'Sematkan gulungan ijazah kehormatan dan lembaran ucapan apresiasi atas pencapaian akademis tertinggi.',
+    accent: 'graduation',
+    icon: GraduationCap,
+  },
+  {
+    id: 'invitation',
+    name: 'Undangan Acara & Jamuan',
+    edition: 'VIP Perforated',
+    desc: 'Format tiket eksklusif dengan perforasi elegan untuk pesta privat, syukuran, gala dinner, atau peluncuran.',
+    accent: 'invitation',
+    icon: Ticket,
+  },
+  {
+    id: 'love',
+    name: 'Surat Cinta & Romansa',
+    edition: 'Wax-Sealed Parchment',
+    desc: 'Surat lipat berstempel lilin autentik untuk mengungkap isi kalbu terdalam secara intim dan penuh ketulusan.',
+    accent: 'love',
+    icon: MailOpen,
+  },
+  {
+    id: 'greetings',
+    name: 'Ucapan & Hari Raya',
+    edition: '3D Gold Bifold',
+    desc: 'Kartu lipat tiga dimensi berornamen cahaya emas untuk mengantarkan doa tulus di hari kemenangan dan perayaan.',
+    accent: 'greetings',
+    icon: Sparkles,
+  },
+];
 ---
 
-<BaseLayout title="ElCelebrate — Platform Perayaan & Undangan Digital Eksklusif" description="Ciptakan kartu ucapan dan undangan digital mewah dengan animasi sinematik, musik latar, serta galeri foto interaktif yang berkesan.">
+<BaseLayout
+  title="ElCelebrate — Studio Kartu & Undangan Digital Eksklusif"
+  description="Studio digital stationery eksklusif: rancang undangan dan kartu ucapan mewah berarsitektur editorial dengan animasi pembuka sinematik, musik latar, serta RSVP terpadu."
+>
   <Navbar user={user} />
 
-  <!-- Hero Section -->
-  <section class="relative w-full min-h-screen overflow-hidden">
-    <!-- Ambient background -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-      <div class="absolute left-1/4 top-0 h-150 w-150 -translate-x-1/2 rounded-full bg-primary/8 blur-[120px]"></div>
-      <div class="absolute right-1/4 top-1/3 h-125 w-125 translate-x-1/2 rounded-full bg-secondary/6 blur-[100px]"></div>
-      <div class="absolute bottom-0 left-1/2 h-100 w-100 -translate-x-1/2 rounded-full bg-accent/5 blur-[80px]"></div>
-    </div>
+  <!-- Restrained Warm Spotlight Atmosphere -->
+  <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div
+      class="absolute top-0 left-1/2 -translate-x-1/2 h-180 w-full max-w-5xl opacity-80"
+      style="background: radial-gradient(circle at 50% 0%, rgba(245, 197, 99, 0.07) 0%, rgba(245, 197, 99, 0.02) 40%, transparent 75%);"
+    ></div>
+  </div>
 
-    <div class="relative mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-      <div class="mx-auto max-w-3xl text-center">
-        <!-- Floating emoji decorations -->
-        <div class="mb-8 sm:mb-10 flex justify-center gap-4">
-          <span class="animate-float text-4xl" style="animation-delay: 0s">💍</span>
-          <span class="animate-float text-4xl" style="animation-delay: 0.5s">🎂</span>
-          <span class="animate-float text-4xl" style="animation-delay: 1s">🎓</span>
-          <span class="animate-float text-4xl" style="animation-delay: 1.5s">💌</span>
+  <!-- Hero Section: Editorial Split with Live Interactive Card Showcase -->
+  <section class="relative w-full overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-28 lg:pt-20 lg:pb-32 border-b border-white/8">
+    <div class="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        
+        <!-- Left Column: Editorial Studio Copywriting & Trust Strip -->
+        <div class="lg:col-span-7 text-left">
+          <!-- Studio Atelier Tag -->
+          <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-[#f5c563]/25 bg-[#f5c563]/5 text-[#f5c563] text-xs tracking-wider uppercase font-medium mb-6">
+            <Sparkles class="w-3.5 h-3.5 text-[#f5c563]" stroke-width="1.5" />
+            <span>Digital Stationery & Invitation Studio</span>
+          </div>
+
+          <!-- Main Editorial Heading -->
+          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-white tracking-tight leading-[1.14]">
+            Bukan sekadar pesan singkat, <br class="hidden sm:inline" />
+            <span class="font-serif italic font-normal text-[#f5c563]">merancang momen yang layak dikenang.</span>
+          </h1>
+
+          <!-- Grounded Indonesian Copywriting -->
+          <p class="mt-6 text-base sm:text-lg text-surface-300 leading-relaxed max-w-xl">
+            Hadirkan keanggunan seni undangan fisik ke dalam medium digital. Ciptakan kartu ucapan dan undangan interaktif dengan animasi pembuka sinematik, kurasi musik personal, serta tipografi editorial yang bernilai seni abadi.
+          </p>
+
+          <!-- Clean CTAs -->
+          <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <Button
+              href={user ? '/dashboard/create' : '/signup'}
+              variant="primary"
+              size="lg"
+              id="hero-cta"
+              class="shadow-xl shadow-[#f5c563]/15 flex items-center justify-center gap-2"
+            >
+              <span>Mulai Mendesain</span>
+              <ArrowRight class="w-4 h-4 ml-0.5" stroke-width="2" />
+            </Button>
+            <Button href="#categories" variant="secondary" size="lg" class="flex items-center justify-center">
+              Jelajahi Koleksi Desain
+            </Button>
+          </div>
+
+          <!-- Understated Editorial Trust Strip -->
+          <div class="mt-12 pt-8 border-t border-white/10 flex flex-wrap items-center gap-y-3 gap-x-6 text-xs sm:text-sm text-surface-300">
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#f5c563]"></span>
+              <span>Bebas Iklan & Watermark</span>
+            </div>
+            <div class="h-4 w-px bg-white/15 hidden sm:block"></div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#f5c563]"></span>
+              <span>Ringan & Akses Instan &lt;1 Detik</span>
+            </div>
+            <div class="h-4 w-px bg-white/15 hidden sm:block"></div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#f5c563]"></span>
+              <span>7 Kategori Eksklusif</span>
+            </div>
+          </div>
         </div>
 
-        <h1 class="font-display" style="font-size: var(--text-display); font-weight: 800; line-height: 1.1;">
-          <span class="bg-linear-to-r from-amber-300 via-pink-400 to-purple-400 bg-clip-text text-transparent">Abadikan & Rayakan</span>
-          <br />
-          <span class="text-surface-50">Setiap Momen Istimewa</span>
-        </h1>
+        <!-- Right Column: Live Interactive Card Showcase -->
+        <div class="lg:col-span-5 flex flex-col items-center justify-center">
+          <!-- Subtle Outer Frame Glow -->
+          <div class="relative group p-1.5 rounded-[38px] bg-linear-to-b from-[#f5c563]/30 via-white/5 to-[#f5c563]/10 shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
+            
+            <!-- Live Preview Indicator Pill -->
+            <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1 rounded-full border border-[#f5c563]/30 bg-[#181522]/95 backdrop-blur-md text-[11px] font-medium text-[#f5c563] inline-flex items-center gap-2 shadow-lg">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Pratinjau Interaktif Studio</span>
+            </div>
 
-        <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-surface-300" style="font-size: var(--text-subheading);">
-          Ciptakan kartu ucapan dan undangan digital mewah dengan animasi sinematik, musik latar, serta galeri foto interaktif yang berkesan.
-        </p>
+            <!-- Miniature Card Showcase Frame -->
+            <div
+              id="hero-showcase-frame"
+              class="w-72.5 sm:w-80 aspect-9/16 rounded-[32px] border border-[#f5c563]/30 bg-[#181522] shadow-2xl relative overflow-hidden select-none"
+            >
+              <!-- ── LAYER 1: Card Interior (Revealed upon unboxing) ── -->
+              <div
+                id="hero-card-interior"
+                class="absolute inset-0 p-5 flex flex-col justify-between text-center transition-all duration-700 bg-linear-to-b from-[#181522] via-[#15121e] to-[#0f0d15]"
+              >
+                <!-- Architectural Inner Gold Hairline -->
+                <div class="absolute inset-3 border border-[#f5c563]/20 rounded-2xl pointer-events-none"></div>
 
-        <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Button href="/dashboard/create" variant="primary" size="lg" id="hero-cta">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Buat Kartu Sekarang
-          </Button>
-          <Button href="#categories" variant="secondary" size="lg">
-            Jelajahi Kategori
-          </Button>
+                <!-- Top: Ambient Music Track Pill -->
+                <div class="relative z-10 pt-2">
+                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-surface-300">
+                    <div class="flex items-end gap-0.5 h-3">
+                      <span class="w-0.5 bg-[#f5c563] h-2 animate-[pulse_1s_ease-in-out_infinite]"></span>
+                      <span class="w-0.5 bg-[#f5c563] h-3 animate-[pulse_0.7s_ease-in-out_infinite]"></span>
+                      <span class="w-0.5 bg-[#f5c563] h-1.5 animate-[pulse_1.2s_ease-in-out_infinite]"></span>
+                    </div>
+                    <span class="truncate max-w-42.5">Canon in D • Piano Romance</span>
+                  </div>
+                </div>
+
+                <!-- Center: Couple Typography & Ceremony Details -->
+                <div class="relative z-10 my-auto py-2">
+                  <span class="text-[9px] uppercase tracking-[0.25em] text-[#f5c563]/90 font-medium">Walimatul &apos;Ursy</span>
+                  
+                  <h3 class="font-serif italic text-2xl font-normal text-white mt-2 leading-tight">
+                    Raden Mas Arya <br />
+                    <span class="text-xs font-sans not-italic text-[#f5c563]/80">&</span> <br />
+                    Arum Sekar Kinanti
+                  </h3>
+
+                  <div class="w-12 h-px bg-[#f5c563]/40 mx-auto my-3"></div>
+
+                  <p class="text-[11px] text-surface-200 font-medium">Sabtu, 24 Oktober 2026</p>
+                  <p class="text-[10px] text-surface-400 mt-0.5">Grand Ballroom Dharmawangsa, Jakarta</p>
+
+                  <!-- Interactive RSVP Badge -->
+                  <button
+                    id="showcase-rsvp-toggle"
+                    type="button"
+                    class="mt-4 px-3.5 py-1.5 rounded-lg border border-[#f5c563]/30 bg-[#f5c563]/10 hover:bg-[#f5c563]/20 text-[10px] font-semibold text-[#f5c563] transition-all cursor-pointer active:scale-95 inline-flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Check class="w-3 h-3 text-[#f5c563]" stroke-width="2" />
+                    <span id="showcase-rsvp-label">Konfirmasi Kehadiran</span>
+                  </button>
+                </div>
+
+                <!-- Bottom: Re-seal Action -->
+                <div class="relative z-10 pb-2">
+                  <button
+                    id="showcase-reseal-btn"
+                    type="button"
+                    class="w-full py-1.5 px-3 rounded-lg border border-white/10 hover:border-[#f5c563]/40 bg-white/5 hover:bg-white/10 text-[10px] text-surface-400 hover:text-white transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <span>Tutup Kembali Segel</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- ── LAYER 2: Gate Split Doors (Left & Right) ── -->
+              <!-- Left Gate Door -->
+              <div
+                id="hero-gate-left"
+                class="absolute inset-y-0 left-0 w-1/2 bg-[#1c182a] border-r border-[#f5c563]/30 z-20 transition-transform duration-700 ease-luxury flex flex-col justify-between p-3.5 shadow-xl overflow-hidden"
+              >
+                <!-- Subtle Gold Filigree Hairline -->
+                <div class="absolute inset-2 border-r border-[#f5c563]/15 pointer-events-none"></div>
+                <div class="w-4 h-4 border-t border-l border-[#f5c563]/40"></div>
+                <div class="w-4 h-4 border-b border-l border-[#f5c563]/40"></div>
+              </div>
+
+              <!-- Right Gate Door -->
+              <div
+                id="hero-gate-right"
+                class="absolute inset-y-0 right-0 w-1/2 bg-[#1c182a] border-l border-[#f5c563]/30 z-20 transition-transform duration-700 ease-luxury flex flex-col justify-between p-3.5 shadow-xl overflow-hidden"
+              >
+                <!-- Subtle Gold Filigree Hairline -->
+                <div class="absolute inset-2 border-l border-[#f5c563]/15 pointer-events-none"></div>
+                <div class="w-4 h-4 border-t border-r border-[#f5c563]/40 ml-auto"></div>
+                <div class="w-4 h-4 border-b border-r border-[#f5c563]/40 ml-auto"></div>
+              </div>
+
+              <!-- ── LAYER 3: Cover Typography Overlay (Crosses both doors) ── -->
+              <div
+                id="hero-cover-text"
+                class="absolute inset-x-0 top-12 text-center z-25 transition-all duration-400 pointer-events-none px-4"
+              >
+                <p class="text-[9px] uppercase tracking-[0.25em] text-[#f5c563]/80 font-medium">The Wedding Celebration Of</p>
+                <h3 class="font-serif italic text-xl font-normal text-white mt-1.5">Raden & Arum</h3>
+                <p class="text-[10px] text-surface-400 mt-1">24 . 10 . 2026</p>
+              </div>
+
+              <!-- ── LAYER 4: Center Wax Seal Medallion ── -->
+              <div
+                id="hero-wax-seal"
+                class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 transition-all duration-500 ease-luxury cursor-pointer group"
+                title="Klik untuk membuka kartu"
+              >
+                <div class="w-16 h-16 rounded-full bg-linear-to-br from-[#d9a738] via-[#f5c563] to-[#9e7118] p-1 shadow-[0_8px_25px_rgba(245,197,99,0.45)] border border-[#fae09a]/80 flex items-center justify-center transform group-hover:scale-105 active:scale-95 transition-transform">
+                  <div class="w-full h-full rounded-full border border-amber-950/20 bg-linear-to-br from-[#c9952a] via-[#e5b34e] to-[#966b16] flex flex-col items-center justify-center shadow-inner">
+                    <span class="font-serif italic font-bold text-amber-950 text-xs tracking-wider">R&A</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── LAYER 5: Cover Footer & Interactive CTA Button ── -->
+              <div
+                id="hero-cover-footer"
+                class="absolute inset-x-4 bottom-5 z-25 transition-all duration-400 text-center"
+              >
+                <button
+                  id="hero-unbox-btn"
+                  type="button"
+                  class="w-full py-2.5 px-4 rounded-xl bg-linear-to-r from-[#f5c563] to-[#fae09a] text-[#0f0d15] text-xs font-semibold shadow-lg shadow-[#f5c563]/25 hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Sparkles class="w-3.5 h-3.5 text-[#0f0d15]" stroke-width="2" />
+                  <span>Buka Segel Undangan</span>
+                </button>
+                <p class="text-[10px] text-surface-400 mt-2">Klik untuk menyaksikan simulasi langsung</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Stats -->
-        <div class="mt-16 grid grid-cols-3 gap-6">
-          <div class="text-center">
-            <div class="text-2xl font-bold text-surface-50 sm:text-3xl">Gratis</div>
-            <div class="mt-1 text-xs text-surface-400 sm:text-sm">Mudah & Siap Pakai</div>
-          </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-surface-50 sm:text-3xl">&lt;1 dtk</div>
-            <div class="mt-1 text-xs text-surface-400 sm:text-sm">Akses Cepat & Ringan</div>
-          </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-surface-50 sm:text-3xl">7</div>
-            <div class="mt-1 text-xs text-surface-400 sm:text-sm">Kategori Acara Lengkap</div>
-          </div>
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- Categories Section -->
-  <section id="categories" class="relative w-full overflow-hidden py-(--space-section)">
+  <!-- Categories Section: Luxury Boutique Stationery Samples -->
+  <section id="categories" class="relative w-full overflow-hidden py-20 sm:py-28 border-b border-white/8">
     <div class="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Header -->
       <div class="mx-auto max-w-2xl text-center">
-        <h2 class="font-display text-surface-50" style="font-size: var(--text-heading); font-weight: 700;">
-          Pilihan Kartu untuk Setiap Selebrasi
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#f5c563]/20 bg-[#f5c563]/5 text-[#f5c563] text-xs font-medium uppercase tracking-wider mb-3">
+          <Gem class="w-3.5 h-3.5 text-[#f5c563]" stroke-width="1.5" />
+          <span>Koleksi Desain Atelier</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+          Sentuhan Fisik untuk Setiap Selebrasi
         </h2>
-        <p class="mt-4 text-surface-400">Pilih kategori acara dan hadirkan pengalaman digital yang tak terlupakan</p>
+        <p class="mt-4 text-surface-400 text-base leading-relaxed">
+          Setiap format dirancang sebagai sampel stationery fisik yang elegan—menghadirkan tekstur, ornamen, dan karakteristik tersendiri untuk setiap fase istimewa.
+        </p>
       </div>
 
-      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {Object.entries(CATEGORY_META).map(([key, meta], i) => (
-          <a
-            href="/dashboard/create"
-            class="group relative overflow-hidden rounded-2xl bg-surface-900/60 backdrop-blur-md border border-white/8 p-6 transition-all duration-300 hover:shadow-elevated hover:-translate-y-2 hover:border-purple-500/30"
-            id={`category-${key}`}
-            style={`animation: fade-in-up 0.6s var(--ease-smooth) forwards; animation-delay: ${i * 100}ms; opacity: 0;`}
-          >
-            <div class="mb-4 text-5xl transition-transform duration-300 group-hover:scale-110">
-              {meta.emoji}
-            </div>
-            <h3 class="text-lg font-semibold text-surface-100">{meta.label}</h3>
-            <p class="mt-2 text-sm text-surface-400">{meta.description}</p>
-            <div class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-pink-400 opacity-0 transition-all duration-300 group-hover:opacity-100">
-              + Buat Kartu
-              <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </div>
-          </a>
-        ))}
+      <!-- 7 Boutique Stationery Cards Grid -->
+      <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {BOUTIQUE_CATEGORIES.map((cat, idx) => {
+          const IconComponent = cat.icon;
+          return (
+            <a
+              href="/dashboard/create"
+              id={`category-${cat.id}`}
+              class="group relative overflow-hidden rounded-2xl bg-[#181522]/80 backdrop-blur-md border border-white/10 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#f5c563]/40 hover:shadow-[0_12px_32px_rgba(245,197,99,0.08)] flex flex-col justify-between"
+              style={`animation: fade-in-up 0.5s var(--ease-smooth) forwards; animation-delay: ${idx * 60}ms; opacity: 0;`}
+            >
+              <!-- Micro-Accent: Wedding Corner Hairline -->
+              {cat.accent === 'wedding' && (
+                <>
+                  <div class="w-4 h-4 border-t border-l border-[#f5c563]/40 absolute top-3 left-3 pointer-events-none transition-colors group-hover:border-[#f5c563]"></div>
+                  <div class="w-4 h-4 border-b border-r border-[#f5c563]/40 absolute bottom-3 right-3 pointer-events-none transition-colors group-hover:border-[#f5c563]"></div>
+                </>
+              )}
+
+              <!-- Micro-Accent: Birthday Polaroid Corner Frame -->
+              {cat.accent === 'birthday' && (
+                <div class="absolute top-0 right-0 w-10 h-10 overflow-hidden pointer-events-none">
+                  <div class="w-14 h-14 bg-[#f5c563]/10 rotate-45 transform origin-bottom-left border-b border-[#f5c563]/30"></div>
+                </div>
+              )}
+
+              <!-- Micro-Accent: Invitation Ticket Perforations -->
+              {cat.accent === 'invitation' && (
+                <>
+                  <div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#0f0d15] border border-white/10 pointer-events-none"></div>
+                  <div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#0f0d15] border border-white/10 pointer-events-none"></div>
+                </>
+              )}
+
+              <!-- Micro-Accent: Love Wax Seal Stamp Crease -->
+              {cat.accent === 'love' && (
+                <div class="absolute -bottom-6 -right-6 w-16 h-16 rounded-full border border-rose-400/20 bg-rose-500/5 pointer-events-none"></div>
+              )}
+
+              <!-- Card Header: Medallion + Edition Badge -->
+              <div>
+                <div class="flex items-center justify-between gap-3 mb-5">
+                  <!-- Champagne Gold Glass Medallion -->
+                  <div class="w-11 h-11 rounded-xl border border-[#f5c563]/25 bg-[#f5c563]/5 text-[#f5c563] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
+                    <IconComponent class="w-5 h-5" stroke-width="1.5" />
+                  </div>
+                  <span class="text-[11px] font-medium text-surface-400 uppercase tracking-wider px-2.5 py-1 rounded-md bg-white/5 border border-white/5">
+                    {cat.edition}
+                  </span>
+                </div>
+
+                <h3 class="text-lg font-semibold text-white group-hover:text-[#f5c563] transition-colors">
+                  {cat.name}
+                </h3>
+                <p class="mt-2.5 text-xs text-surface-400 leading-relaxed">
+                  {cat.desc}
+                </p>
+              </div>
+
+              <!-- Card Footer: Refined CTA Link -->
+              <div class="mt-6 pt-4 border-t border-white/8 flex items-center justify-between text-xs font-medium text-[#f5c563]">
+                <span>Rancang Desain</span>
+                <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" stroke-width="2" />
+              </div>
+            </a>
+          );
+        })}
       </div>
     </div>
   </section>
 
-  <!-- Features Section -->
-  <section class="relative w-full overflow-hidden border-t border-white/8 py-(--space-section)">
+  <!-- Features Section: Asymmetric Bento Grid ("Lebih dari Sekadar Kartu") -->
+  <section class="relative w-full overflow-hidden py-20 sm:py-28 border-b border-white/8">
     <div class="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Header -->
       <div class="mx-auto max-w-2xl text-center">
-        <h2 class="font-display text-surface-50" style="font-size: var(--text-heading); font-weight: 700;">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#f5c563]/20 bg-[#f5c563]/5 text-[#f5c563] text-xs font-medium uppercase tracking-wider mb-3">
+          <Sparkles class="w-3.5 h-3.5 text-[#f5c563]" stroke-width="1.5" />
+          <span>Fitur & Pengalaman</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">
           Lebih Dari Sekadar Kartu Ucapan
         </h2>
-        <p class="mt-4 text-surface-400">Setiap kartu dirancang sebagai pengalaman digital interaktif yang menyentuh hati</p>
+        <p class="mt-4 text-surface-400 text-base leading-relaxed">
+          Setiap detail dibangun dengan sentuhan atelier digital—memadukan kemudahan teknologi masa kini dengan kehangatan relasi personal.
+        </p>
       </div>
 
-      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {[
-          { icon: '🎁', title: 'Animasi Pembuka Sinematik', desc: 'Buka amplop, belah gerbang megah, atau tarik pita — tentukan cara penerima membuka kejutan kartu' },
-          { icon: '🎵', title: 'Musik Latar Eksklusif', desc: 'Hadirkan suasana mendalam dengan instrumen pilihan atau unggah lagu favoritmu' },
-          { icon: '📸', title: 'Galeri Foto Interaktif', desc: 'Unggah foto kenangan dengan kompresi otomatis WebP berkecepatan tinggi dan kualitas tajam' },
-          { icon: '🎊', title: 'Ledakan Konfeti Meriah', desc: 'Hujan partikel konfeti menyambut momen pembukaan kartu secara spektakuler' },
-          { icon: '💬', title: 'Buku Tamu & Ucapan Doa', desc: 'Sahabat dan kerabat dapat memberikan ucapan selamat serta doa secara langsung' },
-          { icon: '⏰', title: 'Hitung Mundur Waktu Nyata', desc: 'Bangun antusiasme menuju hari bahagia dengan countdown interaktif' },
-        ].map((f, i) => (
-          <div
-            class="rounded-2xl border border-white/8 hover:border-purple-500/30 transition-all duration-300 bg-surface-900/60 backdrop-blur-md p-6 hover:shadow-glow-sm"
-            style={`animation: fade-in-up 0.6s var(--ease-smooth) forwards; animation-delay: ${i * 80}ms; opacity: 0;`}
-          >
-            <div class="mb-3 text-3xl">{f.icon}</div>
-            <h3 class="text-base font-semibold text-surface-100">{f.title}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-surface-400">{f.desc}</p>
+      <!-- Asymmetric Bento Grid (2 cols + 1 col, 1 col + 2 cols) -->
+      <div class="mt-14 grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <!-- ── BENTO 1 (md:col-span-2): Animasi Pembuka Sinematik ── -->
+        <div class="md:col-span-2 rounded-2xl border border-white/10 bg-[#181522]/80 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-[#f5c563]/30">
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-11 h-11 rounded-xl border border-[#f5c563]/25 bg-[#f5c563]/5 text-[#f5c563] flex items-center justify-center shrink-0">
+                <Sparkles class="w-5 h-5" stroke-width="1.5" />
+              </div>
+              <div>
+                <span class="text-[11px] font-medium text-[#f5c563] uppercase tracking-wider">Unboxing Experience</span>
+                <h3 class="text-lg sm:text-xl font-bold text-white">Animasi Pembuka Sinematik</h3>
+              </div>
+            </div>
+            <p class="text-sm text-surface-400 leading-relaxed max-w-xl">
+              Hadirkan kesan mendalam sejak detik pertama. Pilih ragam gaya pembuka bertema fisik seperti belahan gerbang megah, segel lilin wax seal, atau tumpukan kartu polaroid.
+            </p>
           </div>
-        ))}
+
+          <!-- Miniature Previews Strip (Gate Split, Wax Seal, Polaroid Stack) -->
+          <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            
+            <!-- Miniature 1: Gate Split -->
+            <div class="rounded-xl border border-white/10 bg-[#0f0d15]/80 p-3 flex flex-col items-center text-center">
+              <div class="w-full h-24 rounded-lg bg-[#181522] border border-[#f5c563]/20 relative flex items-center justify-center overflow-hidden mb-2.5">
+                <!-- Left Flap -->
+                <div class="absolute inset-y-0 left-0 w-[48%] bg-surface-700 border-r border-[#f5c563]/30 flex items-center justify-end pr-1">
+                  <div class="w-1 h-6 bg-[#f5c563]/40 rounded-full"></div>
+                </div>
+                <!-- Right Flap -->
+                <div class="absolute inset-y-0 right-0 w-[48%] bg-surface-700 border-l border-[#f5c563]/30 flex items-center justify-start pl-1">
+                  <div class="w-1 h-6 bg-[#f5c563]/40 rounded-full"></div>
+                </div>
+                <!-- Interior Peek -->
+                <span class="text-[10px] font-serif italic text-[#f5c563]">R & A</span>
+              </div>
+              <span class="text-xs font-semibold text-white">Gate Split</span>
+              <span class="text-[10px] text-surface-400 mt-0.5">Pintu Gerbang Belah</span>
+            </div>
+
+            <!-- Miniature 2: Wax Seal -->
+            <div class="rounded-xl border border-white/10 bg-[#0f0d15]/80 p-3 flex flex-col items-center text-center">
+              <div class="w-full h-24 rounded-lg bg-[#181522] border border-[#f5c563]/20 relative flex flex-col items-center justify-center overflow-hidden mb-2.5">
+                <!-- Folded Envelope Flap Angle -->
+                <div class="w-16 h-10 border-b border-[#f5c563]/30 bg-surface-700 rounded-b-xl flex items-center justify-center">
+                  <div class="w-7 h-7 rounded-full bg-linear-to-br from-[#d9a738] to-[#996b12] border border-[#fae09a] shadow flex items-center justify-center">
+                    <span class="text-[8px] font-serif italic text-amber-950 font-bold">Seal</span>
+                  </div>
+                </div>
+              </div>
+              <span class="text-xs font-semibold text-white">Wax Seal</span>
+              <span class="text-[10px] text-surface-400 mt-0.5">Segel Lilin Vintage</span>
+            </div>
+
+            <!-- Miniature 3: Polaroid Stack -->
+            <div class="rounded-xl border border-white/10 bg-[#0f0d15]/80 p-3 flex flex-col items-center text-center">
+              <div class="w-full h-24 rounded-lg bg-[#181522] border border-[#f5c563]/20 relative flex items-center justify-center overflow-hidden mb-2.5">
+                <!-- Layered Cards -->
+                <div class="w-12 h-14 bg-white/90 rounded-[3px] shadow -rotate-6 absolute border border-neutral-300 flex flex-col p-1">
+                  <div class="w-full h-8 bg-amber-950/20 rounded-xs"></div>
+                </div>
+                <div class="w-12 h-14 bg-white rounded-[3px] shadow rotate-3 relative z-10 border border-neutral-300 flex flex-col p-1">
+                  <div class="w-full h-8 bg-[#181522] rounded-xs flex items-center justify-center">
+                    <span class="text-[7px] text-[#f5c563] font-serif">Photo</span>
+                  </div>
+                </div>
+              </div>
+              <span class="text-xs font-semibold text-white">Polaroid Stack</span>
+              <span class="text-[10px] text-surface-400 mt-0.5">Tumpukan Foto Berlapis</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── BENTO 2 (md:col-span-1): Alunan Musik & Suasana ── -->
+        <div class="md:col-span-1 rounded-2xl border border-white/10 bg-[#181522]/80 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-[#f5c563]/30">
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-11 h-11 rounded-xl border border-[#f5c563]/25 bg-[#f5c563]/5 text-[#f5c563] flex items-center justify-center shrink-0">
+                <Music class="w-5 h-5" stroke-width="1.5" />
+              </div>
+              <div>
+                <span class="text-[11px] font-medium text-[#f5c563] uppercase tracking-wider">Harmoni Suasana</span>
+                <h3 class="text-lg font-bold text-white">Alunan Musik Latar</h3>
+              </div>
+            </div>
+            <p class="text-sm text-surface-400 leading-relaxed">
+              Lengkapi momen dengan iringan melodi piano atau lagu pilihan yang berputar secara anggun menyertai kartu.
+            </p>
+          </div>
+
+          <!-- Vinyl Disc & Equalizer UI Mockup -->
+          <div class="mt-8 pt-4 border-t border-white/8 flex flex-col items-center">
+            <div class="relative w-32 h-32 flex items-center justify-center">
+              <!-- Vinyl Sleeve Peek -->
+              <div class="absolute inset-0 rounded-xl bg-linear-to-br from-surface-700 to-[#181522] border border-white/10 -rotate-6 shadow-md"></div>
+              
+              <!-- Rotating Vinyl Disc -->
+              <div class="relative w-28 h-28 rounded-full bg-[#0d0b12] border-4 border-deep-plum-light shadow-xl flex items-center justify-center animate-[spin_10s_linear_infinite]">
+                <!-- Grooves -->
+                <div class="absolute inset-2 rounded-full border border-white/5"></div>
+                <div class="absolute inset-4 rounded-full border border-white/5"></div>
+                <!-- Vinyl Label -->
+                <div class="w-10 h-10 rounded-full bg-[#f5c563] border-2 border-amber-900/30 flex items-center justify-center shadow-inner">
+                  <Disc3 class="w-4 h-4 text-amber-950" stroke-width="2" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Ambient Equalizer Bars Mockup -->
+            <div class="mt-5 flex items-end gap-1.5 h-6">
+              <span class="w-1 bg-[#f5c563] h-3 rounded-full animate-[pulse_0.9s_ease-in-out_infinite]"></span>
+              <span class="w-1 bg-[#f5c563] h-5 rounded-full animate-[pulse_0.6s_ease-in-out_infinite]"></span>
+              <span class="w-1 bg-[#f5c563] h-6 rounded-full animate-[pulse_1.1s_ease-in-out_infinite]"></span>
+              <span class="w-1 bg-[#f5c563] h-4 rounded-full animate-[pulse_0.8s_ease-in-out_infinite]"></span>
+              <span class="w-1 bg-[#f5c563] h-5 rounded-full animate-[pulse_1.3s_ease-in-out_infinite]"></span>
+              <span class="w-1 bg-[#f5c563] h-2 rounded-full animate-[pulse_0.7s_ease-in-out_infinite]"></span>
+            </div>
+            <span class="text-[11px] text-surface-400 mt-2">Harmoni Akustik Berputar Halus</span>
+          </div>
+        </div>
+
+        <!-- ── BENTO 3 (md:col-span-1): Galeri WebP Ringan & Cepat ── -->
+        <div class="md:col-span-1 rounded-2xl border border-white/10 bg-[#181522]/80 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-[#f5c563]/30">
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-11 h-11 rounded-xl border border-[#f5c563]/25 bg-[#f5c563]/5 text-[#f5c563] flex items-center justify-center shrink-0">
+                <Images class="w-5 h-5" stroke-width="1.5" />
+              </div>
+              <div>
+                <span class="text-[11px] font-medium text-[#f5c563] uppercase tracking-wider">Performa Studio</span>
+                <h3 class="text-lg font-bold text-white">Galeri WebP Ringan</h3>
+              </div>
+            </div>
+            <p class="text-sm text-surface-400 leading-relaxed">
+              Kompresi cerdas di sisi peramban memastikan visual foto tajam sejernih kristal dengan ukuran berkas di bawah 80KB.
+            </p>
+          </div>
+
+          <!-- Layered Photo Frame Graphic -->
+          <div class="mt-8 pt-4 border-t border-white/8 flex flex-col items-center">
+            <div class="relative w-full max-w-50 h-32 flex items-center justify-center">
+              <!-- Back Card -->
+              <div class="absolute w-28 h-24 rounded-lg bg-surface-700 border border-white/15 -rotate-8 shadow-md p-1.5 flex flex-col">
+                <div class="w-full h-full rounded bg-[#181522] border border-white/5"></div>
+              </div>
+              <!-- Front Card -->
+              <div class="relative w-32 h-26 rounded-lg bg-linear-to-br from-[#2a243a] to-[#181522] border border-[#f5c563]/30 rotate-3 shadow-xl p-2 flex flex-col justify-between">
+                <div class="flex items-center justify-between">
+                  <span class="text-[9px] text-[#f5c563] font-medium">WebP Lossless</span>
+                  <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                </div>
+                <div class="text-center py-2">
+                  <p class="text-base font-bold text-white">&lt; 80 KB</p>
+                  <p class="text-[9px] text-surface-400">Akses Cepat & Hemat Kuota</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs">
+              <Check class="w-3.5 h-3.5" stroke-width="2" />
+              <span>Optimasi Otomatis Cloudflare R2</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── BENTO 4 (md:col-span-2): RSVP, Amplop Digital & Buku Tamu ── -->
+        <div class="md:col-span-2 rounded-2xl border border-white/10 bg-[#181522]/80 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-[#f5c563]/30">
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-11 h-11 rounded-xl border border-[#f5c563]/25 bg-[#f5c563]/5 text-[#f5c563] flex items-center justify-center shrink-0">
+                <MessageSquareHeart class="w-5 h-5" stroke-width="1.5" />
+              </div>
+              <div>
+                <span class="text-[11px] font-medium text-[#f5c563] uppercase tracking-wider">Interaksi Tamu</span>
+                <h3 class="text-lg sm:text-xl font-bold text-white">RSVP, Amplop Digital & Buku Tamu</h3>
+              </div>
+            </div>
+            <p class="text-sm text-surface-400 leading-relaxed max-w-xl">
+              Konfirmasi kehadiran terdata secara rapi, kemudahan transfer amplop tanda kasih dengan fitur salin rekening satu sentuhan, serta ruang doa dari sahabat terdekat.
+            </p>
+          </div>
+
+          <!-- Realistic Preview: Guest Wish Card + Bank Copy Pill -->
+          <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Guest Wish Card Preview -->
+            <div class="rounded-xl border border-white/10 bg-[#0f0d15]/80 p-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-[#f5c563]/15 text-[#f5c563] text-xs font-bold flex items-center justify-center">
+                      AP
+                    </div>
+                    <span class="text-xs font-semibold text-white">Ananda Putra & Rekan</span>
+                  </div>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+                    Hadir (2)
+                  </span>
+                </div>
+                <p class="text-xs text-surface-300 font-serif italic leading-relaxed">
+                  &ldquo;Selamat menempuh babak baru yang penuh berkah untuk Raden & Arum! Senantiasa dilimpahi cinta dan kebahagiaan seumur hidup.&rdquo;
+                </p>
+              </div>
+              <span class="text-[10px] text-surface-500 mt-3">Terkonfirmasi melalui RSVP digital</span>
+            </div>
+
+            <!-- Bank Copy Pill Preview -->
+            <div class="rounded-xl border border-white/10 bg-[#0f0d15]/80 p-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-semibold text-white">Amplop Tanda Kasih</span>
+                  <span class="text-[10px] font-medium text-[#f5c563] uppercase tracking-wider">Bank BCA</span>
+                </div>
+                <p class="text-xs text-surface-400">a/n Arum Sekar Kinanti</p>
+                <div class="mt-2.5 p-2 rounded-lg bg-[#181522] border border-white/10 flex items-center justify-between">
+                  <span id="sample-account-number" class="font-mono text-xs text-surface-200 tracking-wider">8271 9283 91</span>
+                  <button
+                    id="sample-copy-btn"
+                    type="button"
+                    class="px-2.5 py-1 rounded bg-[#f5c563] hover:bg-[#fae09a] text-[#0f0d15] text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                  >
+                    <Copy class="w-3 h-3 text-[#0f0d15]" stroke-width="2" />
+                    <span id="sample-copy-label">Salin</span>
+                  </button>
+                </div>
+              </div>
+              <span class="text-[10px] text-surface-500 mt-3">Nomor rekening langsung tersalin ke papan klip</span>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- CTA Section -->
-  <section class="relative w-full overflow-hidden border-t border-white/8 py-(--space-section)">
-    <div class="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-      <div class="absolute left-1/2 top-1/2 h-125 w-125 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px]"></div>
-    </div>
-    <div class="relative mx-auto w-full max-w-2xl px-4 text-center sm:px-6">
-      <h2 class="font-display text-surface-50" style="font-size: var(--text-heading); font-weight: 700;">
-        Siap Merayakan Momen Bahagia Bersama ElCelebrate?
+  <!-- Bottom CTA Section: Restrained Boutique Studio Invitation -->
+  <section class="relative w-full overflow-hidden py-24 sm:py-32">
+    <div class="relative mx-auto w-full max-w-3xl px-4 text-center sm:px-6">
+      
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#f5c563]/25 bg-[#f5c563]/5 text-[#f5c563] text-xs font-medium uppercase tracking-wider mb-6">
+        <Sparkles class="w-3.5 h-3.5 text-[#f5c563]" stroke-width="1.5" />
+        <span>Rancang Selebrasi Anda</span>
+      </div>
+
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight">
+        Siap Merancang Undangan <br class="hidden sm:inline" />
+        <span class="font-serif italic font-normal text-[#f5c563]">yang Memikat Hati Tamu Anda?</span>
       </h2>
-      <p class="mt-4 text-lg text-surface-300">
-        Buat kartu digital eksklusif pertamamu dalam hitungan menit. Mudah, cepat, dan berkesan.
+
+      <p class="mt-6 text-base sm:text-lg text-surface-300 leading-relaxed max-w-xl mx-auto">
+        Buat kartu digital eksklusif Anda dalam hitungan menit. Tanpa instalasi rumit, langsung siap disebarkan ke keluarga dan sahabat tersayang.
       </p>
-      <div class="mt-8">
-        <Button href={user ? '/dashboard/create' : '/signup'} variant="primary" size="lg" id="cta-bottom">
-          Mulai Sekarang
+
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <Button
+          href={user ? '/dashboard/create' : '/signup'}
+          variant="primary"
+          size="lg"
+          id="cta-bottom"
+          class="shadow-xl shadow-[#f5c563]/15 flex items-center gap-2 px-8"
+        >
+          <span>Mulai Mendesain Sekarang</span>
+          <ArrowRight class="w-4 h-4" stroke-width="2" />
         </Button>
       </div>
+
+      <p class="mt-6 text-xs text-surface-400">
+        Bebas Biaya Awal • Tampilan Responsif Ponsel • Personalisasi Lengkap
+      </p>
     </div>
   </section>
 
   <Footer />
+
+  <!-- Client-side Interactive Logic for Hero Showcase and Sample Copy Pill -->
+  <script is:inline>
+    (function () {
+      // 1. Hero Showcase Frame: Unbox & Re-seal Animation
+      const unboxBtn = document.getElementById('hero-unbox-btn');
+      const waxSeal = document.getElementById('hero-wax-seal');
+      const resealBtn = document.getElementById('showcase-reseal-btn');
+      const gateLeft = document.getElementById('hero-gate-left');
+      const gateRight = document.getElementById('hero-gate-right');
+      const coverText = document.getElementById('hero-cover-text');
+      const coverFooter = document.getElementById('hero-cover-footer');
+      const rsvpBtn = document.getElementById('showcase-rsvp-toggle');
+      const rsvpLabel = document.getElementById('showcase-rsvp-label');
+
+      let isUnboxed = false;
+      let isRsvpd = false;
+
+      function triggerUnbox() {
+        if (isUnboxed) return;
+        isUnboxed = true;
+
+        if (waxSeal) {
+          waxSeal.classList.add('scale-125', 'opacity-0', 'pointer-events-none');
+        }
+        if (gateLeft) {
+          gateLeft.classList.add('-translate-x-full');
+        }
+        if (gateRight) {
+          gateRight.classList.add('translate-x-full');
+        }
+        if (coverText) {
+          coverText.classList.add('opacity-0', 'pointer-events-none');
+        }
+        if (coverFooter) {
+          coverFooter.classList.add('opacity-0', 'pointer-events-none');
+        }
+      }
+
+      function triggerReseal() {
+        if (!isUnboxed) return;
+        isUnboxed = false;
+
+        if (waxSeal) {
+          waxSeal.classList.remove('scale-125', 'opacity-0', 'pointer-events-none');
+        }
+        if (gateLeft) {
+          gateLeft.classList.remove('-translate-x-full');
+        }
+        if (gateRight) {
+          gateRight.classList.remove('translate-x-full');
+        }
+        if (coverText) {
+          coverText.classList.remove('opacity-0', 'pointer-events-none');
+        }
+        if (coverFooter) {
+          coverFooter.classList.remove('opacity-0', 'pointer-events-none');
+        }
+      }
+
+      if (unboxBtn) unboxBtn.addEventListener('click', triggerUnbox);
+      if (waxSeal) waxSeal.addEventListener('click', triggerUnbox);
+      if (resealBtn) resealBtn.addEventListener('click', triggerReseal);
+
+      // Interactive RSVP Toggle Inside Showcase
+      if (rsvpBtn && rsvpLabel) {
+        rsvpBtn.addEventListener('click', function () {
+          isRsvpd = !isRsvpd;
+          if (isRsvpd) {
+            rsvpLabel.textContent = '✓ Terkonfirmasi Hadir (2 Tamu)';
+            rsvpBtn.classList.remove('text-[#f5c563]', 'border-[#f5c563]/30', 'bg-[#f5c563]/10');
+            rsvpBtn.classList.add('text-emerald-400', 'border-emerald-500/40', 'bg-emerald-500/15');
+          } else {
+            rsvpLabel.textContent = 'Konfirmasi Kehadiran';
+            rsvpBtn.classList.add('text-[#f5c563]', 'border-[#f5c563]/30', 'bg-[#f5c563]/10');
+            rsvpBtn.classList.remove('text-emerald-400', 'border-emerald-500/40', 'bg-emerald-500/15');
+          }
+        });
+      }
+
+      // 2. Bento 4: Sample Account Copy Button
+      const copyBtn = document.getElementById('sample-copy-btn');
+      const copyLabel = document.getElementById('sample-copy-label');
+      const accountNum = document.getElementById('sample-account-number');
+
+      if (copyBtn && copyLabel && accountNum) {
+        copyBtn.addEventListener('click', function () {
+          const text = accountNum.innerText.replace(/\s+/g, '');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(function () {});
+          }
+          copyLabel.textContent = 'Tersalin!';
+          copyBtn.classList.remove('bg-[#f5c563]');
+          copyBtn.classList.add('bg-emerald-400');
+
+          setTimeout(function () {
+            copyLabel.textContent = 'Salin';
+            copyBtn.classList.remove('bg-emerald-400');
+            copyBtn.classList.add('bg-[#f5c563]');
+          }, 2000);
+        });
+      }
+    })();
+  </script>
 </BaseLayout>
