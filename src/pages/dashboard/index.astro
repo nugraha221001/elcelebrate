@@ -30,10 +30,10 @@ cards = data || [];
   <Toast />
 
   <!-- Delete Card Confirmation Modal -->
-  <Modal id="delete-card-modal" title="Hapus Kartu Perayaan" size="sm">
+  <Modal id="delete-card-modal" title="Hapus Kartu Ini?" size="sm">
     <div class="space-y-4">
       <p class="text-sm text-surface-300 leading-relaxed">
-        Apakah Anda yakin ingin menghapus kartu untuk <strong id="delete-card-recipient-name" class="text-white"></strong>? Seluruh foto dan ucapan buku tamu akan dihapus secara permanen.
+        Apakah Anda yakin ingin menghapus kartu untuk <strong id="delete-card-recipient-name" class="text-white"></strong>? Tindakan ini permanen dan akan menghapus semua foto terkait.
       </p>
       <div class="flex items-center justify-end gap-3 pt-2">
         <button
@@ -51,14 +51,14 @@ cards = data || [];
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
           </svg>
-          <span id="delete-btn-text">Hapus Permanen</span>
+          <span id="delete-btn-text">Ya, Hapus</span>
         </button>
       </div>
     </div>
   </Modal>
 
   <!-- Share / WhatsApp Modal -->
-  <Modal id="share-card-modal" title="Bagikan Undangan" size="md">
+  <Modal id="share-card-modal" title="Bagikan Kartu" size="md">
     <div class="space-y-4">
       <div>
         <label id="share-recipient-label" class="block text-xs font-medium text-surface-400 mb-1.5">Nama Tamu</label>
@@ -124,7 +124,7 @@ cards = data || [];
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
           </svg>
-          <span>Kirim WhatsApp</span>
+          <span>Kirim via WhatsApp</span>
         </a>
       </div>
     </div>
@@ -216,7 +216,7 @@ cards = data || [];
 
             <div class="p-5">
               <h3 class="text-base font-semibold text-surface-100 truncate">
-                {card.category === 'wedding' ? card.recipient_name : `For ${card.recipient_name}`}
+                {card.category === 'wedding' ? card.recipient_name : `Untuk ${card.recipient_name}`}
               </h3>
               <p class="mt-1 text-sm text-surface-400">
                 {meta?.label || card.category}
@@ -239,7 +239,7 @@ cards = data || [];
                       : 'bg-surface-800 text-surface-500 pointer-events-none opacity-50'
                   ]}
                   data-card-id={card.id}
-                  title={isPublished ? 'Lihat kartu' : 'Draf (Belum diterbitkan)'}
+                  title="Lihat"
                 >
                   <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -251,7 +251,7 @@ cards = data || [];
                 <a
                   href={`/dashboard/create?edit=${card.id}`}
                   class="inline-flex items-center gap-1 rounded-lg bg-surface-700 px-2.5 py-1.5 text-xs font-medium text-surface-200 transition-colors hover:bg-surface-600 hover:text-white"
-                  title="Edit kartu perayaan"
+                  title="Edit"
                 >
                   <svg class="h-3.5 w-3.5 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -265,7 +265,7 @@ cards = data || [];
                   class="card-copy-btn inline-flex items-center gap-1 rounded-lg bg-surface-700 px-2.5 py-1.5 text-xs font-medium text-surface-200 transition-colors hover:bg-surface-600 hover:text-white cursor-pointer"
                   data-copy-url={`${Astro.url.origin}${cardUrl}`}
                   data-card-id={card.id}
-                  title="Salin tautan kartu"
+                  title="Salin Tautan"
                 >
                   <svg class="h-3.5 w-3.5 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
@@ -279,7 +279,7 @@ cards = data || [];
                   class="delete-card-trigger inline-flex items-center gap-1 rounded-lg bg-surface-700/60 px-2 py-1.5 text-xs font-medium text-surface-400 transition-colors hover:bg-error/15 hover:text-error cursor-pointer ml-auto"
                   data-card-id={card.id}
                   data-recipient={card.recipient_name}
-                  title="Hapus kartu permanen"
+                  title="Hapus"
                 >
                   <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -299,7 +299,7 @@ cards = data || [];
                   data-card-recipient={card.recipient_name}
                   data-card-category={card.category}
                   data-card-id={card.id}
-                  title={isPublished ? (card.category === 'wedding' || card.category === 'invitation' ? 'Bagikan undangan' : 'Bagikan kartu ucapan') : 'Belum diterbitkan (Draf)'}
+                  title="Bagikan"
                 >
                   <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
@@ -322,7 +322,7 @@ cards = data || [];
       const url = (btn as HTMLElement).dataset.copyUrl;
       if (url) {
         await navigator.clipboard.writeText(url);
-        (window as any).showToast({ message: 'Link copied to clipboard!', type: 'success', duration: 2000 });
+        (window as any).showToast({ message: 'Tautan Berhasil Disalin!', type: 'success', duration: 2000 });
       }
     });
   });
@@ -374,10 +374,11 @@ cards = data || [];
 
       if (viewLink) {
         viewLink.className = 'card-view-link inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-surface-700 text-surface-200 hover:bg-surface-600 hover:text-white';
-        viewLink.title = 'Lihat kartu publik';
+        viewLink.title = 'Lihat';
       }
       if (shareBtn) {
         shareBtn.className = 'share-card-trigger inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer bg-surface-700 text-surface-200 hover:bg-emerald-500/15 hover:text-emerald-400';
+        shareBtn.title = 'Bagikan';
       }
     } else {
       btn.className = 'status-toggle-btn inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-all hover:scale-105 cursor-pointer border shadow-xs bg-surface-700/80 text-surface-400 border-white/10 hover:bg-surface-700';
@@ -386,11 +387,11 @@ cards = data || [];
 
       if (viewLink) {
         viewLink.className = 'card-view-link inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors bg-surface-800 text-surface-500 pointer-events-none opacity-50';
-        viewLink.title = 'Belum diterbitkan (Draf)';
+        viewLink.title = 'Lihat';
       }
       if (shareBtn) {
         shareBtn.className = 'share-card-trigger inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer bg-surface-800 text-surface-500 pointer-events-none opacity-50';
-        shareBtn.title = 'Belum diterbitkan (Draf)';
+        shareBtn.title = 'Bagikan';
       }
     }
   }
@@ -422,7 +423,7 @@ cards = data || [];
     if (!activeCardIdToDelete) return;
 
     confirmDeleteBtn.disabled = true;
-    if (deleteBtnText) deleteBtnText.textContent = 'Deleting assets...';
+    if (deleteBtnText) deleteBtnText.textContent = 'Menghapus...';
 
     try {
       const res = await fetch(`/api/cards/${activeCardIdToDelete}`, {
@@ -431,7 +432,7 @@ cards = data || [];
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || 'Failed to delete card');
+        throw new Error(errData.error || 'Gagal menghapus kartu');
       }
 
       // Close modal
@@ -457,23 +458,23 @@ cards = data || [];
             if (grid) grid.remove();
             const emptyState = document.getElementById('empty-state');
             if (emptyState) emptyState.classList.remove('hidden');
-            if (countLabel) countLabel.textContent = "You haven't created any cards yet";
+            if (countLabel) countLabel.textContent = "Belum ada kartu yang dibuat";
           } else {
-            if (countLabel) countLabel.textContent = `${remainingCards.length} card${remainingCards.length === 1 ? '' : 's'} created`;
+            if (countLabel) countLabel.textContent = `${remainingCards.length} kartu telah dibuat`;
           }
         }, 300);
       }
 
       (window as any).showToast({
-        message: '🗑️ Card and all photos deleted permanently.',
+        message: '🗑️ Kartu dan semua foto berhasil dihapus permanen.',
         type: 'success',
         duration: 3000,
       });
     } catch (err: any) {
-      (window as any).showToast({ message: err.message || 'Failed to delete card', type: 'error' });
+      (window as any).showToast({ message: err.message || 'Gagal menghapus kartu', type: 'error' });
     } finally {
       confirmDeleteBtn.disabled = false;
-      if (deleteBtnText) deleteBtnText.textContent = 'Delete Permanently';
+      if (deleteBtnText) deleteBtnText.textContent = 'Ya, Hapus';
       activeCardIdToDelete = null;
     }
   });
@@ -632,11 +633,7 @@ cards = data || [];
         shareCopyText.textContent = 'Tersalin! ✅';
         setTimeout(() => { if (shareCopyText) shareCopyText.textContent = 'Salin Tautan'; }, 2000);
       }
-      const isInvitationCategory = activeShareCategory === 'wedding' || activeShareCategory === 'invitation';
-      const toastMsg = isInvitationCategory
-        ? 'Tautan undangan disalin!'
-        : 'Tautan kartu ucapan disalin!';
-      (window as any).showToast({ message: toastMsg, type: 'success', duration: 2000 });
+      (window as any).showToast({ message: 'Tautan Berhasil Disalin!', type: 'success', duration: 2000 });
     } catch {
       (window as any).showToast({ message: 'Gagal menyalin tautan', type: 'error' });
     }

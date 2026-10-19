@@ -635,7 +635,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
         {weddingData.loveStoryTimeline && Array.isArray(weddingData.loveStoryTimeline) && weddingData.loveStoryTimeline.some(t => t && (t.year || t.title || t.story)) && (
           <section class="pb-28 sm:pb-32 max-w-2xl mx-auto px-4 scroll-mt-24">
             <div class="wedding-reveal reveal-heading text-center mb-8">
-              <p class="text-xs uppercase tracking-[0.3em] font-semibold text-pink-300 mb-1">OUR JOURNEY</p>
+              <p class="text-xs uppercase tracking-[0.3em] font-semibold text-pink-300 mb-1">KISAH CINTA KAMI</p>
               <h2 class="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight">Kisah Cinta & Perjalanan</h2>
               <div class="champagne-divider"></div>
             </div>
@@ -685,7 +685,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                 <div class="champagne-divider"></div>
               </div>
               <div class="countdown-timer flex justify-center gap-3 sm:gap-5" data-target-date={weddingData.akadEvent.date || typedCard.event_date || ''}>
-                {['Hari', 'Jam', 'Mnt', 'Dtk'].map((unit, idx) => (
+                {['Hari', 'Jam', 'Menit', 'Detik'].map((unit, idx) => (
                   <div class="wedding-reveal reveal-countdown flex flex-col items-center" style={`transition-delay: ${idx * 80}ms;`}>
                     <div
                       class="countdown-box flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 backdrop-blur-md text-2xl font-bold text-white sm:h-20 sm:w-20 sm:text-3xl"
@@ -975,7 +975,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
           <section id="amplop" class="pb-28 sm:pb-32 max-w-2xl mx-auto px-4 scroll-mt-24">
             <span id="gift" class="sr-only"></span>
             <div class="wedding-reveal reveal-heading text-center mb-4">
-              <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">🎁 Kirim Tanda Kasih</h2>
+              <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">🎁 Amplop Digital & Tanda Kasih</h2>
               <div class="champagne-divider"></div>
             </div>
             <div
@@ -1118,7 +1118,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
           <span id="wishes" class="sr-only"></span>
           <div class="wedding-reveal reveal-heading text-center mb-6">
             <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
-              💬 Buku Tamu & Doa Restu
+              💬 Buku Tamu & Ucapan Doa
             </h2>
             <div class="champagne-divider"></div>
           </div>
@@ -1139,26 +1139,29 @@ const hasBirthdayAge = birthdayAge.length > 0;
             />
 
             <!-- Attendance Selector -->
-            <div class="grid grid-cols-2 gap-3 w-full">
-              <label class="cursor-pointer">
-                <input type="radio" name="attendance" value="hadir" class="sr-only" checked />
-                <div class="rsvp-toggle-btn">
-                  <span>✅</span>
-                  <span>Hadir</span>
-                </div>
-              </label>
-              <label class="cursor-pointer">
-                <input type="radio" name="attendance" value="berhalangan" class="sr-only" />
-                <div class="rsvp-toggle-btn">
-                  <span>🙏</span>
-                  <span>Berhalangan</span>
-                </div>
-              </label>
+            <div>
+              <p class="text-xs font-semibold text-slate-300 mb-1.5 text-center">Konfirmasi Kehadiran (RSVP)</p>
+              <div class="grid grid-cols-2 gap-3 w-full">
+                <label class="cursor-pointer">
+                  <input type="radio" name="attendance" value="hadir" class="sr-only" checked />
+                  <div class="rsvp-toggle-btn">
+                    <span>✅</span>
+                    <span>Hadir</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="attendance" value="berhalangan" class="sr-only" />
+                  <div class="rsvp-toggle-btn">
+                    <span>🙏</span>
+                    <span>Berhalangan</span>
+                  </div>
+                </label>
+              </div>
             </div>
 
             <textarea
               id="wish-message"
-              placeholder="Tuliskan untaian doa & restu untuk kedua mempelai..."
+              placeholder="Tulis doa dan ucapan hangat Anda..."
               required
               rows="3"
               spellcheck="false"
@@ -1171,7 +1174,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
               id="wish-submit-btn"
               class="w-full py-3.5 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 text-[#0f0d15] bg-linear-to-r from-[#f5c563] to-[#e07a93] hover:brightness-110 active:scale-[0.99] transition-transform shadow-lg shadow-black/20 cursor-pointer"
             >
-              <span>Kirim Doa & Restu</span>
+              <span>Kirim Ucapan</span>
               <span>✨</span>
             </button>
           </form>
@@ -1194,7 +1197,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
             ))}
             {typedWishes.length === 0 && (
               <p class="text-slate-200 text-sm font-medium tracking-wide text-center py-4 drop-shadow-xs">
-                Jadilah yang pertama mengirimkan doa restu! ✨
+                Belum ada ucapan. Jadilah yang pertama memberikan doa terbaik! ✨
               </p>
             )}
           </div>
@@ -1206,7 +1209,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
             href="/"
             class="group inline-flex items-center gap-2 rounded-full border border-white/8 bg-surface-900/60 backdrop-blur-md px-4 py-2 text-xs font-medium text-surface-400 transition-all duration-300 hover:border-purple-500/30 hover:bg-surface-800/80 hover:shadow-glow-sm"
           >
-            <span>Created with</span>
+            <span>Dibuat dengan</span>
             <span class="inline-flex items-center gap-1">
               <span class="bg-linear-to-r from-amber-300 via-pink-400 to-purple-400 bg-clip-text text-transparent font-extrabold tracking-tight">El</span><span class="text-white font-bold tracking-tight">Celebrate</span>
               <span class="text-xs transition-transform duration-300 group-hover:scale-125">✨</span>
@@ -1235,7 +1238,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
             Surat Cinta Terkunci
           </h2>
           <p class="text-xs text-surface-300 mb-6">
-            Masukkan 4 digit PIN rahasia untuk membuka pesan ini 💕
+            Masukkan 4 Digit PIN Rahasia
           </p>
 
           <!-- 4 Visual PIN Boxes -->
@@ -1260,7 +1263,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
 
           <!-- Error Alert -->
           <div id="pin-error-msg" class="hidden text-xs font-semibold text-rose-400 mb-4 transition-all">
-            Kode PIN salah, silakan coba lagi! 💔
+            PIN belum sesuai, coba lagi
           </div>
 
           <!-- Touch Numpad for mobile convenience -->
@@ -1278,6 +1281,14 @@ const hasBirthdayAge = birthdayAge.length > 0;
               );
             })}
           </div>
+
+          <button
+            type="button"
+            id="pin-submit-btn"
+            class="mt-4 w-full py-2.5 rounded-xl text-xs font-semibold text-white bg-linear-to-r from-pink-500 to-rose-500 shadow-md transition-all hover:brightness-110 active:scale-95 cursor-pointer"
+          >
+            Buka Surat
+          </button>
 
           <p class="mt-5 text-[11px] text-surface-400">
             Dibuat dengan cinta untuk <span class="text-pink-300 font-medium">{recipientName}</span>
@@ -1312,7 +1323,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
               </div>
 
               <div class="relative z-5 mt-14 px-3 text-center pointer-events-none">
-                <span class="text-[10px] text-[#f5c563] tracking-widest uppercase font-semibold">Special Gift</span>
+                <span class="text-[10px] text-[#f5c563] tracking-widest uppercase font-semibold">Kado Spesial</span>
                 <p class="text-xs font-bold text-white truncate max-w-44 mt-0.5">{recipientName || 'Kamu'}</p>
               </div>
             </div>
@@ -1497,7 +1508,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
           id="tap-to-open-btn"
           class="mt-8 group inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-semibold text-[#0f0d15] bg-linear-to-r from-[#f5c563] via-[#ffd885] to-[#f5c563] shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer border border-[#f5c563]/60 shadow-[#f5c563]/20"
         >
-          <span>{typedCard.category === 'invitation' ? 'Buka Undangan' : 'Buka Kartu Ucapan'}</span>
+          <span>{typedCard.category === 'invitation' ? 'Buka Undangan' : 'Ketuk untuk Membuka'}</span>
           <span class="text-sm transition-transform group-hover:translate-x-0.5">✨</span>
         </button>
       </div>
@@ -1887,14 +1898,14 @@ const hasBirthdayAge = birthdayAge.length > 0;
         {typedCard.event_date && (
           <section class="mt-10" data-reveal="fade-up">
             <div class="text-center">
-              <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-surface-400">Countdown</h2>
+              <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-surface-400">Hitung Mundur</h2>
               <div class="countdown-timer flex justify-center gap-3 sm:gap-5" data-target-date={typedCard.event_date}>
-                {['Days', 'Hours', 'Min', 'Sec'].map((unit) => (
+                {['Hari', 'Jam', 'Menit', 'Detik'].map((unit, idx) => (
                   <div class="flex flex-col items-center">
                     <div
                       class="flex h-16 w-16 items-center justify-center rounded-xl text-2xl font-bold text-white sm:h-20 sm:w-20 sm:text-3xl"
                       style={`background: linear-gradient(135deg, ${theme.primaryColor}40, ${theme.secondaryColor}30);`}
-                      data-countdown={unit.toLowerCase().replace('min', 'minutes').replace('sec', 'seconds')}
+                      data-countdown={['days', 'hours', 'minutes', 'seconds'][idx]}
                     >
                       --
                     </div>
@@ -2055,28 +2066,31 @@ const hasBirthdayAge = birthdayAge.length > 0;
         <!-- Wish Wall / Guestbook -->
         <section class="mt-12" data-reveal="fade-up">
           <h2 class="mb-6 text-center text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">
-            💬 Untaian Doa & Pesan Kasih
+            💬 Buku Tamu & Ucapan Doa
           </h2>
 
           <!-- Submit Wish Form -->
           <form id="wish-form" class="mb-8" data-reveal="fade-up">
             <div class="rounded-2xl p-5" style={`background: ${theme.primaryColor}08; border: 1px solid ${theme.primaryColor}15;`}>
               {typedCard.category === 'invitation' && (
-                <div class="grid grid-cols-2 gap-3 mb-3 w-full">
-                  <label class="cursor-pointer">
-                    <input type="radio" name="attendance" value="hadir" class="sr-only" checked />
-                    <div class="rsvp-toggle-btn">
-                      <span>✅</span>
-                      <span>Hadir</span>
-                    </div>
-                  </label>
-                  <label class="cursor-pointer">
-                    <input type="radio" name="attendance" value="berhalangan" class="sr-only" />
-                    <div class="rsvp-toggle-btn">
-                      <span>🙏</span>
-                      <span>Berhalangan</span>
-                    </div>
-                  </label>
+                <div class="mb-3">
+                  <p class="text-xs font-semibold text-slate-300 mb-1.5 text-center">Konfirmasi Kehadiran (RSVP)</p>
+                  <div class="grid grid-cols-2 gap-3 w-full">
+                    <label class="cursor-pointer">
+                      <input type="radio" name="attendance" value="hadir" class="sr-only" checked />
+                      <div class="rsvp-toggle-btn">
+                        <span>✅</span>
+                        <span>Hadir</span>
+                      </div>
+                    </label>
+                    <label class="cursor-pointer">
+                      <input type="radio" name="attendance" value="berhalangan" class="sr-only" />
+                      <div class="rsvp-toggle-btn">
+                        <span>🙏</span>
+                        <span>Berhalangan</span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               )}
               <input
@@ -2089,7 +2103,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
               />
               <textarea
                 id="wish-message"
-                placeholder="Tuliskan ucapan dan doa terbaikmu..."
+                placeholder="Tulis doa dan ucapan hangat Anda..."
                 required
                 rows="3"
                 class="form-text mb-3 w-full resize-none rounded-xl border bg-white/5 px-4 py-3 text-sm focus-ring placeholder:text-slate-300 placeholder:opacity-80 focus:border-(--primary) focus:ring-1 focus:ring-(--primary)"
@@ -2122,7 +2136,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
             ))}
             {typedWishes.length === 0 && (
               <p class="text-slate-200 text-sm font-medium tracking-wide text-center py-4 drop-shadow-xs">
-                Jadilah yang pertama mengirimkan ucapan dan doa! 🎉
+                Belum ada ucapan. Jadilah yang pertama memberikan doa terbaik! ✨
               </p>
             )}
           </div>
@@ -2134,7 +2148,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
             href="/"
             class="group inline-flex items-center gap-2 rounded-full border border-white/8 bg-surface-900/60 backdrop-blur-md px-4 py-2 text-xs font-medium text-surface-400 transition-all duration-300 hover:border-purple-500/30 hover:bg-surface-800/80 hover:shadow-glow-sm"
           >
-            <span>Created with</span>
+            <span>Dibuat dengan</span>
             <span class="inline-flex items-center gap-1">
               <span class="bg-linear-to-r from-amber-300 via-pink-400 to-purple-400 bg-clip-text text-transparent font-extrabold tracking-tight">El</span><span class="text-white font-bold tracking-tight">Celebrate</span>
               <span class="text-xs transition-transform duration-300 group-hover:scale-125">✨</span>
@@ -2409,10 +2423,10 @@ const hasBirthdayAge = birthdayAge.length > 0;
     try {
       await navigator.clipboard.writeText(accountEl.textContent?.trim() || '');
       if (btnText) {
-        btnText.textContent = 'Tersalin! ✅';
+        btnText.textContent = 'Nomor Rekening Tersalin! ✅';
         setTimeout(() => { btnText.textContent = 'Salin Nomor Rekening'; }, 2000);
       }
-      showInvitationToast('Nomor rekening disalin! ✨');
+      showInvitationToast('Nomor Rekening Tersalin! ✨');
     } catch {
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
@@ -2422,10 +2436,10 @@ const hasBirthdayAge = birthdayAge.length > 0;
       document.execCommand('copy');
       document.body.removeChild(textArea);
       if (btnText) {
-        btnText.textContent = 'Tersalin! ✅';
+        btnText.textContent = 'Nomor Rekening Tersalin! ✅';
         setTimeout(() => { btnText.textContent = 'Salin Nomor Rekening'; }, 2000);
       }
-      showInvitationToast('Nomor rekening disalin! ✨');
+      showInvitationToast('Nomor Rekening Tersalin! ✨');
     }
   });
 
@@ -2772,6 +2786,10 @@ const hasBirthdayAge = birthdayAge.length > 0;
     const pinErrorMsg = document.getElementById('pin-error-msg');
     const pinHiddenInput = document.getElementById('pin-hidden-input') as HTMLInputElement | null;
     const pinBoxesContainer = document.getElementById('pin-boxes-container');
+
+    document.getElementById('pin-submit-btn')?.addEventListener('click', () => {
+      checkPin();
+    });
 
     function updatePinDisplay() {
       pinBoxes.forEach((box, idx) => {

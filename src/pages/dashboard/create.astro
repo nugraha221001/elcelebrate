@@ -53,7 +53,7 @@ const EXTENDED_SWATCHES = [
     <!-- Step Indicator -->
     <div class="mb-10" id="step-indicator">
       <div class="flex items-center justify-between">
-        {['Kategori', 'Tema', 'Media', 'Pesan', 'Pratinjau'].map((label, i) => (
+        {['Pilih Kategori', 'Tema & Visual', 'Foto & Musik', 'Detail & Pesan', 'Tinjau & Terbitkan'].map((label, i) => (
           <div class="flex flex-1 items-center">
             <div class="flex flex-col items-center gap-1.5">
               <div
@@ -90,7 +90,7 @@ const EXTENDED_SWATCHES = [
               <span>Kembali ke Dashboard</span>
             </a>
           </div>
-          <h2 class="text-xl font-bold text-surface-50">Pilih Kategori</h2>
+          <h2 class="text-xl font-bold text-surface-50">1. Pilih Kategori</h2>
           <p class="mt-2 text-sm text-surface-400">Momen apa yang ingin kamu rayakan?</p>
 
           <div class="mt-6 grid grid-cols-2 gap-4">
@@ -118,7 +118,7 @@ const EXTENDED_SWATCHES = [
 
         <!-- Step 2: Theme Customizer -->
         <div id="step-2" class="wizard-step hidden pb-36 sm:pb-24 w-full max-w-full min-w-0 overflow-x-hidden">
-          <h2 class="text-xl font-bold text-surface-50">Kustomisasi Tema</h2>
+          <h2 class="text-xl font-bold text-surface-50">2. Tema & Visual</h2>
           <p class="mt-2 text-sm text-surface-400">Atur nuansa visual dan palet warna kartu</p>
 
           <div class="mt-6 space-y-6">
@@ -211,7 +211,7 @@ const EXTENDED_SWATCHES = [
               <!-- Primary Color -->
               <div class="rounded-2xl border border-white/10 bg-surface-900/40 p-4">
                 <div class="flex items-center justify-between mb-2.5">
-                  <label for="theme-primary" class="block text-sm font-semibold text-surface-200">Primary Color</label>
+                  <label for="theme-primary" class="block text-sm font-semibold text-surface-200">Warna Utama</label>
                   <span class="text-xs font-mono text-surface-400 bg-surface-800/80 px-2 py-0.5 rounded-md border border-white/5" id="theme-primary-hex">#f5c563</span>
                 </div>
                 <div class="flex items-center gap-3">
@@ -243,7 +243,7 @@ const EXTENDED_SWATCHES = [
                 <!-- Curated Celebration Color Circles for Primary -->
                 <div class="mt-3.5 pt-3 border-t border-white/5">
                   <div class="text-[11px] font-medium text-surface-400 mb-2 flex items-center justify-between">
-                    <span>✨ Celebration Swatches</span>
+                    <span>✨ Palet Warna Pilihan</span>
                     <span class="text-[10px] text-surface-500">Pilih warna</span>
                   </div>
 
@@ -311,7 +311,7 @@ const EXTENDED_SWATCHES = [
               <!-- Secondary Color -->
               <div class="rounded-2xl border border-white/10 bg-surface-900/40 p-4">
                 <div class="flex items-center justify-between mb-2.5">
-                  <label for="theme-secondary" class="block text-sm font-semibold text-surface-200">Secondary Color</label>
+                  <label for="theme-secondary" class="block text-sm font-semibold text-surface-200">Warna Aksen</label>
                   <span class="text-xs font-mono text-surface-400 bg-surface-800/80 px-2 py-0.5 rounded-md border border-white/5" id="theme-secondary-hex">#e07a93</span>
                 </div>
                 <div class="flex items-center gap-3">
@@ -343,7 +343,7 @@ const EXTENDED_SWATCHES = [
                 <!-- Curated Celebration Color Circles for Secondary -->
                 <div class="mt-3.5 pt-3 border-t border-white/5">
                   <div class="text-[11px] font-medium text-surface-400 mb-2 flex items-center justify-between">
-                    <span>✨ Celebration Swatches</span>
+                    <span>✨ Palet Warna Pilihan</span>
                     <span class="text-[10px] text-surface-500">Pilih warna</span>
                   </div>
 
@@ -413,9 +413,9 @@ const EXTENDED_SWATCHES = [
             <div>
               <div class="mb-2 flex items-center justify-between">
                 <label class="block text-xs font-semibold uppercase tracking-wider text-surface-300">
-                  🎨 Quick Palettes
+                  🎨 Palet Warna Pilihan
                 </label>
-                <span class="text-[11px] text-surface-400">Curated color pairings</span>
+                <span class="text-[11px] text-surface-400">Kombinasi warna pilihan serasi</span>
               </div>
               <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" id="palette-swatches-grid">
                 {[
@@ -449,12 +449,12 @@ const EXTENDED_SWATCHES = [
 
             <!-- Background Pattern -->
             <div>
-              <label class="mb-2 block text-sm font-medium text-surface-200">Background Pattern</label>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Motif Latar Belakang</label>
               <div class="flex flex-wrap gap-2">
                 {[
                   {
                     id: 'none',
-                    label: 'None',
+                    label: 'Tanpa Motif',
                     swatch: '',
                     swatchSize: 'auto',
                   },
@@ -551,7 +551,7 @@ const EXTENDED_SWATCHES = [
 
             <!-- Font Family -->
             <div>
-              <label class="mb-2 block text-sm font-medium text-surface-200">Font Style</label>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Gaya Huruf (Font)</label>
               <div class="grid grid-cols-2 gap-3">
                 {[
                   { id: 'sans', label: 'Modern Sans', sample: 'Aa', font: 'Inter' },
@@ -585,7 +585,7 @@ const EXTENDED_SWATCHES = [
 
             <!-- Unbox Style -->
             <div>
-              <label class="mb-2 block text-sm font-medium text-surface-200">Unboxing Animation</label>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Animasi Pembuka</label>
               <!-- Standard Adaptive Unboxing Style -->
               <div id="standard-unbox-container" class="grid grid-cols-2 gap-3">
                 {CATEGORY_UNBOXING_OPTIONS.birthday.map((u, idx) => {
@@ -616,9 +616,9 @@ const EXTENDED_SWATCHES = [
               <!-- Wedding Luxury Unboxing Style -->
               <div id="wedding-unbox-container" class="hidden grid-cols-3 gap-3">
                 {[
-                  { id: 'gate-split', emoji: '🏛️', label: 'Royal Gate Split', desc: 'Splits laterally' },
-                  { id: 'curtain-lift', emoji: '✨', label: 'Curtain Lift', desc: 'Upward silk glide' },
-                  { id: 'wax-seal', emoji: '💌', label: 'Wax Seal', desc: 'Breaking seal flap' },
+                  { id: 'gate-split', emoji: '🏛️', label: 'Royal Gate Split', desc: 'Membuka dua sisi secara megah' },
+                  { id: 'curtain-lift', emoji: '✨', label: 'Curtain Lift', desc: 'Tirai sutra terangkat ke atas' },
+                  { id: 'wax-seal', emoji: '💌', label: 'Wax Seal', desc: 'Membuka segel lilin tradisional' },
                 ].map((u) => {
                   const isDefault = u.id === 'gate-split';
                   return (
@@ -647,11 +647,11 @@ const EXTENDED_SWATCHES = [
 
             <!-- Ambient Visual Effect -->
             <div>
-              <label class="mb-2 block text-sm font-medium text-surface-200">Ambient Visual Effect</label>
-              <p class="mb-3 text-xs text-surface-500">A subtle animated background that enhances the mood of your card</p>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Efek Partikel (Ambient)</label>
+              <p class="mb-3 text-xs text-surface-500">Efek animasi latar belakang yang mempercantik suasana kartu Anda</p>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="ambient-effect-grid">
                 {[
-                  { id: 'none', emoji: '✕', label: 'None' },
+                  { id: 'none', emoji: '✕', label: 'Tanpa Efek' },
                   { id: 'petals', emoji: '🌸', label: 'Petals' },
                   { id: 'golden-sparkles', emoji: '✨', label: 'Golden Sparkles' },
                   { id: 'hearts', emoji: '💕', label: 'Hearts' },
@@ -699,75 +699,75 @@ const EXTENDED_SWATCHES = [
 
             <!-- Corner Ornaments (Indonesian & Luxury Motifs) -->
             <div id="corner-ornaments-container">
-              <label class="mb-2 block text-sm font-medium text-surface-200">Ornamen Sudut (Corner Ornaments)</label>
+              <label class="mb-2 block text-sm font-medium text-surface-200">Ornamen Sudut</label>
               <p class="mb-3 text-xs text-surface-500">Motif budaya nusantara & aksen mewah membingkai keempat sudut kartu</p>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="corner-ornaments-grid">
                 {[
                   {
                     id: 'none',
                     emoji: '✕',
-                    label: 'None',
-                    desc: 'No corner ornament',
+                    label: 'Tanpa Ornamen',
+                    desc: 'Tanpa ornamen sudut',
                   },
                   {
                     id: 'botanical',
                     emoji: '🌿',
                     label: 'Botanical Leafy',
-                    desc: 'Organic drifting branch with gentle breeze sway',
+                    desc: 'Ranting dedaunan organik dengan ayunan semilir angin lembut',
                   },
                   {
                     id: 'keraton',
                     emoji: '🏛️',
                     label: 'Keraton Floral',
-                    desc: 'Royal Javanese & Jepara carved scrollwork',
+                    desc: 'Ukiran motif lung-lungan flora khas keraton Jawa & Jepara',
                   },
                   {
                     id: 'melati',
                     emoji: '🤍',
                     label: 'Ronce Melati',
-                    desc: 'Sacred wedding jasmine & betel garland',
+                    desc: 'Untaian ronce bunga melati & sirih sakral pernikahan adat',
                   },
                   {
                     id: 'pucukrebung',
                     emoji: '🎋',
                     label: 'Pucuk Rebung',
-                    desc: 'Traditional Minang chevron brocade',
+                    desc: 'Motif geometris songket Minang & Melayu berwibawa',
                   },
                   {
                     id: 'artdeco',
                     emoji: '⚜️',
                     label: 'Art Deco Gatsby',
-                    desc: 'Symmetrical geometric luxury Gatsby lines',
+                    desc: 'Garis geometris sudut emas simetris khas era kemewahan Gatsby',
                   },
                   {
                     id: 'baroque',
                     emoji: '👑',
                     label: 'Baroque Flourish',
-                    desc: 'Royal Victorian floral filigree flourish',
+                    desc: 'Sentuhan ornamen floral klasik istana megah era Victoria',
                   },
                   {
                     id: 'diamond-frame',
                     emoji: '💎',
                     label: 'Diamond Frame',
-                    desc: 'Minimalist dual-stroke lines with center diamond stud',
+                    desc: 'Garis ganda minimalis mewah dengan aksen permata berlian',
                   },
                   {
                     id: 'celestial',
                     emoji: '🌙',
                     label: 'Celestial Starburst',
-                    desc: 'Starburst & crescent moon corner accents',
+                    desc: 'Pancaran bintang gemerlap dan sabit malam tematik',
                   },
                   {
                     id: 'gunungan',
                     emoji: '🏔️',
                     label: 'Gunungan Wayang',
-                    desc: 'Stylized traditional Indonesian gunungan finial',
+                    desc: 'Siluet gapura wayang gunungan kaya filosofi kehidupan',
                   },
                   {
                     id: 'mandala',
                     emoji: '🏵️',
                     label: 'Mandala Lace',
-                    desc: 'Symmetrical lace filigree rosette corner',
+                    desc: 'Pola renda melingkar simetris anggun dan menenangkan',
                   },
                 ].map((co) => {
                   const isDefault = co.id === 'none';
@@ -801,10 +801,10 @@ const EXTENDED_SWATCHES = [
           </div>
         </div>
 
-        <!-- Step 3: Media Upload -->
+        <!-- Step 3: Media & Audio Upload -->
         <div id="step-3" class="wizard-step hidden pb-36 sm:pb-24 w-full max-w-full min-w-0 overflow-x-hidden">
-          <h2 class="text-xl font-bold text-surface-50">Unggah Foto</h2>
-          <p class="mt-2 text-sm text-surface-400" id="photo-upload-hint">Unggah hingga 4 foto kenangan (kompresi otomatis WebP, maks. 200KB/foto)</p>
+          <h2 class="text-xl font-bold text-surface-50">3. Foto & Musik</h2>
+          <p class="mt-2 text-sm text-surface-400" id="photo-upload-hint">Unggah Foto Momen (Maks. 4 Foto)</p>
 
           <!-- Standard Photos Container -->
           <div id="standard-photos-container" class="mt-6">
@@ -839,13 +839,13 @@ const EXTENDED_SWATCHES = [
 
           <!-- Wedding Structured 11-Slot Photos (4 Sections) -->
           <div id="wedding-photos-container" class="mt-6 hidden space-y-5">
-            <!-- Slot 1: Foto Utama / Prewedding Sampul -->
+            <!-- Slot 1: Foto Sampul Utama -->
             <div class="rounded-2xl border border-amber-500/25 bg-surface-900/60 p-4 sm:p-5">
               <div class="flex items-start justify-between gap-3 mb-2">
                 <div>
                   <div class="flex items-center gap-2">
                     <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold">1</span>
-                    <h3 class="text-sm font-semibold text-surface-100">Foto Utama / Prewedding Sampul</h3>
+                    <h3 class="text-sm font-semibold text-surface-100">Foto Sampul Utama</h3>
                   </div>
                   <p class="mt-1 text-xs text-surface-400">Foto terbaik berdua. Tampil di layar cover pembuka dan tajuk utama Walimatul 'Urs.</p>
                 </div>
@@ -896,13 +896,13 @@ const EXTENDED_SWATCHES = [
               </div>
             </div>
 
-            <!-- Slot 4-11: Galeri Foto Prewedding (Maksimal 8 Foto) -->
+            <!-- Slot 4-11: Galeri Foto Momen (Maks. 8 Foto) -->
             <div class="rounded-2xl border border-white/10 bg-surface-900/60 p-4 sm:p-5">
               <div class="flex items-start justify-between gap-3 mb-2">
                 <div>
                   <div class="flex items-center gap-2">
                     <span class="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-surface-200 text-xs font-bold">4-11</span>
-                    <h3 class="text-sm font-semibold text-surface-100">Galeri Foto Prewedding (Maksimal 8 Foto)</h3>
+                    <h3 class="text-sm font-semibold text-surface-100">Galeri Foto Momen (Maks. 8 Foto)</h3>
                   </div>
                   <p class="mt-1 text-xs text-surface-400">Foto momen kenangan untuk seksi Galeri Foto, efek mist, dan popup lightbox.</p>
                 </div>
@@ -920,7 +920,290 @@ const EXTENDED_SWATCHES = [
                 <div class="h-2 flex-1 overflow-hidden rounded-full bg-surface-700">
                   <div id="w-upload-progress" class="h-full rounded-full bg-linear-to-r from-primary to-secondary transition-all duration-300" style="width: 0%"></div>
                 </div>
-                <span id="w-upload-text" class="text-xs text-surface-400">Processing...</span>
+                <span id="w-upload-text" class="text-xs text-surface-400">Memproses...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audio Selector -->
+          <div class="mt-8 pt-6 border-t border-white/10">
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-medium text-surface-200">Pilih Musik Latar</label>
+              <span class="text-xs text-surface-400">Pilih musik pengiring kartu</span>
+            </div>
+
+            <!-- Audio Mode Switcher Tabs -->
+            <div class="mb-3 flex rounded-xl border border-white/10 bg-surface-900/60 p-1">
+              <button
+                type="button"
+                id="audio-tab-catalog"
+                class="flex-1 rounded-lg py-2 text-xs font-semibold transition-all cursor-pointer bg-[#f5c563] text-[#0f0d15] shadow-sm"
+              >
+                🎵 Pilih dari Katalog
+              </button>
+              <button
+                type="button"
+                id="audio-tab-custom"
+                class="flex-1 rounded-lg py-2 text-xs font-medium text-surface-400 hover:text-surface-200 transition-all cursor-pointer"
+              >
+                📤 Unggah Musik Sendiri (MP3/Opus, Maks. 3 MB)
+              </button>
+            </div>
+
+            <!-- Catalog Panel -->
+            <div id="audio-catalog-panel" class="space-y-2">
+              <p class="mb-3 text-xs text-surface-500" id="audio-category-hint"></p>
+              <div class="space-y-2" id="audio-track-list">
+                {AUDIO_TRACKS.map((track) => (
+                  <div class="audio-track-item flex items-center gap-2 rounded-xl border border-white/5 bg-surface-800 p-2 transition-all" data-track-row={track.id}>
+                    <!-- Preview Play/Pause Button -->
+                    <button
+                      type="button"
+                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-700 text-surface-300 transition-all hover:bg-primary/20 hover:text-primary cursor-pointer"
+                      data-audio-preview={track.id}
+                      data-audio-url={`/audio/${track.filename}`}
+                      aria-label={`Preview ${track.name}`}
+                    >
+                      <svg class="audio-preview-play h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                      </svg>
+                      <svg class="audio-preview-pause hidden h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                      </svg>
+                    </button>
+
+                    <!-- Track Info & Select Target -->
+                    <button
+                      type="button"
+                      class="flex flex-1 items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-all hover:bg-white/5 cursor-pointer"
+                      data-audio-track={track.id}
+                    >
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm font-medium text-surface-200">{track.name}</span>
+                          <span class="audio-recommended-badge hidden text-[10px] font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5">★ Rekomendasi</span>
+                        </div>
+                        <div class="text-xs text-surface-500">{track.mood} · {track.duration}s</div>
+                      </div>
+                      <!-- Selected Checkmark -->
+                      <div class="audio-check hidden h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f5c563] text-[#0f0d15] shadow-glow-sm">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                      </div>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <!-- Custom Audio Upload Panel -->
+            <div id="audio-custom-panel" class="hidden space-y-3">
+              <!-- Dropzone / Picker -->
+              <div
+                id="custom-audio-dropzone"
+                class="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/10 bg-surface-900/40 p-6 text-center transition-all hover:border-[#f5c563]/40 hover:bg-surface-800/60 cursor-pointer"
+              >
+                <input
+                  type="file"
+                  id="custom-audio-input"
+                  accept=".mp3,.opus,.ogg,audio/mpeg,audio/opus,audio/ogg"
+                  class="hidden"
+                />
+                <div class="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-[#f5c563]/10 text-2xl text-[#f5c563]">
+                  🎵
+                </div>
+                <div class="text-sm font-semibold text-surface-100">Pilih atau Tarik Berkas Musik ke Sini</div>
+                <div class="mt-1 text-xs text-surface-400">Format: MP3, Opus · Maksimal 3 MB</div>
+                <button
+                  type="button"
+                  id="custom-audio-browse-btn"
+                  class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-surface-800 px-3 py-1.5 text-xs font-medium text-surface-200 hover:bg-surface-700 transition-all cursor-pointer"
+                >
+                  <span>Pilih Berkas</span>
+                </button>
+              </div>
+
+              <!-- Upload Progress Indicator -->
+              <div id="custom-audio-progress-container" class="hidden rounded-xl border border-white/10 bg-surface-900/80 p-4">
+                <div class="flex items-center justify-between text-xs text-surface-300 mb-1.5">
+                  <span id="custom-audio-filename" class="font-medium truncate max-w-50">Mengunggah audio...</span>
+                  <span id="custom-audio-pct">0%</span>
+                </div>
+                <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-700">
+                  <div id="custom-audio-bar" class="h-full bg-linear-to-r from-[#f5c563] to-[#e07a93] transition-all duration-200" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Uploaded Custom Audio Active Card -->
+              <div id="custom-audio-active-card" class="hidden rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <!-- Mini Preview Play/Pause Button -->
+                    <button
+                      type="button"
+                      id="custom-audio-preview-btn"
+                      class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-[#0f0d15] shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                      aria-label="Play uploaded audio preview"
+                    >
+                      <svg id="custom-audio-icon-play" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                      </svg>
+                      <svg id="custom-audio-icon-pause" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                      </svg>
+                    </button>
+
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Musik Kustom Aktif</span>
+                        <span class="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">R2 Cloud</span>
+                      </div>
+                      <div id="custom-audio-card-name" class="text-xs font-medium text-surface-200 truncate mt-0.5">custom-music.mp3</div>
+                      <div class="text-[10px] text-surface-400">Diputar otomatis saat kartu dibuka</div>
+                    </div>
+                  </div>
+
+                  <!-- Remove / Replace Button -->
+                  <button
+                    type="button"
+                    id="custom-audio-remove-btn"
+                    class="shrink-0 text-xs text-rose-400 hover:text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:bg-rose-500/10 transition-all cursor-pointer"
+                  >
+                    Hapus Musik
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Studio Audio Preview Player & Custom Start Offset Control -->
+            <div
+              id="audio-preview-controller"
+              class="mt-4 rounded-2xl border border-white/10 bg-surface-900/80 p-4 sm:p-5 backdrop-blur-md shadow-card space-y-4"
+            >
+              <!-- Header / Active Track Indicator -->
+              <div class="flex items-center justify-between gap-2 border-b border-white/8 pb-3">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f5c563]/15 text-[#f5c563] text-sm shadow-inner">
+                    🎧
+                  </span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-semibold text-surface-200 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>Audio Preview & Titik Mulai</span>
+                    </div>
+                    <div id="audio-controller-track-name" class="text-xs text-surface-400 truncate font-medium">Pilih musik untuk preview</div>
+                  </div>
+                </div>
+                <span id="audio-start-offset-badge" class="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber-300">
+                  Mulai: 00:00
+                </span>
+              </div>
+
+              <!-- Hidden native audio element for studio preview playback -->
+              <audio id="studio-preview-audio" preload="metadata" class="hidden"></audio>
+
+              <!-- Player Controls Bar -->
+              <div class="flex items-center gap-3">
+                <!-- Play / Pause Button -->
+                <button
+                  type="button"
+                  id="studio-player-play-btn"
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-r from-[#f5c563] to-[#e07a93] text-[#0f0d15] shadow-lg shadow-[#f5c563]/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                  aria-label="Play / Pause preview"
+                  title="Play / Pause"
+                >
+                  <svg id="studio-player-icon-play" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                  </svg>
+                  <svg id="studio-player-icon-pause" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                  </svg>
+                </button>
+
+                <!-- Timeline Slider & Time Display -->
+                <div class="flex-1 space-y-1.5">
+                  <div class="relative flex items-center">
+                    <input
+                      type="range"
+                      id="studio-player-seek-slider"
+                      min="0"
+                      max="100"
+                      value="0"
+                      step="0.1"
+                      class="w-full h-2 rounded-lg appearance-none bg-surface-700 accent-[#f5c563] cursor-pointer focus:outline-none"
+                    />
+                  </div>
+                  <div class="flex items-center justify-between text-xs font-mono text-surface-400">
+                    <span id="studio-player-time-current">00:00</span>
+                    <span id="studio-player-time-duration">00:00</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Start Time Offset Control Section -->
+              <div class="rounded-xl border border-white/5 bg-surface-800/60 p-3 sm:p-4 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-surface-200">
+                      ⏱️ Mulai Putar dari Detik ke-
+                    </label>
+                    <p class="text-[11px] text-surface-400 leading-tight mt-0.5">
+                      Musik akan otomatis diputar dari detik ini saat penerima membuka kartu.
+                    </p>
+                  </div>
+
+                  <!-- Manual Input & Action Buttons -->
+                  <div class="flex items-center gap-2 shrink-0">
+                    <div class="flex items-center gap-1.5 rounded-lg border border-white/10 bg-surface-900/90 px-2.5 py-1.5">
+                      <span class="text-xs text-surface-400">Waktu:</span>
+                      <input
+                        type="text"
+                        id="audio-start-time-input"
+                        placeholder="00:00"
+                        value="00:00"
+                        maxlength="5"
+                        class="w-14 text-center font-mono text-xs font-bold text-[#f5c563] bg-transparent focus:outline-none"
+                        title="Format MM:SS (contoh 00:24) atau angka detik"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      id="audio-preview-from-start-btn"
+                      class="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-300 hover:bg-amber-500/25 transition-all cursor-pointer active:scale-95"
+                      title="Tes putar audio dari titik mulai yang dipilih"
+                    >
+                      <span>▶ Tes</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      id="audio-reset-start-btn"
+                      class="rounded-lg border border-white/10 bg-surface-800 px-2.5 py-1.5 text-xs text-surface-400 hover:text-surface-200 transition-all cursor-pointer"
+                      title="Reset titik mulai ke 00:00 (awal lagu)"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Quick Set to Current Scrubbed Position Button -->
+                <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-white/5">
+                  <button
+                    type="button"
+                    id="audio-set-current-start-btn"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-xs font-semibold text-primary hover:bg-primary/20 hover:border-primary/50 transition-all cursor-pointer active:scale-95 shadow-xs"
+                  >
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                    </svg>
+                    <span>Jadikan Detik Saat Ini sebagai Titik Mulai</span>
+                  </button>
+                  <span id="audio-start-status-text" class="text-[11px] text-surface-400 italic">
+                    Default: Mulai dari awal (00:00)
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -928,7 +1211,7 @@ const EXTENDED_SWATCHES = [
 
         <!-- Step 4: Message & Details -->
         <div id="step-4" class="wizard-step hidden pb-36 sm:pb-24 w-full max-w-full min-w-0 overflow-x-hidden">
-          <h2 class="text-xl font-bold text-surface-50">Pesan & Detail Acara</h2>
+          <h2 class="text-xl font-bold text-surface-50">4. Detail & Pesan</h2>
           <p class="mt-2 text-sm text-surface-400">Tuliskan pesan tulus dan lengkapi detail acara</p>
 
           <div class="mt-6 space-y-5">
@@ -1218,14 +1501,14 @@ const EXTENDED_SWATCHES = [
             <div id="wedding-fields" class="hidden space-y-6">
               <hr class="border-white/5" />
               <div class="flex items-center gap-2 text-sm font-semibold text-surface-100">
-                <span class="text-lg">💍</span> Detail Pernikahan (Wedding Details)
+                <span class="text-lg">💍</span> Detail Pernikahan
               </div>
 
               <!-- Tajuk Acara / Header Title -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-2">
                 <div class="flex items-center justify-between">
                   <label for="w-header-title" class="block text-xs font-semibold uppercase tracking-wider text-amber-300">
-                    👑 Tajuk Acara / Header Title
+                    👑 Tajuk Acara
                   </label>
                   <span class="text-[11px] text-surface-400">Tampil di layar cover pembuka & tajuk utama</span>
                 </div>
@@ -1265,7 +1548,7 @@ const EXTENDED_SWATCHES = [
                   <div class="flex items-center gap-2">
                     <span class="text-lg">✨</span>
                     <div>
-                      <div class="text-xs font-semibold uppercase tracking-wider text-amber-300">Kutipan Sakral / Ayat Suci (Opsional)</div>
+                      <div class="text-xs font-semibold uppercase tracking-wider text-amber-300">Kutipan Suci / Ayat (Opsional)</div>
                       <p class="text-[11px] text-surface-400">Ayat suci atau kata mutiara pengantar pernikahan</p>
                     </div>
                   </div>
@@ -1567,7 +1850,7 @@ const EXTENDED_SWATCHES = [
 
               <!-- Digital Envelope -->
               <div class="rounded-2xl border border-white/8 bg-surface-900/40 p-4 space-y-3">
-                <div class="text-xs font-semibold uppercase tracking-wider text-yellow-400">💰 Amplop Digital (Digital Envelope)</div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-yellow-400">💰 Amplop Digital</div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="mb-1 block text-xs font-medium text-surface-300">Bank / E-Wallet</label>
@@ -1595,7 +1878,7 @@ const EXTENDED_SWATCHES = [
                 <div class="flex items-center gap-2">
                   <span class="text-lg">⏳</span>
                   <div>
-                    <div class="text-xs font-semibold uppercase tracking-wider text-pink-300">Love Story Timeline (Kisah Cinta)</div>
+                    <div class="text-xs font-semibold uppercase tracking-wider text-pink-300">Perjalanan Kisah Cinta (Love Story Timeline)</div>
                     <p class="text-[11px] text-surface-400">3 momen penting dalam perjalanan cinta menuju pelaminan (opsional)</p>
                   </div>
                 </div>
@@ -1605,8 +1888,8 @@ const EXTENDED_SWATCHES = [
                   <div class="rounded-xl border border-white/5 bg-surface-800/50 p-3 space-y-2">
                     <span class="text-[11px] font-semibold text-amber-300">Momen 1 (Awal Bertemu)</span>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <input type="text" id="w-timeline-year-0" placeholder="Tahun / Tanggal (e.g. 2021)" class="form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
-                      <input type="text" id="w-timeline-title-0" placeholder="Judul (e.g. Pertama Kali Bertemu)" class="sm:col-span-2 form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
+                      <input type="text" id="w-timeline-year-0" placeholder="Tahun / Tanggal (contoh: 2021)" class="form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
+                      <input type="text" id="w-timeline-title-0" placeholder="Judul (contoh: Pertama Kali Bertemu)" class="sm:col-span-2 form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
                     </div>
                     <textarea id="w-timeline-story-0" rows="2" placeholder="Cerita singkat momen ini..." class="form-input w-full resize-none rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]"></textarea>
                   </div>
@@ -1615,8 +1898,8 @@ const EXTENDED_SWATCHES = [
                   <div class="rounded-xl border border-white/5 bg-surface-800/50 p-3 space-y-2">
                     <span class="text-[11px] font-semibold text-pink-300">Momen 2 (Komitmen / Lamaran)</span>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <input type="text" id="w-timeline-year-1" placeholder="Tahun / Tanggal (e.g. 2024)" class="form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
-                      <input type="text" id="w-timeline-title-1" placeholder="Judul (e.g. Hari Lamaran)" class="sm:col-span-2 form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
+                      <input type="text" id="w-timeline-year-1" placeholder="Tahun / Tanggal (contoh: 2024)" class="form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
+                      <input type="text" id="w-timeline-title-1" placeholder="Judul (contoh: Hari Lamaran)" class="sm:col-span-2 form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
                     </div>
                     <textarea id="w-timeline-story-1" rows="2" placeholder="Cerita singkat momen ini..." class="form-input w-full resize-none rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]"></textarea>
                   </div>
@@ -1625,8 +1908,8 @@ const EXTENDED_SWATCHES = [
                   <div class="rounded-xl border border-white/5 bg-surface-800/50 p-3 space-y-2">
                     <span class="text-[11px] font-semibold text-teal-300">Momen 3 (Menuju Ikatan Suci)</span>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <input type="text" id="w-timeline-year-2" placeholder="Tahun / Tanggal (e.g. 2026)" class="form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
-                      <input type="text" id="w-timeline-title-2" placeholder="Judul (e.g. Hari Pernikahan)" class="sm:col-span-2 form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
+                      <input type="text" id="w-timeline-year-2" placeholder="Tahun / Tanggal (contoh: 2026)" class="form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
+                      <input type="text" id="w-timeline-title-2" placeholder="Judul (contoh: Hari Pernikahan)" class="sm:col-span-2 form-input rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]" />
                     </div>
                     <textarea id="w-timeline-story-2" rows="2" placeholder="Cerita singkat momen ini..." class="form-input w-full resize-none rounded-xl border border-white/10 bg-surface-800/80 px-3 py-2 text-xs text-white focus:ring-1 focus:ring-[#f5c563]"></textarea>
                   </div>
@@ -1650,295 +1933,12 @@ const EXTENDED_SWATCHES = [
                 ></textarea>
               </div>
             </div>
-
-            <!-- Audio Selector -->
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-medium text-surface-200">Musik Latar (Background Music)</label>
-                <span class="text-xs text-surface-400">Pilih musik pengiring kartu</span>
-              </div>
-
-              <!-- Audio Mode Switcher Tabs -->
-              <div class="mb-3 flex rounded-xl border border-white/10 bg-surface-900/60 p-1">
-                <button
-                  type="button"
-                  id="audio-tab-catalog"
-                  class="flex-1 rounded-lg py-2 text-xs font-semibold transition-all cursor-pointer bg-[#f5c563] text-[#0f0d15] shadow-sm"
-                >
-                  🎵 Pilih dari Katalog
-                </button>
-                <button
-                  type="button"
-                  id="audio-tab-custom"
-                  class="flex-1 rounded-lg py-2 text-xs font-medium text-surface-400 hover:text-surface-200 transition-all cursor-pointer"
-                >
-                  📤 Upload Musik Sendiri
-                </button>
-              </div>
-
-              <!-- Catalog Panel -->
-              <div id="audio-catalog-panel" class="space-y-2">
-                <p class="mb-3 text-xs text-surface-500" id="audio-category-hint"></p>
-                <div class="space-y-2" id="audio-track-list">
-                  {AUDIO_TRACKS.map((track) => (
-                    <div class="audio-track-item flex items-center gap-2 rounded-xl border border-white/5 bg-surface-800 p-2 transition-all" data-track-row={track.id}>
-                      <!-- Preview Play/Pause Button -->
-                      <button
-                        type="button"
-                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-700 text-surface-300 transition-all hover:bg-primary/20 hover:text-primary cursor-pointer"
-                        data-audio-preview={track.id}
-                        data-audio-url={`/audio/${track.filename}`}
-                        aria-label={`Preview ${track.name}`}
-                      >
-                        <svg class="audio-preview-play h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                        </svg>
-                        <svg class="audio-preview-pause hidden h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
-                        </svg>
-                      </button>
-
-                      <!-- Track Info & Select Target -->
-                      <button
-                        type="button"
-                        class="flex flex-1 items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-all hover:bg-white/5 cursor-pointer"
-                        data-audio-track={track.id}
-                      >
-                        <div class="flex-1 min-w-0">
-                          <div class="flex items-center gap-2">
-                            <span class="text-sm font-medium text-surface-200">{track.name}</span>
-                            <span class="audio-recommended-badge hidden text-[10px] font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5">★ Rekomendasi</span>
-                          </div>
-                          <div class="text-xs text-surface-500">{track.mood} · {track.duration}s</div>
-                        </div>
-                        <!-- Selected Checkmark -->
-                        <div class="audio-check hidden h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f5c563] text-[#0f0d15] shadow-glow-sm">
-                          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                          </svg>
-                        </div>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <!-- Custom Audio Upload Panel -->
-              <div id="audio-custom-panel" class="hidden space-y-3">
-                <!-- Dropzone / Picker -->
-                <div
-                  id="custom-audio-dropzone"
-                  class="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/10 bg-surface-900/40 p-6 text-center transition-all hover:border-[#f5c563]/40 hover:bg-surface-800/60 cursor-pointer"
-                >
-                  <input
-                    type="file"
-                    id="custom-audio-input"
-                    accept=".mp3,.opus,.ogg,audio/mpeg,audio/opus,audio/ogg"
-                    class="hidden"
-                  />
-                  <div class="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-[#f5c563]/10 text-2xl text-[#f5c563]">
-                    🎵
-                  </div>
-                  <div class="text-sm font-semibold text-surface-100">Pilih atau Drag File Musik Sendiri</div>
-                  <div class="mt-1 text-xs text-surface-400">Format: MP3, Opus, Ogg · Maksimal 3MB</div>
-                  <button
-                    type="button"
-                    id="custom-audio-browse-btn"
-                    class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-surface-800 px-3 py-1.5 text-xs font-medium text-surface-200 hover:bg-surface-700 transition-all cursor-pointer"
-                  >
-                    <span>Pilih Berkas</span>
-                  </button>
-                </div>
-
-                <!-- Upload Progress Indicator -->
-                <div id="custom-audio-progress-container" class="hidden rounded-xl border border-white/10 bg-surface-900/80 p-4">
-                  <div class="flex items-center justify-between text-xs text-surface-300 mb-1.5">
-                    <span id="custom-audio-filename" class="font-medium truncate max-w-50">Mengupload audio...</span>
-                    <span id="custom-audio-pct">0%</span>
-                  </div>
-                  <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-700">
-                    <div id="custom-audio-bar" class="h-full bg-linear-to-r from-[#f5c563] to-[#e07a93] transition-all duration-200" style="width: 0%"></div>
-                  </div>
-                </div>
-
-                <!-- Uploaded Custom Audio Active Card -->
-                <div id="custom-audio-active-card" class="hidden rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
-                  <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-3 min-w-0">
-                      <!-- Mini Preview Play/Pause Button -->
-                      <button
-                        type="button"
-                        id="custom-audio-preview-btn"
-                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-[#0f0d15] shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                        aria-label="Play uploaded audio preview"
-                      >
-                        <svg id="custom-audio-icon-play" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                        </svg>
-                        <svg id="custom-audio-icon-pause" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
-                        </svg>
-                      </button>
-
-                      <div class="min-w-0">
-                        <div class="flex items-center gap-2">
-                          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Musik Kustom Aktif</span>
-                          <span class="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">R2 Cloud</span>
-                        </div>
-                        <div id="custom-audio-card-name" class="text-xs font-medium text-surface-200 truncate mt-0.5">custom-music.mp3</div>
-                        <div class="text-[10px] text-surface-400">Diputar otomatis saat kartu dibuka</div>
-                      </div>
-                    </div>
-
-                    <!-- Remove / Replace Button -->
-                    <button
-                      type="button"
-                      id="custom-audio-remove-btn"
-                      class="shrink-0 text-xs text-rose-400 hover:text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:bg-rose-500/10 transition-all cursor-pointer"
-                    >
-                      Hapus / Ganti
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Studio Audio Preview Player & Custom Start Offset Control -->
-              <div
-                id="audio-preview-controller"
-                class="mt-4 rounded-2xl border border-white/10 bg-surface-900/80 p-4 sm:p-5 backdrop-blur-md shadow-card space-y-4"
-              >
-                <!-- Header / Active Track Indicator -->
-                <div class="flex items-center justify-between gap-2 border-b border-white/8 pb-3">
-                  <div class="flex items-center gap-2.5 min-w-0">
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f5c563]/15 text-[#f5c563] text-sm shadow-inner">
-                      🎧
-                    </span>
-                    <div class="min-w-0">
-                      <div class="text-xs font-semibold text-surface-200 uppercase tracking-wider flex items-center gap-1.5">
-                        <span>Audio Preview & Titik Mulai</span>
-                      </div>
-                      <div id="audio-controller-track-name" class="text-xs text-surface-400 truncate font-medium">Pilih musik untuk preview</div>
-                    </div>
-                  </div>
-                  <span id="audio-start-offset-badge" class="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber-300">
-                    Mulai: 00:00
-                  </span>
-                </div>
-
-                <!-- Hidden native audio element for studio preview playback -->
-                <audio id="studio-preview-audio" preload="metadata" class="hidden"></audio>
-
-                <!-- Player Controls Bar -->
-                <div class="flex items-center gap-3">
-                  <!-- Play / Pause Button -->
-                  <button
-                    type="button"
-                    id="studio-player-play-btn"
-                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-r from-[#f5c563] to-[#e07a93] text-[#0f0d15] shadow-lg shadow-[#f5c563]/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                    aria-label="Play / Pause preview"
-                    title="Play / Pause"
-                  >
-                    <svg id="studio-player-icon-play" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                    </svg>
-                    <svg id="studio-player-icon-pause" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
-                    </svg>
-                  </button>
-
-                  <!-- Timeline Slider & Time Display -->
-                  <div class="flex-1 space-y-1.5">
-                    <div class="relative flex items-center">
-                      <input
-                        type="range"
-                        id="studio-player-seek-slider"
-                        min="0"
-                        max="100"
-                        value="0"
-                        step="0.1"
-                        class="w-full h-2 rounded-lg appearance-none bg-surface-700 accent-[#f5c563] cursor-pointer focus:outline-none"
-                      />
-                    </div>
-                    <div class="flex items-center justify-between text-xs font-mono text-surface-400">
-                      <span id="studio-player-time-current">00:00</span>
-                      <span id="studio-player-time-duration">00:00</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Start Time Offset Control Section -->
-                <div class="rounded-xl border border-white/5 bg-surface-800/60 p-3 sm:p-4 space-y-3">
-                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <label class="block text-xs font-semibold text-surface-200">
-                        ⏱️ Titik Mulai Musik (Chorus / Reff Start)
-                      </label>
-                      <p class="text-[11px] text-surface-400 leading-tight mt-0.5">
-                        Musik akan otomatis diputar dari detik ini saat penerima membuka kartu.
-                      </p>
-                    </div>
-
-                    <!-- Manual Input & Action Buttons -->
-                    <div class="flex items-center gap-2 shrink-0">
-                      <div class="flex items-center gap-1.5 rounded-lg border border-white/10 bg-surface-900/90 px-2.5 py-1.5">
-                        <span class="text-xs text-surface-400">Waktu:</span>
-                        <input
-                          type="text"
-                          id="audio-start-time-input"
-                          placeholder="00:00"
-                          value="00:00"
-                          maxlength="5"
-                          class="w-14 text-center font-mono text-xs font-bold text-[#f5c563] bg-transparent focus:outline-none"
-                          title="Format MM:SS (contoh 00:24) atau angka detik"
-                        />
-                      </div>
-
-                      <button
-                        type="button"
-                        id="audio-preview-from-start-btn"
-                        class="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-300 hover:bg-amber-500/25 transition-all cursor-pointer active:scale-95"
-                        title="Tes putar audio dari titik mulai yang dipilih"
-                      >
-                        <span>▶ Tes</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        id="audio-reset-start-btn"
-                        class="rounded-lg border border-white/10 bg-surface-800 px-2.5 py-1.5 text-xs text-surface-400 hover:text-surface-200 transition-all cursor-pointer"
-                        title="Reset titik mulai ke 00:00 (awal lagu)"
-                      >
-                        Reset
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Quick Set to Current Scrubbed Position Button -->
-                  <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-white/5">
-                    <button
-                      type="button"
-                      id="audio-set-current-start-btn"
-                      class="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-xs font-semibold text-primary hover:bg-primary/20 hover:border-primary/50 transition-all cursor-pointer active:scale-95 shadow-xs"
-                    >
-                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                      </svg>
-                      <span>Jadikan Detik Saat Ini sebagai Titik Mulai</span>
-                    </button>
-                    <span id="audio-start-status-text" class="text-[11px] text-surface-400 italic">
-                      Default: Mulai dari awal (00:00)
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
         <!-- Step 5: Preview -->
         <div id="step-5" class="wizard-step hidden pb-36 sm:pb-24 w-full max-w-full min-w-0 overflow-x-hidden">
-          <h2 class="text-xl font-bold text-surface-50">{isEdit ? "Pratinjau & Simpan Perubahan" : "Pratinjau & Terbitkan"}</h2>
+          <h2 class="text-xl font-bold text-surface-50">{isEdit ? "5. Tinjau & Simpan Perubahan" : "5. Tinjau & Terbitkan"}</h2>
           <p class="mt-2 text-sm text-surface-400">{isEdit ? "Tinjau kembali perubahan sebelum menyimpan" : "Tinjau kartu perayaan Anda sebelum dibagikan"}</p>
 
           <!-- Mobile inline preview (visible < 1020px on step 5) -->
@@ -1954,15 +1954,15 @@ const EXTENDED_SWATCHES = [
                   type="button"
                   class="preview-mode-btn preview-toggle-unbox py-1 px-2.5 rounded-md transition-all cursor-pointer text-surface-400 hover:text-white"
                   data-preview-mode="unbox"
-                  title="Test Unboxing Cover"
+                  title="Uji Animasi Pembuka"
                 >
-                  🔒 Unbox
+                  🔒 Uji Animasi
                 </button>
                 <button
                   type="button"
                   class="preview-mode-btn preview-toggle-content py-1 px-2.5 rounded-md transition-all cursor-pointer bg-[#f5c563] text-[#0f0d15] font-semibold shadow-xs"
                   data-preview-mode="content"
-                  title="Full Card Content"
+                  title="Lihat Konten Lengkap"
                 >
                   📜 Konten
                 </button>
@@ -2058,19 +2058,19 @@ const EXTENDED_SWATCHES = [
                 type="button"
                 class="preview-mode-btn preview-toggle-unbox flex-1 py-1.5 px-2 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer text-surface-400 hover:text-white"
                 data-preview-mode="unbox"
-                title="Test Unboxing Animation"
+                title="Uji Animasi Pembuka"
               >
                 <span>🔒</span>
-                <span class="truncate">Test Unbox Cover</span>
+                <span class="truncate">Uji Animasi Pembuka</span>
               </button>
               <button
                 type="button"
                 class="preview-mode-btn preview-toggle-content flex-1 py-1.5 px-2 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-[#f5c563] text-[#0f0d15] font-semibold shadow-xs"
                 data-preview-mode="content"
-                title="View Full Card Content"
+                title="Lihat Konten Kartu Lengkap"
               >
                 <span>📜</span>
-                <span class="truncate">Full Card Content</span>
+                <span class="truncate">Konten Kartu</span>
               </button>
             </div>
           </div>
@@ -2094,7 +2094,7 @@ const EXTENDED_SWATCHES = [
                 >
                   <div class="flex h-full flex-col items-center justify-center text-center p-6">
                     <span class="text-4xl mb-3">✨</span>
-                    <p class="text-sm text-surface-400">Your card preview<br/>will appear here</p>
+                    <p class="text-sm text-surface-400">Pratinjau kartu Anda<br/>akan tampil di sini</p>
                   </div>
                 </div>
               </div>
@@ -7804,6 +7804,7 @@ const EXTENDED_SWATCHES = [
   function updatePreviewSummary() {
     const summary = document.getElementById('preview-summary');
     if (!summary) return;
+    const isEditMode = new URLSearchParams(window.location.search).has('edit');
 
     const categoryEmojis: Record<string, string> = {
       birthday: '🎂 Ulang Tahun',
@@ -7846,12 +7847,12 @@ const EXTENDED_SWATCHES = [
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${categoryEmojis[state.category] || state.category}</span>
         </div>
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">${state.category === 'wedding' ? 'Mempelai' : 'Penerima'}</span>
+          <span class="text-sm text-surface-400 shrink-0">Nama Penerima / Pasangan</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.recipientName}</span>
         </div>
         ${state.senderName ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Pengirim</span>
+          <span class="text-sm text-surface-400 shrink-0">Nama Pengirim</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${state.senderName}</span>
         </div>` : ''}
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
@@ -7931,16 +7932,16 @@ const EXTENDED_SWATCHES = [
         </div>` : ''}
         ${state.themeConfig.customAudioUrl ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Musik Pengiring</span>
-          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">🎵 Upload Musik Sendiri (MP3/Opus)</span>
+          <span class="text-sm text-surface-400 shrink-0">Musik Latar</span>
+          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">🎵 Unggah Musik Sendiri (MP3/Opus)</span>
         </div>` : (state.themeConfig.audioTrackId ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">Musik Pengiring</span>
+          <span class="text-sm text-surface-400 shrink-0">Musik Latar</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">🎵 ${AUDIO_TRACKS.find(t => t.id === state.themeConfig.audioTrackId)?.name || state.themeConfig.audioTrackId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
         </div>` : '')}
         ${state.eventDate ? `
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
-          <span class="text-sm text-surface-400 shrink-0">${state.category === 'anniversary' ? 'Tanggal Mulai Hubungan' : 'Tanggal Acara'}</span>
+          <span class="text-sm text-surface-400 shrink-0">Tanggal Acara</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">${new Date(state.eventDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
         </div>` : ''}
         ${state.category === 'wedding' && state.themeConfig.weddingData ? `
@@ -7960,6 +7961,10 @@ const EXTENDED_SWATCHES = [
           <span class="text-sm text-surface-400 shrink-0">Amplop Digital</span>
           <span class="text-sm font-medium text-surface-200 break-words break-all [overflow-wrap:anywhere] sm:text-right">💰 ${state.themeConfig.weddingData.digitalEnvelope.bankName ? `${state.themeConfig.weddingData.digitalEnvelope.bankName} (${state.themeConfig.weddingData.digitalEnvelope.accountNumber || '—'}) a/n ${state.themeConfig.weddingData.digitalEnvelope.accountHolder || '—'}` : '—'}</span>
         </div>` : ''}
+        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
+          <span class="text-sm text-surface-400 shrink-0">Status Publikasi</span>
+          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">✅ ${isEditMode ? 'Siap Disimpan' : 'Siap Diterbitkan'}</span>
+        </div>
         <hr class="border-white/5" />
         <div class="min-w-0 w-full">
           <span class="text-sm text-surface-400">Pratinjau Pesan</span>

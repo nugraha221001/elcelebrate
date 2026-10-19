@@ -233,33 +233,33 @@ export interface UnboxingOption {
 
 export const CATEGORY_UNBOXING_OPTIONS: Record<CardCategory, UnboxingOption[]> = {
   wedding: [
-    { id: 'gate-split', emoji: '🏛️', label: 'Royal Gate Split', desc: 'Splits laterally' },
-    { id: 'curtain-lift', emoji: '✨', label: 'Curtain Lift', desc: 'Upward silk glide' },
-    { id: 'wax-seal', emoji: '💌', label: 'Wax Seal Envelope', desc: 'Breaking seal flap' },
+    { id: 'gate-split', emoji: '🏛️', label: 'Gate Split', desc: 'Pintu gerbang megah terbuka menyamping' },
+    { id: 'curtain-lift', emoji: '✨', label: 'Curtain Lift', desc: 'Tirai sutra terangkat anggun ke atas' },
+    { id: 'wax-seal', emoji: '💌', label: 'Wax Seal', desc: 'Amplop segel lilin terbuka elegan' },
   ],
   birthday: [
-    { id: 'giftbox-pop', emoji: '🎁', label: 'Luxury Gift Box Pop', desc: 'Lid lifts with pop' },
-    { id: 'ribbon-untie', emoji: '🎀', label: 'Satin Ribbon Untie', desc: 'Silky ribbon unbind' },
+    { id: 'giftbox-pop', emoji: '🎁', label: 'Gift Box Pop', desc: 'Tutup kotak kado terbuka ke atas' },
+    { id: 'ribbon-untie', emoji: '🎀', label: 'Pita Sutra Terurai', desc: 'Pita satin terlepas lembut' },
   ],
   love: [
-    { id: 'wax-seal-letter', emoji: '💌', label: 'Wax Seal Love Letter', desc: '3D stamp & unfold' },
-    { id: 'folded-note', emoji: '📜', label: 'Romantic Folded Note', desc: 'Unfolds tender note' },
+    { id: 'wax-seal-letter', emoji: '💌', label: 'Wax Seal Love Letter', desc: 'Segel stempel lilin terbuka perlahan' },
+    { id: 'folded-note', emoji: '📜', label: 'Lipatan Surat Romantis', desc: 'Lipatan kertas surat terbuka rapi' },
   ],
   graduation: [
-    { id: 'diploma-scroll', emoji: '📜', label: 'Royal Diploma Scroll', desc: 'Gold ring unroll' },
-    { id: 'folder-reveal', emoji: '🎓', label: 'Honor Folder Reveal', desc: 'Embossed folder open' },
+    { id: 'diploma-scroll', emoji: '📜', label: 'Gulungan Ijazah', desc: 'Gulungan pita emas terurai rapi' },
+    { id: 'folder-reveal', emoji: '🎓', label: 'Map Kehormatan', desc: 'Map embossed terbuka anggun' },
   ],
   invitation: [
-    { id: 'vip-sleeve', emoji: '🎟️', label: 'VIP Pass Sleeve Reveal', desc: 'Velvet pocket slide' },
-    { id: 'gold-envelope', emoji: '✉️', label: 'Black & Gold Envelope', desc: 'Gold-lined flap flip' },
+    { id: 'vip-sleeve', emoji: '🎟️', label: 'VIP Pass Sleeve', desc: 'Kartu VIP meluncur keluar mewah' },
+    { id: 'gold-envelope', emoji: '✉️', label: 'Amplop Hitam & Emas', desc: 'Amplop aksen emas terbuka mewah' },
   ],
   anniversary: [
-    { id: 'jewelry-box', emoji: '💍', label: 'Velvet Keepsake Box', desc: 'Hinged jewel shine' },
-    { id: 'ribbon-untie', emoji: '🎀', label: 'Satin Ribbon Untie', desc: 'Silky ribbon unbind' },
+    { id: 'jewelry-box', emoji: '💍', label: 'Kotak Perhiasan Velvet', desc: 'Kotak beludru terbuka berkilau' },
+    { id: 'ribbon-untie', emoji: '🎀', label: 'Pita Sutra Terurai', desc: 'Pita satin terlepas lembut' },
   ],
   greetings: [
-    { id: 'bifold-card', emoji: '📖', label: '3D Bifold Card Open', desc: 'Booklet gatefold swing' },
-    { id: 'festive-envelope', emoji: '✨', label: 'Festive Envelope', desc: 'Glowing flap reveal' },
+    { id: 'bifold-card', emoji: '📖', label: 'Bifold Card', desc: 'Kartu lipat 3D membuka elegan' },
+    { id: 'festive-envelope', emoji: '✨', label: 'Amplop Perayaan', desc: 'Amplop bercahaya terbuka anggun' },
   ],
 };
 
