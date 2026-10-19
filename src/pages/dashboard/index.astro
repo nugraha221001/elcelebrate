@@ -5,29 +5,58 @@ import Modal from '../../components/ui/Modal.astro';
 import Toast from '../../components/ui/Toast.astro';
 import { CATEGORY_META } from '../../lib/types';
 import type { Card } from '../../lib/types';
+import { Cake, Sparkles, Gift, Eye, Share2, Plus, Sparkle, ArrowRight, ShieldCheck } from 'lucide-astro';
+import { SHOWCASE_WEDDING_CARD } from '../../lib/showcase-wedding';
 
 export const prerender = false;
 
-// Auth guard — must run before any HTML is emitted
+// Auth check — allow guest mode showcase preview without hard redirect
 const user = Astro.locals.user;
-if (!user) {
-  return Astro.redirect('/signin');
-}
+const isGuest = !user;
 
-const supabase = Astro.locals.supabase;
-
-// Fetch user's cards
+// Fetch user's cards if logged in
 let cards: Card[] = [];
-const { data } = await supabase
-  .from('cards')
-  .select('*')
-  .eq('user_id', user.id)
-  .order('created_at', { ascending: false });
-cards = data || [];
+if (user) {
+  const supabase = Astro.locals.supabase;
+  const { data } = await supabase
+    .from('cards')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+  cards = data || [];
+}
 ---
 
-<DashboardLayout title="Kartu Saya">
+<DashboardLayout title={isGuest ? "Pratinjau Dashboard" : "Kartu Saya"}>
   <Toast />
+
+  {isGuest && (
+    <div class="mb-8 rounded-2xl border border-[#f5c563]/30 bg-[#f5c563]/10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md shadow-lg">
+      <div class="flex items-start sm:items-center gap-3">
+        <div class="w-10 h-10 rounded-xl border border-[#f5c563]/30 bg-[#f5c563]/15 text-[#f5c563] flex items-center justify-center shrink-0">
+          <Sparkles class="w-5 h-5" stroke-width={1.5} />
+        </div>
+        <div>
+          <h2 class="text-sm font-semibold text-white">Mode Pratinjau Tamu (Guest Showcase)</h2>
+          <p class="text-xs text-surface-300 mt-0.5">Anda sedang melihat Pratinjau Dashboard. Masuk untuk menyimpan dan mengelola undangan Anda sendiri.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5 shrink-0">
+        <a
+          href="/signin"
+          class="rounded-xl bg-[#f5c563] text-[#0f0d15] px-4 py-2 text-xs font-semibold shadow-md shadow-[#f5c563]/20 hover:brightness-110 active:scale-95 transition-all"
+        >
+          Masuk ke Akun
+        </a>
+        <a
+          href="/signup"
+          class="rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white px-3.5 py-2 text-xs font-medium transition-all"
+        >
+          Daftar Gratis
+        </a>
+      </div>
+    </div>
+  )}
 
   <!-- Delete Card Confirmation Modal -->
   <Modal id="delete-card-modal" title="Hapus Kartu Ini?" size="sm">
@@ -131,47 +160,195 @@ cards = data || [];
   </Modal>
 
   <!-- Header -->
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
     <div>
-      <h1 class="text-2xl font-bold text-surface-50">Kartu Saya</h1>
+      <h1 class="text-2xl font-bold text-surface-50">{isGuest ? "Pratinjau Dashboard" : "Kartu Saya"}</h1>
       <p class="mt-1 text-sm text-surface-400" id="card-count-label">
-        {cards.length === 0
-          ? "Belum ada kartu yang dibuat"
-          : `${cards.length} kartu telah dibuat`}
+        {isGuest
+          ? "Menampilkan contoh kartu resmi & alur kerja ElCelebrate"
+          : cards.length === 0
+            ? "Belum ada kartu buatan sendiri"
+            : `${cards.length} kartu telah dibuat`}
       </p>
     </div>
-    <Button href="/dashboard/create" variant="primary" size="md" id="dashboard-create-btn">
+    <Button href={isGuest ? "/signin" : "/dashboard/create"} variant="primary" size="md" id="dashboard-create-btn">
       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
-      Buat Kartu
+      {isGuest ? "Masuk untuk Membuat" : "Buat Kartu"}
     </Button>
   </div>
 
-  <!-- Empty State Container -->
-  <div id="empty-state" class:list={['mt-16 flex flex-col items-center justify-center text-center', cards.length === 0 ? '' : 'hidden']}>
-    <div class="mb-6 flex gap-3">
-      <span class="animate-float text-5xl" style="animation-delay: 0s">🎂</span>
-      <span class="animate-float text-5xl" style="animation-delay: 0.3s">🎉</span>
-      <span class="animate-float text-5xl" style="animation-delay: 0.6s">✨</span>
+  <!-- ── Master Showcase Card: Raden & Arum ── -->
+  <div class="mb-10">
+    <div class="flex items-center justify-between mb-3.5">
+      <div class="flex items-center gap-2">
+        <Sparkle class="w-4 h-4 text-[#f5c563]" stroke-width={2} />
+        <h2 class="text-xs font-semibold tracking-wider uppercase text-[#f5c563]">
+          {isGuest ? "Contoh Undangan Studio: Raden & Arum (Wedding Invitation)" : "Contoh Resmi Studio: Raden & Arum (Wedding)"}
+        </h2>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#f5c563]/10 text-[#f5c563] border border-[#f5c563]/25">
+        <ShieldCheck class="w-3.5 h-3.5" stroke-width={1.5} />
+        <span>Boutique Master Template</span>
+      </span>
     </div>
-    <h2 class="text-xl font-semibold text-surface-200">Belum Ada Kartu Perayaan</h2>
-    <p class="mt-2 max-w-sm text-sm text-surface-400">
-      Mulai buat undangan pernikahan, ucapan ulang tahun, atau kartu selebrasi pertamamu sekarang.
-    </p>
-    <div class="mt-8">
-      <Button href="/dashboard/create" variant="primary" size="lg" id="empty-state-cta">
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        Buat Kartu
-      </Button>
+
+    <!-- Luxury Showcase Banner Card -->
+    <div class="relative overflow-hidden rounded-2xl border border-[#f5c563]/30 bg-linear-to-br from-[#1b1728] via-[#15121e] to-[#0f0d15] p-5 sm:p-6 shadow-2xl backdrop-blur-md">
+      <!-- Decorative Inset Hairline -->
+      <div class="pointer-events-none absolute inset-2 rounded-xl border border-[#f5c563]/15"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="flex items-center gap-4 min-w-0">
+          <div class="relative w-20 h-20 sm:w-22 sm:h-22 rounded-2xl overflow-hidden border border-[#f5c563]/40 shadow-lg shrink-0">
+            <img
+              src={SHOWCASE_WEDDING_CARD.media_urls[0]}
+              alt="Raden & Arum"
+              class="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
+            <span class="absolute bottom-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-[#f5c563] text-[#0f0d15] shadow-xs">
+              Wedding
+            </span>
+          </div>
+
+          <div class="min-w-0 flex-1">
+            <div class="inline-flex items-center gap-2 text-xs font-serif italic text-[#f5c563]">
+              <span>Walimatul &apos;Ursy • Signature Atelier</span>
+            </div>
+            <h3 class="text-lg sm:text-xl font-bold text-white font-serif tracking-tight mt-0.5 truncate">
+              Raden & Arum
+            </h3>
+            <p class="text-xs text-surface-300 mt-0.5 truncate">
+              Sabtu, 24 Oktober 2026 • Grand Ballroom The Dharmawangsa, Jakarta
+            </p>
+            <div class="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-surface-400">
+              <span class="inline-flex items-center gap-1 text-emerald-400 font-medium">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Wax Seal Unbox</span>
+              </span>
+              <span>•</span>
+              <span>Opus Audio</span>
+              <span>•</span>
+              <span>Filigree Divider</span>
+              <span>•</span>
+              <span>11 Prewedding Photos</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0 pt-2 md:pt-0">
+          {isGuest ? (
+            <>
+              <a
+                href="/c/demo-wedding"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 rounded-xl bg-[#f5c563] text-[#0f0d15] px-4 py-2.5 text-xs font-semibold shadow-md shadow-[#f5c563]/20 hover:brightness-110 active:scale-95 transition-all"
+              >
+                <Eye class="w-4 h-4" stroke-width={2} />
+                <span>Lihat Undangan Utuh</span>
+              </a>
+              <a
+                href="/c/demo-wedding"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white px-3.5 py-2.5 text-xs font-medium transition-all"
+              >
+                <span>Simulasi Studio</span>
+                <ArrowRight class="w-3.5 h-3.5 text-surface-400" />
+              </a>
+              <a
+                href="/signin"
+                class="inline-flex items-center gap-1.5 rounded-xl border border-[#f5c563]/30 bg-[#f5c563]/10 hover:bg-[#f5c563]/20 text-[#f5c563] px-3.5 py-2.5 text-xs font-semibold transition-all"
+              >
+                <Sparkles class="w-3.5 h-3.5" />
+                <span>Gunakan Konsep Ini</span>
+              </a>
+            </>
+          ) : (
+            <>
+              <a
+                href="/c/demo-wedding"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 rounded-xl bg-surface-700 text-surface-100 hover:bg-surface-600 hover:text-white px-3.5 py-2 text-xs font-medium transition-all"
+              >
+                <Eye class="w-3.5 h-3.5 text-surface-400" />
+                <span>Lihat Demo Utuh</span>
+              </a>
+              <button
+                type="button"
+                class="share-card-trigger inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-medium text-white transition-all hover:brightness-110 cursor-pointer"
+                style="background: #25D366;"
+                data-card-slug="demo-wedding"
+                data-card-recipient="Raden & Arum"
+                data-card-category="wedding"
+                data-card-id="showcase-wedding-card-001"
+              >
+                <Share2 class="w-3.5 h-3.5" />
+                <span>Uji Bagikan WA</span>
+              </button>
+              <a
+                href="/dashboard/create?category=wedding"
+                class="inline-flex items-center gap-2 rounded-xl bg-[#f5c563] text-[#0f0d15] px-4 py-2 text-xs font-semibold shadow-md shadow-[#f5c563]/20 hover:brightness-110 active:scale-95 transition-all"
+              >
+                <Plus class="w-3.5 h-3.5" stroke-width={2.5} />
+                <span>Buat Seperti Ini</span>
+              </a>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- User Cards Section -->
+  {!isGuest && (
+    <div>
+      {cards.length > 0 ? (
+        <div class="mb-4">
+          <h2 class="text-sm font-semibold tracking-wide uppercase text-surface-400">
+            Kartu Undangan & Ucapan Anda ({cards.length})
+          </h2>
+        </div>
+      ) : (
+        <div id="empty-state" class="mt-8 mb-12 flex flex-col items-center justify-center text-center p-8 rounded-2xl border border-white/8 bg-surface-900/40">
+          <div class="mb-4 flex gap-3 items-center justify-center">
+            <div class="w-12 h-12 rounded-2xl border border-[#f5c563]/25 bg-[#f5c563]/5 text-[#f5c563] flex items-center justify-center shadow-lg shadow-[#f5c563]/5">
+              <Cake class="w-6 h-6" stroke-width={1.5} />
+            </div>
+            <div class="w-14 h-14 rounded-2xl border border-[#f5c563]/40 bg-[#f5c563]/10 text-[#f5c563] flex items-center justify-center shadow-xl shadow-[#f5c563]/10">
+              <Sparkles class="w-7 h-7" stroke-width={1.5} />
+            </div>
+            <div class="w-12 h-12 rounded-2xl border border-[#f5c563]/25 bg-[#f5c563]/5 text-[#f5c563] flex items-center justify-center shadow-lg shadow-[#f5c563]/5">
+              <Gift class="w-6 h-6" stroke-width={1.5} />
+            </div>
+          </div>
+          <h3 class="text-lg font-semibold text-surface-200">Belum Ada Kartu Buatan Sendiri</h3>
+          <p class="mt-1.5 max-w-sm text-sm text-surface-400">
+            Mulai rancang undangan pernikahan, ulang tahun, atau kartu selebrasi pertama Anda dengan alur kreasi intuitif.
+          </p>
+          <div class="mt-6">
+            <Button href="/dashboard/create" variant="primary" size="md" id="empty-state-cta">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Buat Kartu Pertama
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+
   <!-- Card Grid -->
   {cards.length > 0 && (
-    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" id="cards-grid">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" id="cards-grid">
       {cards.map((card, i) => {
         const meta = CATEGORY_META[card.category as keyof typeof CATEGORY_META];
         const cardUrl = `/c/${card.slug}`;

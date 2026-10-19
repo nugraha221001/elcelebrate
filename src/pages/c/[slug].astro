@@ -7,29 +7,43 @@ import { CATEGORY_META, resolveUnboxingStyle } from '../../lib/types';
 import { getTrackById, getTrackUrl } from '../../lib/audio-tracks';
 import { resolveMediaUrl } from '../../lib/r2';
 
+import { SHOWCASE_WEDDING_CARD, SHOWCASE_WEDDING_WISHES } from '../../lib/showcase-wedding';
+
 export const prerender = false;
 
 const { slug } = Astro.params;
 const supabase = Astro.locals.supabase;
 
-// Fetch card by slug
-const { data: card, error: cardError } = await supabase
-  .from('cards')
-  .select('*')
-  .eq('slug', slug)
-  .eq('is_published', true)
-  .single();
+let card: Card | null = null;
+let wishes: Wish[] = [];
 
-if (cardError || !card) {
-  return new Response(null, { status: 404, statusText: 'Card not found' });
+if (slug === 'demo-wedding') {
+  card = SHOWCASE_WEDDING_CARD as Card;
+  wishes = [...SHOWCASE_WEDDING_WISHES] as Wish[];
+} else {
+  // Fetch card by slug
+  const { data: dbCard, error: cardError } = await supabase
+    .from('cards')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_published', true)
+    .single();
+
+  if (cardError || !dbCard) {
+    return new Response(null, { status: 404, statusText: 'Card not found' });
+  }
+
+  card = dbCard as Card;
+
+  // Fetch wishes
+  const { data: dbWishes } = await supabase
+    .from('wishes')
+    .select('*')
+    .eq('card_id', card.id)
+    .order('created_at', { ascending: false });
+
+  wishes = (dbWishes || []) as Wish[];
 }
-
-// Fetch wishes
-const { data: wishes } = await supabase
-  .from('wishes')
-  .select('*')
-  .eq('card_id', card.id)
-  .order('created_at', { ascending: false });
 
 const typedCard = card as Card;
 const typedWishes = (wishes || []) as Wish[];
@@ -62,6 +76,7 @@ const unboxingStyle = (theme as any).unboxingStyle || theme.unboxStyle || 'gate-
 const currentUnboxStyle = resolveUnboxingStyle(typedCard.category, (theme as any).unboxingStyle, theme.unboxStyle);
 const weddingHeaderTitle = (theme as any).weddingHeaderTitle || "Walimatul 'Urs";
 const cornerOrnament = (theme as any).cornerOrnament || (isWedding ? 'botanical' : 'none');
+const isEmbed = Astro.url.searchParams.get('embed') === '1';
 
 // Anniversary relationship time computation
 let anniversaryTime: { years: number; months: number; days: number; isTogether: boolean } | null = null;
@@ -245,6 +260,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
     data-passcode={theme.passcode || ''}
     data-has-passcode={hasPasscode ? 'true' : 'false'}
     data-audio-start-time={audioStartTime.toString()}
+    data-is-embed={isEmbed ? 'true' : 'false'}
     class="hidden"
   ></div>
 
@@ -257,8 +273,8 @@ const hasBirthdayAge = birthdayAge.length > 0;
     <div
       id="wedding-cover"
       data-unboxing-style={unboxingStyle}
-      class={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden h-dvh ${unboxingStyle === 'curtain-lift' ? 'curtain-lift-mode' : ''}`}
-      style={`font-family: ${fontFamily};`}
+      class={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden h-dvh ${unboxingStyle === 'curtain-lift' ? 'curtain-lift-mode' : ''} ${isEmbed ? 'hidden! pointer-events-none' : ''}`}
+      style={`font-family: ${fontFamily}; ${isEmbed ? 'display: none !important;' : ''}`}
     >
       <!-- Center Seam Gold Glow Line (Visual Depth & Seam Detailing - Gate Split Only) -->
       {unboxingStyle !== 'wax-seal' && (
@@ -404,7 +420,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
     <!-- Wedding Content (hidden until cover is dismissed) -->
     <main
       id="wedding-content"
-      class="hidden min-h-dvh relative"
+      class={`${isEmbed ? '' : 'hidden '}min-h-dvh relative`}
       style={`--primary: ${theme.primaryColor}; --secondary: ${theme.secondaryColor}; background: ${theme.backgroundColor}; background-image: ${bgPattern}; background-size: ${bgPatternSize}; font-family: ${fontFamily};`}
     >
       <!-- Confetti Canvas -->
@@ -539,18 +555,21 @@ const hasBirthdayAge = birthdayAge.length > 0;
         {weddingData.sacredQuote?.quote && weddingData.sacredQuote?.enabled !== false && (
           <section class="py-8 sm:py-12 max-w-2xl mx-auto overflow-hidden px-4">
             <div
-              class="wedding-reveal reveal-card rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden border border-white/10 backdrop-blur-md"
+              class="wedding-reveal reveal-card relative rounded-2xl p-6 sm:p-8 text-center max-w-full overflow-hidden border border-[#f5c563]/30 backdrop-blur-md shadow-lg"
               style={`background: ${theme.primaryColor}08;`}
             >
-              <p class="text-slate-100 font-serif italic text-sm md:text-base leading-relaxed max-w-lg mx-auto whitespace-pre-line" style={`font-family: ${fontFamily};`}>
-                "{weddingData.sacredQuote.quote}"
-              </p>
-              <div class="champagne-divider my-3"></div>
-              {weddingData.sacredQuote.source && (
-                <p class="text-xs md:text-sm font-semibold tracking-wider text-amber-300 uppercase">
-                  — {weddingData.sacredQuote.source}
+              <div class="pointer-events-none absolute inset-2 rounded-xl border border-[#f5c563]/20" aria-hidden="true"></div>
+              <div class="relative z-10">
+                <p class="text-slate-100 font-serif italic text-sm md:text-base leading-relaxed max-w-lg mx-auto whitespace-pre-line" style={`font-family: ${fontFamily};`}>
+                  "{weddingData.sacredQuote.quote}"
                 </p>
-              )}
+                <div class="champagne-divider my-3"></div>
+                {weddingData.sacredQuote.source && (
+                  <p class="text-xs md:text-sm font-semibold tracking-wider text-amber-300 uppercase">
+                    — {weddingData.sacredQuote.source}
+                  </p>
+                )}
+              </div>
             </div>
           </section>
         )}
@@ -757,7 +776,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                     rel="noopener noreferrer"
                     class="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-slate-100 backdrop-blur-xs transition-all hover:bg-white/20 active:scale-95"
                   >
-                    <span>🗓️</span> Save to Google Calendar
+                    <span>🗓️</span> Simpan ke Google Calendar
                   </a>
                 )}
               </div>
@@ -810,7 +829,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                       rel="noopener noreferrer"
                       class="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-slate-100 backdrop-blur-xs transition-all hover:bg-white/20 active:scale-95"
                     >
-                      <span>🗓️</span> Save to Google Calendar
+                      <span>🗓️</span> Simpan ke Google Calendar
                     </a>
                   )}
                 </div>
@@ -867,7 +886,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                       rel="noopener noreferrer"
                       class="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-slate-100 backdrop-blur-xs transition-all hover:bg-white/20 active:scale-95"
                     >
-                      <span>🗓️</span> Save to Google Calendar
+                      <span>🗓️</span> Simpan ke Google Calendar
                     </a>
                   )}
                 </div>
@@ -1770,7 +1789,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                     rel="noopener noreferrer"
                     class="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-[#0f0d15] bg-[#f5c563] hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                   >
-                    <span>🗓️</span> <span>Save to Google Calendar</span>
+                    <span>🗓️</span> <span>Simpan ke Google Calendar</span>
                   </a>
                 )}
                 {theme.invitationVenue && (
@@ -2227,17 +2246,66 @@ const hasBirthdayAge = birthdayAge.length > 0;
   const weddingCover = document.getElementById('wedding-cover');
   const weddingContent = document.getElementById('wedding-content');
 
+  const isEmbedMode = (dataEl?.dataset.isEmbed === 'true') || (new URLSearchParams(window.location.search).get('embed') === '1');
+
+  if (isEmbedMode) {
+    document.documentElement.classList.add('is-embed');
+    document.body.classList.add('is-embed');
+  }
+
   // ═══════════════════════════════════════════════════════
   // Wedding Cinematic Cover Unlock
   // ═══════════════════════════════════════════════════════
   if (isWedding && weddingCover && weddingContent) {
-    document.body.style.overflow = 'hidden';
+    if (isEmbedMode) {
+      document.body.style.overflow = '';
+      weddingCover.style.display = 'none';
+      weddingCover.style.pointerEvents = 'none';
+      weddingContent.classList.remove('hidden');
 
-    let invitationOpened = false;
+      const heroPhoto = document.getElementById('hero-couple-img');
+      const heroBadge = document.getElementById('hero-header-badge');
+      const heroNames = document.getElementById('hero-couple-names');
+      const dock = document.getElementById('floating-dock');
+      const disc = document.querySelector('.music-disc');
 
-    const openInvitation = () => {
-      if (invitationOpened) return;
-      invitationOpened = true;
+      if (dock) dock.classList.add('dock-visible');
+      if (disc) disc.classList.add('disc-visible');
+
+      setTimeout(() => {
+        if (heroPhoto) {
+          heroPhoto.classList.remove('hero-photo-init');
+          heroPhoto.classList.add('hero-photo-settling');
+        }
+      }, 150);
+
+      setTimeout(() => {
+        if (heroBadge) heroBadge.classList.add('is-revealed');
+      }, 250);
+
+      setTimeout(() => {
+        if (heroNames) heroNames.classList.add('is-revealed');
+      }, 380);
+
+      setTimeout(() => {
+        if (heroPhoto) {
+          heroPhoto.classList.remove('hero-photo-settling');
+          heroPhoto.classList.add('ken-burns-active');
+        }
+      }, 1400);
+
+      setTimeout(() => {
+        observeWeddingReveals();
+        observeRevealElements();
+      }, 250);
+    } else {
+      document.body.style.overflow = 'hidden';
+
+      let invitationOpened = false;
+
+      const openInvitation = () => {
+        if (invitationOpened) return;
+        invitationOpened = true;
 
       const style = weddingCover.dataset.unboxingStyle || 'gate-split';
       const coverBtn = document.getElementById('wedding-cover-btn');
@@ -2394,9 +2462,55 @@ const hasBirthdayAge = birthdayAge.length > 0;
       }, 400);
     };
 
-    document.getElementById('wedding-cover-btn')?.addEventListener('click', openInvitation);
-    document.getElementById('wedding-wax-seal-btn')?.addEventListener('click', openInvitation);
+      document.getElementById('wedding-cover-btn')?.addEventListener('click', openInvitation);
+      document.getElementById('wedding-wax-seal-btn')?.addEventListener('click', openInvitation);
+    }
   }
+
+  // ═══════════════════════════════════════════════════════
+  // Studio Embed Message Channel
+  // ═══════════════════════════════════════════════════════
+  window.addEventListener('message', (e) => {
+    if (!e.data || typeof e.data !== 'object') return;
+    const { type } = e.data;
+
+    if (type === 'PLAY_AUDIO') {
+      startAudio(true);
+      const audio = document.getElementById('bg-audio') as HTMLAudioElement | null;
+      if (audio && audio.paused) {
+        audio.play().catch(() => {});
+      }
+    } else if (type === 'TOGGLE_MUTE') {
+      const toggle = document.getElementById('audio-toggle');
+      if (toggle) {
+        toggle.click();
+      } else {
+        const audio = document.getElementById('bg-audio') as HTMLAudioElement | null;
+        if (audio) {
+          if (audio.paused) {
+            audio.play().catch(() => {});
+            isPlaying = true;
+            updateAudioUI(true);
+          } else {
+            audio.pause();
+            isPlaying = false;
+            updateAudioUI(false);
+          }
+        }
+      }
+    } else if (type === 'RESET_SEAL') {
+      const audio = document.getElementById('bg-audio') as HTMLAudioElement | null;
+      if (audio) {
+        audio.pause();
+      }
+      try {
+        stopSynth();
+      } catch {}
+      isPlaying = false;
+      updateAudioUI(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
 
   // ═══════════════════════════════════════════════════════
   // Copy Account Number (Digital Envelope)
@@ -3040,10 +3154,20 @@ const hasBirthdayAge = birthdayAge.length > 0;
         if (banner) banner.classList.remove('hidden');
 
         // Burst celebration from candle's screen position
-        const targetEl = flame || cakeTrigger;
-        const rect = targetEl.getBoundingClientRect();
-        const originX = Math.max(0.1, Math.min(0.9, (rect.left + rect.width / 2) / (window.innerWidth || 1)));
-        const originY = Math.max(0.1, Math.min(0.9, (rect.top + rect.height / 2) / (window.innerHeight || 1)));
+        let originX = 0.5;
+        let originY = 0.6;
+        try {
+          const targetEl = flame || cakeTrigger;
+          if (targetEl && typeof targetEl.getBoundingClientRect === 'function') {
+            const rect = targetEl.getBoundingClientRect();
+            if (rect.width > 0 || rect.height > 0) {
+              originX = Math.max(0.1, Math.min(0.9, (rect.left + rect.width / 2) / (window.innerWidth || 1)));
+              originY = Math.max(0.1, Math.min(0.9, (rect.top + rect.height / 2) / (window.innerHeight || 1)));
+            }
+          }
+        } catch {
+          // Fallback to center coordinates if detached or zero-dimension
+        }
         triggerBirthdayCelebration(originX, originY);
 
         // Allow re-lighting after 3-second cooldown automatically
@@ -3345,6 +3469,11 @@ const hasBirthdayAge = birthdayAge.length > 0;
         : 'M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z'
       );
     }
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'AUDIO_STATE_CHANGED', isPlaying: playing }, '*');
+      }
+    } catch {}
   }
 
   async function fallbackToSynth(fadeIn = false) {
@@ -3592,6 +3721,33 @@ const hasBirthdayAge = birthdayAge.length > 0;
     }
 
     try {
+      if (cardId === 'showcase-wedding-card-001') {
+        // Instant client-side simulation for demo wedding showcase
+        await new Promise((r) => setTimeout(r, 350));
+        const container = document.getElementById('wishes-container');
+        if (container) {
+          const placeholder = container.querySelector('p.text-center');
+          if (placeholder) placeholder.remove();
+
+          const wishEl = document.createElement('div');
+          wishEl.className = 'wedding-reveal reveal-card reveal-blur-card is-revealed in-view rounded-2xl border border-white/10 backdrop-blur-md overflow-hidden p-4 sm:p-5 max-w-full animate-fade-in-up';
+          wishEl.style.cssText = 'background: rgba(245, 197, 99, 0.08);';
+          wishEl.innerHTML = `
+            <div class="flex items-baseline justify-between gap-2 max-w-full">
+              <span class="text-sm font-semibold text-white wrap-anywhere min-w-0">${escapeHtml(sender.value)}</span>
+              <span class="text-xs text-surface-500 shrink-0">Baru saja</span>
+            </div>
+            <p class="mt-1.5 text-sm text-slate-200 leading-relaxed wrap-anywhere whitespace-pre-wrap max-w-full overflow-hidden">${escapeHtml(wish_message)}</p>
+          `;
+          container.prepend(wishEl);
+        }
+
+        sender.value = '';
+        message.value = '';
+        showInvitationToast('Ucapan & Doa Terkirim! ✨');
+        return;
+      }
+
       const res = await fetch(`/api/wishes/${cardId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3763,6 +3919,24 @@ const hasBirthdayAge = birthdayAge.length > 0;
   :root {
     --primary: var(--primary);
     --secondary: var(--secondary);
+  }
+
+  /* ── Seamless Studio Embed Mode Scrollbar & Styling ── */
+  :global(html.is-embed),
+  :global(body.is-embed) {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(245, 197, 99, 0.35) transparent;
+  }
+  :global(html.is-embed::-webkit-scrollbar),
+  :global(body.is-embed::-webkit-scrollbar) {
+    width: 4px;
+  }
+  :global(html.is-embed::-webkit-scrollbar-thumb),
+  :global(body.is-embed::-webkit-scrollbar-thumb) {
+    background: rgba(245, 197, 99, 0.35);
+    border-radius: 9999px;
   }
 
   /* ── Romantic Cloud Mist & Soft Reveal ── */

@@ -6,7 +6,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
   const { email } = await request.json();
 
   if (!email) {
-    return new Response(JSON.stringify({ error: 'Email is required' }), {
+    return new Response(JSON.stringify({ error: 'Alamat email wajib diisi' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -26,7 +26,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
     });
   }
 
-  return new Response(JSON.stringify({ message: 'Magic link sent' }), {
+  return new Response(JSON.stringify({ message: 'Tautan masuk berhasil dikirim ke email Anda' }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });

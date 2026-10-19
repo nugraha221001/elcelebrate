@@ -5,6 +5,7 @@ import Footer from '../components/layout/Footer.astro';
 import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Toast from '../components/ui/Toast.astro';
+import { Sparkles } from 'lucide-astro';
 
 export const prerender = false;
 
@@ -28,8 +29,8 @@ if (user) {
     <div class="relative w-full max-w-md" style="animation: fade-in-up 0.5s var(--ease-smooth) forwards;">
       <!-- Header -->
       <div class="mb-8 text-center">
-        <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-secondary/20 text-3xl">
-          🎉
+        <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-[#f5c563]/25 bg-[#f5c563]/10 text-[#f5c563] shadow-md">
+          <Sparkles class="h-7 w-7 text-[#f5c563]" stroke-width="1.5" />
         </div>
         <h1 class="text-2xl font-bold text-surface-50">Selamat Datang Kembali</h1>
         <p class="mt-2 text-sm text-surface-400 leading-relaxed">Masuk untuk melanjutkan dan mengelola kartu perayaanmu di ElCelebrate</p>

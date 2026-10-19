@@ -5929,10 +5929,13 @@ const EXTENDED_SWATCHES = [
 
     const sacredQuoteHtml = (wd.sacredQuote?.quote && wd.sacredQuote?.enabled !== false) ? `
       <section class="py-2.5 px-3 text-center">
-        <div class="rounded-xl p-3 border border-amber-300/20 bg-amber-500/5">
-          <p class="text-[11px] italic text-slate-100 leading-relaxed whitespace-pre-line font-serif">"${wd.sacredQuote.quote}"</p>
-          <div class="champagne-divider my-2"></div>
-          ${wd.sacredQuote.source ? `<p class="text-[9px] font-semibold text-amber-200 tracking-wider uppercase">— ${wd.sacredQuote.source}</p>` : ''}
+        <div class="relative rounded-xl p-3.5 border border-[#f5c563]/30 bg-[#f5c563]/5 overflow-hidden">
+          <div class="pointer-events-none absolute inset-1.5 rounded-lg border border-[#f5c563]/20" aria-hidden="true"></div>
+          <div class="relative z-10">
+            <p class="text-[11px] italic text-slate-100 leading-relaxed whitespace-pre-line font-serif">"${wd.sacredQuote.quote}"</p>
+            <div class="champagne-divider my-2"></div>
+            ${wd.sacredQuote.source ? `<p class="text-[9px] font-semibold text-amber-200 tracking-wider uppercase">— ${wd.sacredQuote.source}</p>` : ''}
+          </div>
         </div>
       </section>
     ` : '';
@@ -6567,7 +6570,7 @@ const EXTENDED_SWATCHES = [
                   type="button"
                   class="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-[10px] font-semibold text-[#0f0d15] bg-[#f5c563] shadow-sm pointer-events-none"
                 >
-                  <span>🗓️</span> <span>Save to Google Calendar</span>
+                  <span>🗓️</span> <span>Simpan ke Google Calendar</span>
                 </button>
               ` : ''}
               ${state.themeConfig?.invitationVenue ? `
@@ -7062,10 +7065,20 @@ const EXTENDED_SWATCHES = [
         if (banner) banner.classList.remove('hidden');
 
         // Burst celebration from candle's screen position
-        const targetEl = flame || cakeTrigger;
-        const rect = targetEl.getBoundingClientRect();
-        const originX = Math.max(0.1, Math.min(0.9, (rect.left + rect.width / 2) / (window.innerWidth || 1)));
-        const originY = Math.max(0.1, Math.min(0.9, (rect.top + rect.height / 2) / (window.innerHeight || 1)));
+        let originX = 0.5;
+        let originY = 0.6;
+        try {
+          const targetEl = flame || cakeTrigger;
+          if (targetEl && typeof targetEl.getBoundingClientRect === 'function') {
+            const rect = targetEl.getBoundingClientRect();
+            if (rect.width > 0 || rect.height > 0) {
+              originX = Math.max(0.1, Math.min(0.9, (rect.left + rect.width / 2) / (window.innerWidth || 1)));
+              originY = Math.max(0.1, Math.min(0.9, (rect.top + rect.height / 2) / (window.innerHeight || 1)));
+            }
+          }
+        } catch {
+          // Fallback to center coordinates if detached or zero-dimension
+        }
         triggerBirthdayCelebration(originX, originY);
 
         // Allow re-lighting after 3-second cooldown automatically

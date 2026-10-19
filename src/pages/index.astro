@@ -20,6 +20,10 @@ import {
   Check,
   Copy,
   Disc3,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  ExternalLink,
 } from 'lucide-astro';
 
 const user = Astro.locals.user;
@@ -168,12 +172,12 @@ const BOUTIQUE_CATEGORIES: BoutiqueCategory[] = [
         </div>
 
         <!-- Right Column: Live Interactive Card Showcase -->
-        <div class="lg:col-span-5 flex flex-col items-center justify-center">
+        <div id="studio-preview" class="lg:col-span-5 flex flex-col items-center justify-center">
           <!-- Subtle Outer Frame Glow -->
           <div class="relative group p-1.5 rounded-[38px] bg-linear-to-b from-[#f5c563]/30 via-white/5 to-[#f5c563]/10 shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
             
             <!-- Live Preview Indicator Pill -->
-            <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1 rounded-full border border-[#f5c563]/30 bg-[#181522]/95 backdrop-blur-md text-[11px] font-medium text-[#f5c563] inline-flex items-center gap-2 shadow-lg">
+            <div class="absolute -top-4.5 sm:-top-5 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1 rounded-full border border-[#f5c563]/30 bg-[#181522]/95 backdrop-blur-md text-[11px] font-medium text-[#f5c563] inline-flex items-center gap-2 shadow-[0_4px_16px_rgba(0,0,0,0.6)] whitespace-nowrap">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>Pratinjau Interaktif Studio</span>
             </div>
@@ -181,71 +185,94 @@ const BOUTIQUE_CATEGORIES: BoutiqueCategory[] = [
             <!-- Miniature Card Showcase Frame -->
             <div
               id="hero-showcase-frame"
-              class="w-72.5 sm:w-80 aspect-9/16 rounded-[32px] border border-[#f5c563]/30 bg-[#181522] shadow-2xl relative overflow-hidden select-none"
+              class="w-72.5 sm:w-80 h-145 sm:h-157.5 rounded-[32px] border border-[#f5c563]/30 bg-[#0f0d15] shadow-2xl relative overflow-hidden select-none"
             >
-              <!-- ── LAYER 1: Card Interior (Revealed upon unboxing) ── -->
+              <!-- ── TOP ACTION BAR (Revealed upon unboxing) ── -->
               <div
-                id="hero-card-interior"
-                class="absolute inset-0 p-5 flex flex-col justify-between text-center transition-all duration-700 bg-linear-to-b from-[#181522] via-[#15121e] to-[#0f0d15]"
+                id="showcase-top-bar"
+                class="absolute top-0 inset-x-0 z-35 bg-[#181522]/95 backdrop-blur-md border-b border-[#f5c563]/20 pt-4 pb-2 px-3 flex items-center justify-between opacity-0 pointer-events-none transition-opacity duration-300"
               >
-                <!-- Architectural Inner Gold Hairline -->
-                <div class="absolute inset-3 border border-[#f5c563]/20 rounded-2xl pointer-events-none"></div>
+                <!-- Phone Top Speaker Notch -->
+                <div class="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-white/20 pointer-events-none"></div>
 
-                <!-- Top: Ambient Music Track Pill -->
-                <div class="relative z-10 pt-2">
-                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-surface-300">
-                    <div class="flex items-end gap-0.5 h-3">
-                      <span class="w-0.5 bg-[#f5c563] h-2 animate-[pulse_1s_ease-in-out_infinite]"></span>
-                      <span class="w-0.5 bg-[#f5c563] h-3 animate-[pulse_0.7s_ease-in-out_infinite]"></span>
-                      <span class="w-0.5 bg-[#f5c563] h-1.5 animate-[pulse_1.2s_ease-in-out_infinite]"></span>
-                    </div>
-                    <span class="truncate max-w-42.5">Canon in D • Piano Romance</span>
+                <!-- Reseal Reset Action -->
+                <button
+                  id="showcase-reseal-top-btn"
+                  type="button"
+                  class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] text-surface-300 hover:text-white border border-white/10 transition-colors cursor-pointer"
+                  title="Tutup Kembali Segel"
+                >
+                  <RotateCcw class="w-3 h-3 text-[#f5c563]" stroke-width="2" />
+                  <span>Tutup Segel</span>
+                </button>
+
+                <!-- Audio Track Indicator & Pulse Bars -->
+                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#f5c563]/10 border border-[#f5c563]/25 text-[9px] text-[#f5c563] font-medium">
+                  <div class="flex items-end gap-0.5 h-2.5" id="showcase-sound-bars">
+                    <span class="w-0.5 bg-[#f5c563] h-1.5 animate-[pulse_0.8s_ease-in-out_infinite]"></span>
+                    <span class="w-0.5 bg-[#f5c563] h-2.5 animate-[pulse_0.6s_ease-in-out_infinite]"></span>
+                    <span class="w-0.5 bg-[#f5c563] h-1 animate-[pulse_1s_ease-in-out_infinite]"></span>
                   </div>
+                  <span class="tracking-wide">wedding.opus</span>
                 </div>
 
-                <!-- Center: Couple Typography & Ceremony Details -->
-                <div class="relative z-10 my-auto py-2">
-                  <span class="text-[9px] uppercase tracking-[0.25em] text-[#f5c563]/90 font-medium">Walimatul &apos;Ursy</span>
-                  
-                  <h3 class="font-serif italic text-2xl font-normal text-white mt-2 leading-tight">
-                    Raden Mas Arya <br />
-                    <span class="text-xs font-sans not-italic text-[#f5c563]/80">&</span> <br />
-                    Arum Sekar Kinanti
-                  </h3>
-
-                  <div class="w-12 h-px bg-[#f5c563]/40 mx-auto my-3"></div>
-
-                  <p class="text-[11px] text-surface-200 font-medium">Sabtu, 24 Oktober 2026</p>
-                  <p class="text-[10px] text-surface-400 mt-0.5">Grand Ballroom Dharmawangsa, Jakarta</p>
-
-                  <!-- Interactive RSVP Badge -->
+                <!-- Audio Controls & Fullscreen Link -->
+                <div class="flex items-center gap-1.5">
                   <button
-                    id="showcase-rsvp-toggle"
+                    id="showcase-audio-btn"
                     type="button"
-                    class="mt-4 px-3.5 py-1.5 rounded-lg border border-[#f5c563]/30 bg-[#f5c563]/10 hover:bg-[#f5c563]/20 text-[10px] font-semibold text-[#f5c563] transition-all cursor-pointer active:scale-95 inline-flex items-center gap-1.5 shadow-sm"
+                    class="w-7 h-7 rounded-lg bg-[#f5c563]/10 hover:bg-[#f5c563]/20 border border-[#f5c563]/30 text-[#f5c563] flex items-center justify-center transition-colors cursor-pointer"
+                    title="Bisukan / Nyalakan Musik"
+                    aria-label="Toggle Audio"
                   >
-                    <Check class="w-3 h-3 text-[#f5c563]" stroke-width="2" />
-                    <span id="showcase-rsvp-label">Konfirmasi Kehadiran</span>
+                    <Volume2 id="showcase-audio-on-icon" class="w-3.5 h-3.5" stroke-width="2" />
+                    <VolumeX id="showcase-audio-off-icon" class="w-3.5 h-3.5 hidden text-surface-400" stroke-width="2" />
                   </button>
-                </div>
-
-                <!-- Bottom: Re-seal Action -->
-                <div class="relative z-10 pb-2">
-                  <button
-                    id="showcase-reseal-btn"
-                    type="button"
-                    class="w-full py-1.5 px-3 rounded-lg border border-white/10 hover:border-[#f5c563]/40 bg-white/5 hover:bg-white/10 text-[10px] text-surface-400 hover:text-white transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  <a
+                    href="/c/demo-wedding"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-surface-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                    title="Buka Layar Penuh di Tab Baru"
+                    aria-label="Buka Layar Penuh"
                   >
-                    <span>Tutup Kembali Segel</span>
-                  </button>
+                    <ExternalLink class="w-3.5 h-3.5 text-[#f5c563]" stroke-width="2" />
+                  </a>
                 </div>
               </div>
+
+              <!-- ── 1:1 EMBEDDED INVITATION VIEWPORT ── -->
+              <div
+                id="showcase-iframe-container"
+                class="absolute inset-0 pt-13 pb-0 overflow-hidden bg-[#0f0d15]"
+              >
+                <iframe
+                  id="showcase-iframe"
+                  title="Pratinjau Undangan Raden & Arum"
+                  data-src="/c/demo-wedding?embed=1"
+                  class="w-full h-full border-0 select-auto"
+                  loading="lazy"
+                ></iframe>
+              </div>
+
+              <!-- Floating Fullscreen Shortcut -->
+              <a
+                id="showcase-fullscreen-float-btn"
+                href="/c/demo-wedding"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="absolute bottom-3 right-3 z-35 px-2.5 py-1.5 rounded-full bg-[#181522]/90 hover:bg-[#181522] border border-[#f5c563]/30 hover:border-[#f5c563]/60 backdrop-blur-md shadow-lg text-[10px] font-medium text-[#f5c563] inline-flex items-center gap-1.5 opacity-0 pointer-events-none transition-all duration-300 hover:scale-105 active:scale-95"
+                title="Buka Layar Penuh"
+              >
+                <ExternalLink class="w-3 h-3 text-[#f5c563]" stroke-width="2" />
+                <span>Layar Penuh</span>
+              </a>
 
               <!-- ── LAYER 2: Gate Split Doors (Left & Right) ── -->
               <!-- Left Gate Door -->
               <div
                 id="hero-gate-left"
-                class="absolute inset-y-0 left-0 w-1/2 bg-[#1c182a] border-r border-[#f5c563]/30 z-20 transition-transform duration-700 ease-luxury flex flex-col justify-between p-3.5 shadow-xl overflow-hidden"
+                class="absolute inset-y-0 left-0 w-1/2 bg-[#1c182a] border-r border-[#f5c563]/30 z-40 transition-transform duration-700 ease-luxury flex flex-col justify-between p-3.5 shadow-xl overflow-hidden"
               >
                 <!-- Subtle Gold Filigree Hairline -->
                 <div class="absolute inset-2 border-r border-[#f5c563]/15 pointer-events-none"></div>
@@ -256,7 +283,7 @@ const BOUTIQUE_CATEGORIES: BoutiqueCategory[] = [
               <!-- Right Gate Door -->
               <div
                 id="hero-gate-right"
-                class="absolute inset-y-0 right-0 w-1/2 bg-[#1c182a] border-l border-[#f5c563]/30 z-20 transition-transform duration-700 ease-luxury flex flex-col justify-between p-3.5 shadow-xl overflow-hidden"
+                class="absolute inset-y-0 right-0 w-1/2 bg-[#1c182a] border-l border-[#f5c563]/30 z-40 transition-transform duration-700 ease-luxury flex flex-col justify-between p-3.5 shadow-xl overflow-hidden"
               >
                 <!-- Subtle Gold Filigree Hairline -->
                 <div class="absolute inset-2 border-l border-[#f5c563]/15 pointer-events-none"></div>
@@ -267,22 +294,22 @@ const BOUTIQUE_CATEGORIES: BoutiqueCategory[] = [
               <!-- ── LAYER 3: Cover Typography Overlay (Crosses both doors) ── -->
               <div
                 id="hero-cover-text"
-                class="absolute inset-x-0 top-12 text-center z-25 transition-all duration-400 pointer-events-none px-4"
+                class="absolute inset-x-0 top-12 text-center z-45 transition-all duration-400 pointer-events-none px-4"
               >
                 <p class="text-[9px] uppercase tracking-[0.25em] text-[#f5c563]/80 font-medium">The Wedding Celebration Of</p>
-                <h3 class="font-serif italic text-xl font-normal text-white mt-1.5">Raden & Arum</h3>
+                <h3 class="font-serif italic text-xl font-normal text-white mt-1.5">Raden &amp; Arum</h3>
                 <p class="text-[10px] text-surface-400 mt-1">24 . 10 . 2026</p>
               </div>
 
               <!-- ── LAYER 4: Center Wax Seal Medallion ── -->
               <div
                 id="hero-wax-seal"
-                class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 transition-all duration-500 ease-luxury cursor-pointer group"
+                class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 transition-all duration-500 ease-luxury cursor-pointer group"
                 title="Klik untuk membuka kartu"
               >
                 <div class="w-16 h-16 rounded-full bg-linear-to-br from-[#d9a738] via-[#f5c563] to-[#9e7118] p-1 shadow-[0_8px_25px_rgba(245,197,99,0.45)] border border-[#fae09a]/80 flex items-center justify-center transform group-hover:scale-105 active:scale-95 transition-transform">
                   <div class="w-full h-full rounded-full border border-amber-950/20 bg-linear-to-br from-[#c9952a] via-[#e5b34e] to-[#966b16] flex flex-col items-center justify-center shadow-inner">
-                    <span class="font-serif italic font-bold text-amber-950 text-xs tracking-wider">R&A</span>
+                    <span class="font-serif italic font-bold text-amber-950 text-xs tracking-wider">R&amp;A</span>
                   </div>
                 </div>
               </div>
@@ -290,7 +317,7 @@ const BOUTIQUE_CATEGORIES: BoutiqueCategory[] = [
               <!-- ── LAYER 5: Cover Footer & Interactive CTA Button ── -->
               <div
                 id="hero-cover-footer"
-                class="absolute inset-x-4 bottom-5 z-25 transition-all duration-400 text-center"
+                class="absolute inset-x-4 bottom-5 z-45 transition-all duration-400 text-center"
               >
                 <button
                   id="hero-unbox-btn"
@@ -697,83 +724,133 @@ const BOUTIQUE_CATEGORIES: BoutiqueCategory[] = [
   <!-- Client-side Interactive Logic for Hero Showcase and Sample Copy Pill -->
   <script is:inline>
     (function () {
-      // 1. Hero Showcase Frame: Unbox & Re-seal Animation
+      // ── 1. Hero Showcase Frame: Lazy Load Iframe & Audio Bridge ──
       const unboxBtn = document.getElementById('hero-unbox-btn');
       const waxSeal = document.getElementById('hero-wax-seal');
-      const resealBtn = document.getElementById('showcase-reseal-btn');
+      const resealBtn = document.getElementById('showcase-reseal-top-btn');
       const gateLeft = document.getElementById('hero-gate-left');
       const gateRight = document.getElementById('hero-gate-right');
       const coverText = document.getElementById('hero-cover-text');
       const coverFooter = document.getElementById('hero-cover-footer');
-      const rsvpBtn = document.getElementById('showcase-rsvp-toggle');
-      const rsvpLabel = document.getElementById('showcase-rsvp-label');
+      const topBar = document.getElementById('showcase-top-bar');
+      const floatBtn = document.getElementById('showcase-fullscreen-float-btn');
+      const audioBtn = document.getElementById('showcase-audio-btn');
+      const audioOnIcon = document.getElementById('showcase-audio-on-icon');
+      const audioOffIcon = document.getElementById('showcase-audio-off-icon');
+      const soundBars = document.getElementById('showcase-sound-bars');
+      const showcaseIframe = document.getElementById('showcase-iframe');
 
       let isUnboxed = false;
-      let isRsvpd = false;
+      let iframeLoaded = false;
+
+      function loadIframe() {
+        if (iframeLoaded || !showcaseIframe) return;
+        const dataSrc = showcaseIframe.getAttribute('data-src');
+        if (dataSrc) {
+          showcaseIframe.src = dataSrc;
+          iframeLoaded = true;
+        }
+      }
+
+      // Preload iframe on idle or on first hover/touch of the preview mockup
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(loadIframe, { timeout: 1500 });
+      } else {
+        setTimeout(loadIframe, 1000);
+      }
+      const previewContainer = document.getElementById('studio-preview');
+      if (previewContainer) {
+        previewContainer.addEventListener('mouseenter', loadIframe, { once: true });
+        previewContainer.addEventListener('touchstart', loadIframe, { once: true });
+      }
+
+      function sendIframeMessage(msg) {
+        if (!showcaseIframe || !showcaseIframe.contentWindow) return;
+        try {
+          showcaseIframe.contentWindow.postMessage(msg, '*');
+        } catch (e) {}
+      }
+
+      function setAudioUiState(isPlaying) {
+        if (isPlaying) {
+          if (audioOnIcon) audioOnIcon.classList.remove('hidden');
+          if (audioOffIcon) audioOffIcon.classList.add('hidden');
+          if (soundBars) soundBars.classList.remove('opacity-30');
+        } else {
+          if (audioOnIcon) audioOnIcon.classList.add('hidden');
+          if (audioOffIcon) audioOffIcon.classList.remove('hidden');
+          if (soundBars) soundBars.classList.add('opacity-30');
+        }
+      }
 
       function triggerUnbox() {
         if (isUnboxed) return;
         isUnboxed = true;
+        loadIframe();
 
-        if (waxSeal) {
-          waxSeal.classList.add('scale-125', 'opacity-0', 'pointer-events-none');
+        if (waxSeal) waxSeal.classList.add('scale-125', 'opacity-0', 'pointer-events-none');
+        if (gateLeft) gateLeft.classList.add('-translate-x-full');
+        if (gateRight) gateRight.classList.add('translate-x-full');
+        if (coverText) coverText.classList.add('opacity-0', 'pointer-events-none');
+        if (coverFooter) coverFooter.classList.add('opacity-0', 'pointer-events-none');
+
+        if (topBar) {
+          topBar.classList.remove('opacity-0', 'pointer-events-none');
+          topBar.classList.add('opacity-100', 'pointer-events-auto');
         }
-        if (gateLeft) {
-          gateLeft.classList.add('-translate-x-full');
+        if (floatBtn) {
+          floatBtn.classList.remove('opacity-0', 'pointer-events-none');
+          floatBtn.classList.add('opacity-100', 'pointer-events-auto');
         }
-        if (gateRight) {
-          gateRight.classList.add('translate-x-full');
-        }
-        if (coverText) {
-          coverText.classList.add('opacity-0', 'pointer-events-none');
-        }
-        if (coverFooter) {
-          coverFooter.classList.add('opacity-0', 'pointer-events-none');
-        }
+
+        // Tell the embedded invitation to begin playback
+        sendIframeMessage({ type: 'PLAY_AUDIO' });
       }
 
       function triggerReseal() {
         if (!isUnboxed) return;
         isUnboxed = false;
 
-        if (waxSeal) {
-          waxSeal.classList.remove('scale-125', 'opacity-0', 'pointer-events-none');
+        if (waxSeal) waxSeal.classList.remove('scale-125', 'opacity-0', 'pointer-events-none');
+        if (gateLeft) gateLeft.classList.remove('-translate-x-full');
+        if (gateRight) gateRight.classList.remove('translate-x-full');
+        if (coverText) coverText.classList.remove('opacity-0', 'pointer-events-none');
+        if (coverFooter) coverFooter.classList.remove('opacity-0', 'pointer-events-none');
+
+        if (topBar) {
+          topBar.classList.remove('opacity-100', 'pointer-events-auto');
+          topBar.classList.add('opacity-0', 'pointer-events-none');
         }
-        if (gateLeft) {
-          gateLeft.classList.remove('-translate-x-full');
+        if (floatBtn) {
+          floatBtn.classList.remove('opacity-100', 'pointer-events-auto');
+          floatBtn.classList.add('opacity-0', 'pointer-events-none');
         }
-        if (gateRight) {
-          gateRight.classList.remove('translate-x-full');
-        }
-        if (coverText) {
-          coverText.classList.remove('opacity-0', 'pointer-events-none');
-        }
-        if (coverFooter) {
-          coverFooter.classList.remove('opacity-0', 'pointer-events-none');
-        }
+
+        // Send reset signal to iframe
+        sendIframeMessage({ type: 'RESET_SEAL' });
+        setAudioUiState(false);
       }
 
       if (unboxBtn) unboxBtn.addEventListener('click', triggerUnbox);
       if (waxSeal) waxSeal.addEventListener('click', triggerUnbox);
       if (resealBtn) resealBtn.addEventListener('click', triggerReseal);
 
-      // Interactive RSVP Toggle Inside Showcase
-      if (rsvpBtn && rsvpLabel) {
-        rsvpBtn.addEventListener('click', function () {
-          isRsvpd = !isRsvpd;
-          if (isRsvpd) {
-            rsvpLabel.textContent = '✓ Terkonfirmasi Hadir (2 Tamu)';
-            rsvpBtn.classList.remove('text-[#f5c563]', 'border-[#f5c563]/30', 'bg-[#f5c563]/10');
-            rsvpBtn.classList.add('text-emerald-400', 'border-emerald-500/40', 'bg-emerald-500/15');
-          } else {
-            rsvpLabel.textContent = 'Konfirmasi Kehadiran';
-            rsvpBtn.classList.add('text-[#f5c563]', 'border-[#f5c563]/30', 'bg-[#f5c563]/10');
-            rsvpBtn.classList.remove('text-emerald-400', 'border-emerald-500/40', 'bg-emerald-500/15');
-          }
+      // Audio Toggle Button on the Phone Frame Toolbar
+      if (audioBtn) {
+        audioBtn.addEventListener('click', function () {
+          sendIframeMessage({ type: 'TOGGLE_MUTE' });
         });
       }
 
-      // 2. Bento 4: Sample Account Copy Button
+      // Listen for Audio State Sync from embedded iframe
+      window.addEventListener('message', function (event) {
+        if (!event.data || typeof event.data !== 'object') return;
+        if (event.data.type === 'AUDIO_STATE_CHANGED') {
+          setAudioUiState(Boolean(event.data.isPlaying));
+        }
+      });
+
+      // ── 2. Bento 4: Sample Account Copy Button ──
       const copyBtn = document.getElementById('sample-copy-btn');
       const copyLabel = document.getElementById('sample-copy-label');
       const accountNum = document.getElementById('sample-account-number');

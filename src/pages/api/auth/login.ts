@@ -6,7 +6,7 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
   const { email, password } = await request.json();
 
   if (!email || !password) {
-    return new Response(JSON.stringify({ error: 'Email and password are required' }), {
+    return new Response(JSON.stringify({ error: 'Email dan kata sandi wajib diisi' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -18,7 +18,13 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
   });
 
   if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    let localizedError = error.message;
+    if (error.message.includes('Invalid login credentials')) {
+      localizedError = 'Email atau kata sandi yang Anda masukkan salah.';
+    } else if (error.message.includes('Email not confirmed')) {
+      localizedError = 'Alamat email belum dikonfirmasi. Silakan periksa kotak masuk email Anda.';
+    }
+    return new Response(JSON.stringify({ error: localizedError }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
     });

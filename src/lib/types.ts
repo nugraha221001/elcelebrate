@@ -145,6 +145,7 @@ export interface Wish {
   card_id: string;
   sender_name: string;
   message: string;
+  attendance?: string;
   created_at: string;
 }
 

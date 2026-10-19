@@ -6,7 +6,7 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
   const { email, password, full_name } = await request.json();
 
   if (!email || !password) {
-    return new Response(JSON.stringify({ error: 'Email and password are required' }), {
+    return new Response(JSON.stringify({ error: 'Email dan kata sandi wajib diisi' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -21,7 +21,15 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
   });
 
   if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    let localizedError = error.message;
+    if (error.message.includes('already registered')) {
+      localizedError = 'Email ini sudah terdaftar. Silakan masuk.';
+    } else if (error.message.includes('at least 6 characters')) {
+      localizedError = 'Kata sandi minimal harus 6 karakter.';
+    } else if (error.message.includes('valid email')) {
+      localizedError = 'Format alamat email tidak valid.';
+    }
+    return new Response(JSON.stringify({ error: localizedError }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
