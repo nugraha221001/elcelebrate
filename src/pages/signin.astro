@@ -5,6 +5,7 @@ import Footer from '../components/layout/Footer.astro';
 import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Toast from '../components/ui/Toast.astro';
+import Modal from '../components/ui/Modal.astro';
 import { Sparkles } from 'lucide-astro';
 
 export const prerender = false;
@@ -49,9 +50,18 @@ if (user) {
 
           <!-- Password field with visibility toggle -->
           <div class="flex flex-col gap-1.5">
-            <label for="input-password" class="text-sm font-medium text-surface-200">
-              Kata Sandi <span class="text-confetti-pink">*</span>
-            </label>
+            <div class="flex items-center justify-between">
+              <label for="input-password" class="text-sm font-medium text-surface-200">
+                Kata Sandi <span class="text-confetti-pink">*</span>
+              </label>
+              <button
+                type="button"
+                id="open-forgot-modal"
+                class="text-xs font-medium text-primary hover:text-primary-light transition-colors cursor-pointer"
+              >
+                Lupa kata sandi?
+              </button>
+            </div>
             <div class="relative">
               <input
                 type="password"
@@ -127,6 +137,40 @@ if (user) {
       </p>
     </div>
   </main>
+
+  <!-- Forgot Password Modal -->
+  <Modal id="forgot-password-modal" title="Atur Ulang Kata Sandi" size="sm">
+    <form id="forgot-password-form" class="flex flex-col gap-4">
+      <p class="text-xs text-surface-300 leading-relaxed">
+        Masukkan alamat email terdaftar Anda. Kami akan mengirimkan tautan untuk mengatur ulang kata sandi ke kotak masuk email Anda.
+      </p>
+
+      <Input
+        label="Alamat Email"
+        name="forgot_email"
+        type="email"
+        placeholder="nama@email.com"
+        required={true}
+      />
+
+      <div class="mt-2 flex items-center justify-end gap-2.5">
+        <button
+          type="button"
+          class="rounded-xl px-4 py-2 text-xs font-medium text-surface-400 hover:text-white transition-colors cursor-pointer"
+          data-modal-close="forgot-password-modal"
+        >
+          Batal
+        </button>
+        <Button type="submit" variant="primary" size="sm" id="forgot-submit-btn">
+          <span id="forgot-btn-text">Kirim Tautan Atur Ulang</span>
+          <svg id="forgot-spinner" class="hidden h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </Button>
+      </div>
+    </form>
+  </Modal>
 
   <Footer />
 </BaseLayout>
@@ -237,6 +281,79 @@ if (user) {
       if (btnText) btnText.textContent = 'Kirim Magic Link';
       spinner?.classList.add('hidden');
       envelopeIcon?.classList.remove('hidden');
+    }
+  });
+
+  // ── Forgot Password Modal & Form Submission ───────────────────
+  const openForgotModalBtn = document.getElementById('open-forgot-modal');
+  const forgotModal = document.getElementById('forgot-password-modal');
+  const forgotForm = document.getElementById('forgot-password-form') as HTMLFormElement | null;
+  const loginEmailInput = document.querySelector('input[name="email"]') as HTMLInputElement | null;
+  const forgotEmailInput = document.querySelector('input[name="forgot_email"]') as HTMLInputElement | null;
+
+  openForgotModalBtn?.addEventListener('click', () => {
+    if (loginEmailInput?.value && forgotEmailInput && !forgotEmailInput.value) {
+      forgotEmailInput.value = loginEmailInput.value.trim();
+    }
+    if (forgotModal) {
+      forgotModal.classList.remove('hidden');
+      forgotModal.classList.add('flex');
+      setTimeout(() => forgotEmailInput?.focus(), 50);
+    }
+  });
+
+  forgotForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(forgotForm);
+    const email = (formData.get('forgot_email') as string || '').trim();
+
+    if (!email) {
+      (window as any).showToast({ message: 'Alamat email wajib diisi.', type: 'error' });
+      return;
+    }
+
+    const btn = document.getElementById('forgot-submit-btn') as HTMLButtonElement | null;
+    const btnText = document.getElementById('forgot-btn-text');
+    const spinner = document.getElementById('forgot-spinner');
+
+    if (btn) btn.disabled = true;
+    if (btnText) btnText.textContent = 'Mengirim...';
+    spinner?.classList.remove('hidden');
+
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (forgotModal) {
+          forgotModal.classList.add('hidden');
+          forgotModal.classList.remove('flex');
+        }
+        (window as any).showToast({
+          message: data.message || 'Tautan atur ulang kata sandi telah dikirim ke email Anda.',
+          type: 'success',
+        });
+        forgotForm.reset();
+      } else {
+        (window as any).showToast({
+          message: data.error || 'Gagal mengirim tautan atur ulang kata sandi.',
+          type: 'error',
+        });
+      }
+    } catch {
+      (window as any).showToast({
+        message: 'Kesalahan jaringan. Silakan coba lagi.',
+        type: 'error',
+      });
+    } finally {
+      if (btn) btn.disabled = false;
+      if (btnText) btnText.textContent = 'Kirim Tautan Atur Ulang';
+      spinner?.classList.add('hidden');
     }
   });
 </script>

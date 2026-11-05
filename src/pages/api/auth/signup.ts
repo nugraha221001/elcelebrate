@@ -12,11 +12,14 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
     });
   }
 
+  const origin = new URL(request.url).origin;
+
   const { data, error } = await locals.supabase.auth.signUp({
     email,
     password,
     options: {
       data: { full_name: full_name || '' },
+      emailRedirectTo: `${origin}/api/auth/callback`,
     },
   });
 
@@ -36,6 +39,21 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
   }
 
   const { session, user } = data;
+
+  // If email confirmation is enabled on Supabase, a user is created without an active session
+  if (user && !session) {
+    return new Response(
+      JSON.stringify({
+        requiresEmailConfirmation: true,
+        user,
+        message: 'Pendaftaran berhasil! Silakan periksa kotak masuk email Anda untuk memverifikasi akun.',
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
 
   if (session) {
     const isProd = import.meta.env.PROD;

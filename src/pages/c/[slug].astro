@@ -18,7 +18,7 @@ let card: Card | null = null;
 let wishes: Wish[] = [];
 
 if (slug === 'demo-wedding') {
-  card = SHOWCASE_WEDDING_CARD as Card;
+  card = JSON.parse(JSON.stringify(SHOWCASE_WEDDING_CARD)) as Card;
   wishes = [...SHOWCASE_WEDDING_WISHES] as Wish[];
 } else {
   // Fetch card by slug
@@ -69,14 +69,55 @@ const fontFamily = fontMap[theme.fontFamily] || fontMap.sans;
 // Wedding-specific data
 const isWedding = typedCard.category === 'wedding';
 const weddingData = theme.weddingData || null;
+const isDemoWedding = slug === 'demo-wedding' || typedCard.slug === 'demo-wedding';
+
+// Evergreen future target date for demo wedding (30 days from today)
+const evergreenTargetMs = Date.now() + 30 * 24 * 60 * 60 * 1000;
+const evergreenTargetDate = new Date(evergreenTargetMs);
+const evergreenDateIso = evergreenTargetDate.toISOString();
+const evergreenDateStr = `${evergreenTargetDate.getFullYear()}-${String(evergreenTargetDate.getMonth() + 1).padStart(2, '0')}-${String(evergreenTargetDate.getDate()).padStart(2, '0')}`;
+
+const isAkadInPast = weddingData?.akadEvent?.date
+  ? new Date(weddingData.akadEvent.date + (weddingData.akadEvent.date.includes('T') ? '' : 'T00:00:00')).getTime() <= Date.now()
+  : true;
+
+if (isDemoWedding || (typedCard.slug === 'demo-wedding' && isAkadInPast)) {
+  typedCard.event_date = evergreenDateStr;
+  if (weddingData) {
+    if (weddingData.akadEvent) {
+      weddingData.akadEvent.date = evergreenDateStr;
+    }
+    if (weddingData.receptionEvent) {
+      weddingData.receptionEvent.date = evergreenDateStr;
+    }
+  }
+  if (typedCard.media_urls && typedCard.media_urls.length > 10) {
+    typedCard.media_urls[10] = 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80';
+  }
+}
+
 const recipientParam = Astro.url.searchParams.get('to');
 const recipientName = recipientParam || typedCard.recipient_name;
 const guestName = recipientParam || 'Tamu Undangan';
 const unboxingStyle = (theme as any).unboxingStyle || theme.unboxStyle || 'gate-split';
 const currentUnboxStyle = resolveUnboxingStyle(typedCard.category, (theme as any).unboxingStyle, theme.unboxStyle);
 const weddingHeaderTitle = (theme as any).weddingHeaderTitle || "Walimatul 'Urs";
-const cornerOrnament = (theme as any).cornerOrnament || (isWedding ? 'botanical' : 'none');
+const cornerOrnament = isDemoWedding ? 'diamond-frame' : ((theme as any).cornerOrnament || (isWedding ? 'botanical' : 'none'));
 const isEmbed = Astro.url.searchParams.get('embed') === '1';
+
+const indonesianDateFormatter = new Intl.DateTimeFormat('id-ID', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+function formatIndonesianScheduleDate(dateStr: string | undefined): string {
+  if (!dateStr) return '';
+  const parseable = dateStr.length === 10 && !dateStr.includes('T') ? `${dateStr}T00:00:00` : dateStr;
+  const d = new Date(parseable);
+  return isNaN(d.getTime()) ? dateStr : indonesianDateFormatter.format(d);
+}
 
 // Anniversary relationship time computation
 let anniversaryTime: { years: number; months: number; days: number; isTogether: boolean } | null = null;
@@ -251,6 +292,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
   <div
     id="card-data"
     data-card-id={typedCard.id}
+    data-slug={typedCard.slug}
     data-audio-url={audioUrl || ''}
     data-track-id={trackId}
     data-has-audio={hasAudio ? 'true' : 'false'}
@@ -377,7 +419,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
 
         {weddingData.akadEvent.date && (
           <p class="text-sm text-surface-400 mb-4" style={`font-family: ${fontFamily};`}>
-            {new Date(weddingData.akadEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            {formatIndonesianScheduleDate(weddingData.akadEvent.date)}
           </p>
         )}
 
@@ -703,7 +745,11 @@ const hasBirthdayAge = birthdayAge.length > 0;
                 <h2 class="text-xs md:text-sm font-semibold tracking-[0.25em] text-slate-300 uppercase">Menghitung Hari</h2>
                 <div class="champagne-divider"></div>
               </div>
-              <div class="countdown-timer flex justify-center gap-3 sm:gap-5" data-target-date={weddingData.akadEvent.date || typedCard.event_date || ''}>
+              <div
+                class="countdown-timer flex justify-center gap-3 sm:gap-5"
+                data-target-date={isDemoWedding ? evergreenDateIso : (weddingData.akadEvent.date || typedCard.event_date || '')}
+                data-is-demo={isDemoWedding ? 'true' : 'false'}
+              >
                 {['Hari', 'Jam', 'Menit', 'Detik'].map((unit, idx) => (
                   <div class="wedding-reveal reveal-countdown flex flex-col items-center" style={`transition-delay: ${idx * 80}ms;`}>
                     <div
@@ -711,7 +757,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                       style={`background: linear-gradient(135deg, ${theme.primaryColor}40, ${theme.secondaryColor}30);`}
                       data-countdown={['days', 'hours', 'minutes', 'seconds'][idx]}
                     >
-                      --
+                      {isDemoWedding ? (idx === 0 ? '30' : '00') : '--'}
                     </div>
                     <span class="mt-1.5 text-slate-200 text-xs font-medium tracking-wider">{unit}</span>
                   </div>
@@ -738,7 +784,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
               </div>
               <div class="space-y-1.5 text-sm">
                 {weddingData.akadEvent.date && (
-                  <p class="text-slate-100 font-medium">📅 {new Date(weddingData.akadEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  <p class="text-slate-100 font-medium">📅 {formatIndonesianScheduleDate(weddingData.akadEvent.date)}</p>
                 )}
                 {(weddingData.akadEvent.timeStart || weddingData.akadEvent.timeEnd) && (
                   <p class="text-slate-100 font-medium">🕐 {weddingData.akadEvent.timeStart || '--:--'} — {weddingData.akadEvent.timeEnd || 'Selesai'}</p>
@@ -791,7 +837,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                 </div>
                 <div class="space-y-1.5 text-sm">
                   {weddingData.receptionEvent.date && (
-                    <p class="text-slate-100 font-medium">📅 {new Date(weddingData.receptionEvent.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    <p class="text-slate-100 font-medium">📅 {formatIndonesianScheduleDate(weddingData.receptionEvent.date)}</p>
                   )}
                   {(weddingData.receptionEvent.timeStart || weddingData.receptionEvent.timeEnd) && (
                     <p class="text-slate-100 font-medium">🕐 {weddingData.receptionEvent.timeStart || '--:--'} — {weddingData.receptionEvent.timeEnd || 'Selesai'}</p>
@@ -974,6 +1020,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                       alt={`Galeri Foto ${index + 1}`}
                       loading="lazy"
                       decoding="async"
+                      onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80';"
                       class="w-full aspect-4/5 object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                     <!-- Bottom Gradient CTA -->
@@ -2035,6 +2082,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                             src={resolveMediaUrl(url)}
                             alt={`Film ${i + 1}`}
                             loading="lazy"
+                            onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80';"
                             class="h-full w-full object-cover sepia-[0.2] contrast-105 transition-all duration-500 group-hover:scale-105 group-hover:sepia-0"
                           />
                         </div>
@@ -2072,6 +2120,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                         alt={`Photo ${i + 1}`}
                         loading="lazy"
                         decoding="async"
+                        onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80';"
                         class="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
@@ -2201,6 +2250,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
         id="lightbox-img"
         src=""
         alt="Preview Foto"
+        onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80';"
         class="max-h-[90vh] max-w-full rounded-xl object-contain shadow-2xl transition-transform duration-300 scale-95"
       />
     </div>
@@ -3651,9 +3701,15 @@ const hasBirthdayAge = birthdayAge.length > 0;
   // Countdown Timer
   const countdownEl = document.querySelector('[data-target-date]') as HTMLElement | null;
   if (countdownEl) {
+    const isDemo = countdownEl.dataset.isDemo === 'true' || dataEl?.dataset.slug === 'demo-wedding' || window.location.pathname.includes('/demo-wedding');
     const rawDate = countdownEl.dataset.targetDate || '';
     const parseableStr = rawDate.length === 10 && !rawDate.includes('T') ? `${rawDate}T00:00:00` : rawDate;
-    const target = new Date(parseableStr || countdownEl.dataset.targetDate || '').getTime();
+    let target = new Date(parseableStr || countdownEl.dataset.targetDate || '').getTime();
+
+    // If demo-wedding and target is missing, invalid, or already in the past, keep it evergreen: 30 days ahead
+    if (isDemo && (!target || isNaN(target) || target <= Date.now())) {
+      target = Date.now() + 30 * 24 * 60 * 60 * 1000;
+    }
 
     if (!target || isNaN(target)) {
       countdownEl.style.display = 'none';
@@ -3662,13 +3718,18 @@ const hasBirthdayAge = birthdayAge.length > 0;
     } else {
       function updateCountdown() {
         const now = Date.now();
-        const diff = target - now;
+        let diff = target - now;
 
         if (diff <= 0) {
-          countdownEl?.querySelectorAll('[data-countdown]').forEach((el) => {
-            el.textContent = '🎉';
-          });
-          return;
+          if (isDemo) {
+            target = Date.now() + 30 * 24 * 60 * 60 * 1000;
+            diff = target - now;
+          } else {
+            countdownEl?.querySelectorAll('[data-countdown]').forEach((el) => {
+              el.textContent = '🎉';
+            });
+            return;
+          }
         }
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));

@@ -40,7 +40,7 @@ export const SHOWCASE_WEDDING_CARD: Readonly<Card> = {
     // 9: Prewedding Gallery 7 (Intimate moment)
     'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=600&q=75',
     // 10: Prewedding Gallery 8 (Celebration confetti / banquet)
-    'https://images.unsplash.com/photo-1519225424780-dd228d9a2ffb?auto=format&fit=crop&w=600&q=75',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80',
   ],
   theme_config: {
     primaryColor: '#f5c563',
@@ -48,7 +48,7 @@ export const SHOWCASE_WEDDING_CARD: Readonly<Card> = {
     backgroundColor: '#0f0d15',
     fontFamily: 'serif',
     backgroundPattern: 'kawung',
-    cornerOrnament: 'keraton',
+    cornerOrnament: 'diamond-frame',
     ambientEffect: 'champagne-dust',
     unboxStyle: 'envelope',
     unboxingStyle: 'wax-seal',

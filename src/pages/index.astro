@@ -28,6 +28,13 @@ import {
 
 const user = Astro.locals.user;
 
+// Evergreen demo celebration date: 30 days from today
+const demoTargetDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+const demoDayStr = String(demoTargetDate.getDate()).padStart(2, '0');
+const demoMonthStr = String(demoTargetDate.getMonth() + 1).padStart(2, '0');
+const demoYearStr = String(demoTargetDate.getFullYear());
+const demoDateFormatted = `${demoDayStr} . ${demoMonthStr} . ${demoYearStr}`;
+
 interface BoutiqueCategory {
   id: string;
   name: string;
@@ -298,7 +305,7 @@ const BOUTIQUE_CATEGORIES: BoutiqueCategory[] = [
               >
                 <p class="text-[9px] uppercase tracking-[0.25em] text-[#f5c563]/80 font-medium">The Wedding Celebration Of</p>
                 <h3 class="font-serif italic text-xl font-normal text-white mt-1.5">Raden &amp; Arum</h3>
-                <p class="text-[10px] text-surface-400 mt-1">24 . 10 . 2026</p>
+                <p class="text-[10px] text-surface-400 mt-1">{demoDateFormatted}</p>
               </div>
 
               <!-- ── LAYER 4: Center Wax Seal Medallion ── -->
