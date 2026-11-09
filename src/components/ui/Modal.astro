@@ -17,7 +17,7 @@ const sizeClasses: Record<string, string> = {
 <!-- Backdrop -->
 <div
   id={id}
-  class="fixed inset-0 z-(--z-modal) hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+  class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto overscroll-contain"
   role="dialog"
   aria-modal="true"
   aria-labelledby={`${id}-title`}
@@ -25,18 +25,18 @@ const sizeClasses: Record<string, string> = {
   <!-- Modal Panel -->
   <div
     class:list={[
-      'glass w-full rounded-2xl p-6 shadow-elevated animate-fade-in-scale',
+      'glass max-h-[90dvh] w-full flex flex-col overflow-hidden my-auto rounded-2xl p-4 sm:p-6 shadow-elevated animate-fade-in-scale',
       sizeClasses[size],
     ]}
   >
     {title && (
-      <div class="mb-4 flex items-center justify-between">
+      <div class="mb-4 flex items-center justify-between shrink-0 sticky top-0 z-10">
         <h2 id={`${id}-title`} class="text-lg font-semibold text-surface-100">
           {title}
         </h2>
         <button
           type="button"
-          class="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-white/10 hover:text-white"
+          class="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
           data-modal-close={id}
           aria-label="Tutup"
         >
@@ -46,7 +46,9 @@ const sizeClasses: Record<string, string> = {
         </button>
       </div>
     )}
-    <slot />
+    <div class="flex-1 overflow-y-auto overscroll-contain">
+      <slot />
+    </div>
   </div>
 </div>
 

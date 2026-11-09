@@ -26,7 +26,6 @@ if (slug === 'demo-wedding') {
     .from('cards')
     .select('*')
     .eq('slug', slug)
-    .eq('is_published', true)
     .single();
 
   if (cardError || !dbCard) {
@@ -44,6 +43,16 @@ if (slug === 'demo-wedding') {
 
   wishes = (dbWishes || []) as Wish[];
 }
+
+const isDemoWedding = slug === 'demo-wedding' || card.slug === 'demo-wedding';
+const isAdminFree = card.payment_status === 'admin_free';
+
+const isUnpaid = !isDemoWedding && !isAdminFree && (card.payment_status === 'unpaid' || (!card.is_published && !card.paid_at));
+const isExpired = !isDemoWedding && !isAdminFree && (
+  card.payment_status === 'expired' ||
+  Boolean(card.expires_at && new Date(card.expires_at).getTime() < Date.now())
+);
+const isCardInactive = isUnpaid || isExpired;
 
 const typedCard = card as Card;
 const typedWishes = (wishes || []) as Wish[];
@@ -69,7 +78,6 @@ const fontFamily = fontMap[theme.fontFamily] || fontMap.sans;
 // Wedding-specific data
 const isWedding = typedCard.category === 'wedding';
 const weddingData = theme.weddingData || null;
-const isDemoWedding = slug === 'demo-wedding' || typedCard.slug === 'demo-wedding';
 
 // Evergreen future target date for demo wedding (30 days from today)
 const evergreenTargetMs = Date.now() + 30 * 24 * 60 * 60 * 1000;
@@ -284,11 +292,74 @@ const hasBirthdayAge = birthdayAge.length > 0;
 ---
 
 <BaseLayout
-  title={isWedding && weddingData ? `Wedding of ${weddingData.bride.nickname || weddingData.bride.fullName} & ${weddingData.groom.nickname || weddingData.groom.fullName}` : `${meta?.label || 'Card'} for ${recipientName}`}
-  description={typedCard.message.slice(0, 155)}
+  title={isCardInactive
+    ? (isUnpaid ? `Kartu Belum Diaktifkan — ${typedCard.recipient_name}` : `Masa Aktif Berakhir — ${typedCard.recipient_name}`)
+    : (isWedding && weddingData ? `Wedding of ${weddingData.bride.nickname || weddingData.bride.fullName} & ${weddingData.groom.nickname || weddingData.groom.fullName}` : `${meta?.label || 'Card'} for ${recipientName}`)
+  }
+  description={isCardInactive ? "Undangan digital ini sedang dalam penyesuaian masa aktif." : typedCard.message.slice(0, 155)}
   ogImage={ogImage}
 >
-  <!-- Data bridge for client script -->
+  {isCardInactive ? (
+    <div id="inactive-card-gate" class="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans selection:bg-amber-500/20 selection:text-amber-200">
+      <!-- Glow ambient lights -->
+      <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Luxury Glassmorphic Card -->
+      <div class="relative z-10 max-w-lg w-full bg-slate-900/80 backdrop-blur-xl border border-amber-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/80 text-center">
+        <!-- Floating Emblem -->
+        <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-linear-to-br from-amber-400/20 to-amber-600/10 border border-amber-400/40 flex items-center justify-center text-amber-300 text-2xl shadow-inner">
+          {isUnpaid ? '🔒' : '⏳'}
+        </div>
+
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest bg-amber-500/10 text-amber-300 border border-amber-500/30 mb-4">
+          {isUnpaid ? 'Draf Belum Diaktifkan' : 'Masa Aktif Berakhir'}
+        </span>
+
+        <h1 class="text-2xl sm:text-3xl font-serif font-bold text-transparent bg-clip-text bg-linear-to-r from-amber-200 via-yellow-100 to-amber-400 mb-3">
+          {isUnpaid ? 'Kartu Belum Diaktifkan' : 'Masa Tayang Telah Berakhir'}
+        </h1>
+
+        <p class="text-sm text-slate-300 leading-relaxed mb-6">
+          {isUnpaid
+            ? `Undangan digital untuk "${typedCard.recipient_name}" telah dirancang namun belum diaktifkan oleh pemilik kartu.`
+            : `Masa penayangan undangan digital untuk "${typedCard.recipient_name}" telah berakhir sesuai paket durasi yang dipilih.`
+          }
+        </p>
+
+        {card.grace_until && new Date(card.grace_until).getTime() > Date.now() && (
+          <div class="mb-6 p-4 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-left">
+            <div class="flex items-center gap-2 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-1">
+              <span>🛡️</span>
+              <span>Masa Tenggang 48 Jam Aktif</span>
+            </div>
+            <p class="text-xs text-amber-200/80 leading-relaxed">
+              Data ucapan dan memori masih tersimpan aman hingga <strong class="text-amber-100">{new Date(card.grace_until).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} WIB</strong>. Pemilik dapat mengunduh rekapan ucapan (CSV) atau memperpanjang masa aktif di dashboard.
+            </p>
+          </div>
+        )}
+
+        <!-- CTAs -->
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <a
+            href={`/dashboard?pay=${card.id}`}
+            class="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm bg-linear-to-r from-amber-400 via-yellow-300 to-amber-500 text-slate-950 hover:brightness-110 transition-all shadow-lg shadow-amber-500/20 active:scale-95"
+          >
+            <span>✨</span>
+            <span>{isUnpaid ? 'Aktifkan Kartu' : 'Perpanjang Masa Aktif'}</span>
+          </a>
+          <a
+            href="/"
+            class="inline-flex items-center justify-center px-4 py-3 rounded-xl font-medium text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-slate-700/50 transition-colors"
+          >
+            Beranda
+          </a>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <>
+      <!-- Data bridge for client script -->
   <div
     id="card-data"
     data-card-id={typedCard.id}
@@ -1020,7 +1091,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                       alt={`Galeri Foto ${index + 1}`}
                       loading="lazy"
                       decoding="async"
-                      onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80';"
+                      data-fallback-img
                       class="w-full aspect-4/5 object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                     <!-- Bottom Gradient CTA -->
@@ -2082,7 +2153,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                             src={resolveMediaUrl(url)}
                             alt={`Film ${i + 1}`}
                             loading="lazy"
-                            onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80';"
+                            data-fallback-img
                             class="h-full w-full object-cover sepia-[0.2] contrast-105 transition-all duration-500 group-hover:scale-105 group-hover:sepia-0"
                           />
                         </div>
@@ -2120,7 +2191,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
                         alt={`Photo ${i + 1}`}
                         loading="lazy"
                         decoding="async"
-                        onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80';"
+                        data-fallback-img
                         class="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
@@ -2250,16 +2321,33 @@ const hasBirthdayAge = birthdayAge.length > 0;
         id="lightbox-img"
         src=""
         alt="Preview Foto"
-        onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80';"
+        data-fallback-img
         class="max-h-[90vh] max-w-full rounded-xl object-contain shadow-2xl transition-transform duration-300 scale-95"
       />
     </div>
   </div>
+    </>
+  )}
 </BaseLayout>
 
 <script>
   import confetti from 'canvas-confetti';
   import { startSynth, stopSynth } from '../../lib/synth-audio';
+
+  // Defensive gallery fallback image handler
+  const FALLBACK_PHOTO_URL = 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80';
+  document.addEventListener(
+    'error',
+    (e) => {
+      const target = e.target as HTMLImageElement;
+      if (target && target.tagName === 'IMG' && target.hasAttribute('data-fallback-img')) {
+        if (target.src !== FALLBACK_PHOTO_URL) {
+          target.src = FALLBACK_PHOTO_URL;
+        }
+      }
+    },
+    true
+  );
 
   function triggerBirthdayCelebration(originX = 0.5, originY = 0.6) {
     try {
@@ -2597,7 +2685,9 @@ const hasBirthdayAge = birthdayAge.length > 0;
       textArea.value = accountEl.textContent?.trim() || '';
       document.body.appendChild(textArea);
       textArea.select();
-      document.execCommand('copy');
+      if ('execCommand' in document) {
+        (document as any).execCommand('copy');
+      }
       document.body.removeChild(textArea);
       if (btnText) {
         btnText.textContent = 'Nomor Rekening Tersalin! ✅';

@@ -138,6 +138,11 @@ export interface Card {
   media_urls: string[];
   is_published: boolean;
   created_at: string;
+  payment_status?: 'unpaid' | 'paid' | 'admin_free' | 'expired';
+  duration_days?: number;
+  paid_at?: string | null;
+  expires_at?: string | null;
+  grace_until?: string | null;
 }
 
 export interface Wish {
@@ -149,13 +154,46 @@ export interface Wish {
   created_at: string;
 }
 
+export type UserRole = 'user' | 'admin' | 'super_admin';
+
+export const ROOT_OWNER_EMAIL = 'lesynugraha@gmail.com';
+
+/** Helper to check if a user is super_admin (or the root owner email) */
+export function isSuperAdmin(role?: string | null, email?: string | null): boolean {
+  if (email && email.trim().toLowerCase() === ROOT_OWNER_EMAIL.toLowerCase()) return true;
+  return role === 'super_admin';
+}
+
+/** Helper to check if a user is admin or super_admin (or the root owner email) */
+export function isAdminOrSuperAdmin(role?: string | null, email?: string | null): boolean {
+  if (email && email.trim().toLowerCase() === ROOT_OWNER_EMAIL.toLowerCase()) return true;
+  return role === 'admin' || role === 'super_admin';
+}
+
 export interface Profile {
   id: string;
   email: string;
   full_name: string;
   avatar_url?: string | null;
   phone_number?: string | null;
+  role?: 'user' | 'admin' | 'super_admin';
   created_at: string;
+}
+
+export interface Transaction {
+  id: string;
+  order_id: string;
+  card_id: string | null;
+  user_id: string;
+  amount: number;
+  duration_days: number;
+  status: 'pending' | 'settled' | 'expired' | 'failed';
+  payment_method: string;
+  qr_string?: string | null;
+  gateway_provider?: string;
+  gateway_reference?: string | null;
+  created_at: string;
+  settled_at?: string | null;
 }
 
 export interface AudioTrack {

@@ -3,10 +3,13 @@ import DashboardLayout from '../../components/layout/DashboardLayout.astro';
 import Button from '../../components/ui/Button.astro';
 import Modal from '../../components/ui/Modal.astro';
 import Toast from '../../components/ui/Toast.astro';
-import { CATEGORY_META } from '../../lib/types';
+import { CATEGORY_META, ROOT_OWNER_EMAIL, isSuperAdmin, type UserRole } from '../../lib/types';
 import type { Card } from '../../lib/types';
 import { Cake, Sparkles, Gift, Eye, Share2, Plus, Sparkle, ArrowRight, ShieldCheck } from 'lucide-astro';
 import { SHOWCASE_WEDDING_CARD } from '../../lib/showcase-wedding';
+import { cleanupExpiredCards } from '../../lib/cleanup-expired';
+import { createSupabaseAdminClient } from '../../lib/supabase';
+import { DURATION_TIERS, formatRupiah } from '../../lib/pricing';
 
 export const prerender = false;
 
@@ -14,17 +17,45 @@ export const prerender = false;
 const user = Astro.locals.user;
 const isGuest = !user;
 
-// Fetch user's cards if logged in
+let userRole: UserRole = 'user';
 let cards: Card[] = [];
+
 if (user) {
   const supabase = Astro.locals.supabase;
+
+  // Fetch user role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+  const isRoot = user.email?.trim().toLowerCase() === ROOT_OWNER_EMAIL.toLowerCase();
+  userRole = isRoot ? 'super_admin' : (profile?.role as UserRole) || 'user';
+
+  // Fetch user's cards
   const { data } = await supabase
     .from('cards')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
   cards = data || [];
+
+  // Non-blocking background garbage collector for expired cards & unpaid drafts
+  try {
+    const adminClient = createSupabaseAdminClient();
+    const cleanupPromise = cleanupExpiredCards(adminClient);
+    const runtime = (Astro.locals as any).runtime;
+    if (runtime?.ctx?.waitUntil) {
+      runtime.ctx.waitUntil(cleanupPromise);
+    } else {
+      cleanupPromise.catch((err) => console.error('[Dashboard cleanup] Error:', err));
+    }
+  } catch (e) {
+    // Non-critical background task
+  }
 }
+
+const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
 ---
 
 <DashboardLayout title={isGuest ? "Pratinjau Dashboard" : "Kartu Saya"}>
@@ -159,6 +190,139 @@ if (user) {
     </div>
   </Modal>
 
+  <!-- QRIS Payment & Activation Modal -->
+  <Modal id="qris-modal" title="Aktivasi & Perpanjang Durasi Kartu" size="md">
+    <div class="space-y-3 pb-2">
+      <div class="p-3 rounded-xl bg-surface-800/60 border border-white/10 flex items-center justify-between">
+        <div class="min-w-0 pr-2">
+          <p class="text-xs text-surface-400">Undangan:</p>
+          <h4 id="qris-card-title" class="text-sm font-bold text-white truncate">—</h4>
+        </div>
+        <span id="qris-tier-badge" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
+          Paket 7 Hari
+        </span>
+      </div>
+
+      <!-- Duration Selector in Modal -->
+      <div>
+        <label class="block text-xs font-medium text-surface-300 mb-2">Pilih Durasi Masa Aktif:</label>
+        <div class="grid grid-cols-3 gap-2 [&_.modal-duration-tier-btn]:py-2! [&_.modal-duration-tier-btn]:px-2.5! [&_.modal-duration-tier-btn]:text-xs!" id="qris-modal-tier-picker">
+          {DURATION_TIERS.map((tier) => (
+            <button
+              type="button"
+              class={`modal-duration-tier-btn py-2 px-2.5 text-xs rounded-xl border text-left transition-all cursor-pointer ${
+                tier.days === 7
+                  ? 'border-amber-400/60 bg-amber-500/10 ring-1 ring-amber-400/30'
+                  : 'border-white/10 bg-surface-800/40 hover:border-white/20'
+              }`}
+              data-days={tier.days}
+              data-price={tier.price}
+              data-name={tier.name}
+            >
+              <div class="text-[11px] font-semibold text-surface-300">{tier.days} Hari</div>
+              <div class="text-xs font-bold text-amber-300">{formatRupiah(tier.price)}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- QR Code Display Box -->
+      <div class="rounded-2xl border border-amber-500/25 bg-slate-950 p-3 sm:p-4 text-center shadow-inner">
+        <div class="flex items-center justify-between text-xs text-surface-400 mb-2 px-1">
+          <span class="flex items-center gap-1 font-mono text-[11px]">
+            <span class="text-amber-400">#</span>
+            <span id="qris-order-id">ELC-...</span>
+          </span>
+          <span class="flex items-center gap-1 font-semibold text-amber-300">
+            <span>⏳</span>
+            <span id="qris-countdown">15:00</span>
+          </span>
+        </div>
+
+        <div
+          id="qris-qr-container"
+          class="w-full max-w-52.5 sm:max-w-57.5 mx-auto p-3 rounded-2xl bg-white shadow-xl border-2 border-amber-400/30 my-2 text-slate-900 flex flex-col items-center justify-center min-h-52.5 sm:[&_.w-48]:w-40! [&_.h-48]:h-36! sm:[&_.h-48]:h-40! sm:[&_svg]:w-40! sm:[&_svg]:h-40!"
+        >
+          <!-- Injected SVG QR -->
+          <div class="animate-pulse text-xs text-slate-500 font-medium py-10">Membuat Kode QRIS...</div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs pt-1 px-1">
+          <span class="text-surface-400">Total Pembayaran:</span>
+          <span id="qris-amount-display" class="text-base font-extrabold text-amber-300">Rp10.000</span>
+        </div>
+      </div>
+
+      <!-- Status indicator -->
+      <div id="qris-status-box" class="flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-surface-800/80 border border-white/10 text-xs text-surface-300">
+        <span class="inline-flex h-2 w-2 rounded-full bg-amber-400 animate-pulse"></span>
+        <span id="qris-status-text">Menunggu pembayaran via aplikasi perbankan / e-wallet...</span>
+      </div>
+
+      <!-- Simulation mode button (Test mode) -->
+      <div id="qris-sim-container" class="pt-1 pb-2">
+        <button
+          type="button"
+          id="qris-simulate-btn"
+          class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-xs bg-amber-400/20 text-amber-300 border border-amber-400/40 hover:bg-amber-400/30 hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer shadow-sm"
+        >
+          <span>⚡</span>
+          <span>Simulasikan Pembayaran Berhasil (Test Mode)</span>
+        </button>
+      </div>
+    </div>
+  </Modal>
+
+  <!-- Multi-Admin Management Modal (Super Admin Only) -->
+  {isSuperAdminUser && (
+    <Modal id="admin-roles-modal" title="Kelola Akses Admin (RBAC)" size="lg">
+      <div class="space-y-5">
+        <!-- Promote/Demote Form -->
+        <div class="p-4 rounded-2xl bg-surface-800/60 border border-white/10">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-amber-300 mb-3">Ubah Peran Pengguna</h4>
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <input
+              type="email"
+              id="admin-role-email"
+              placeholder="email.pengguna@example.com"
+              class="form-input flex-1 rounded-xl bg-white/5 border border-white/10 px-3.5 py-2 text-xs focus-ring text-white"
+            />
+            <select
+              id="admin-role-select"
+              class="rounded-xl bg-surface-800 border border-white/10 px-3 py-2 text-xs text-white focus-ring cursor-pointer"
+            >
+              <option value="admin">Admin Mitra 👑</option>
+              <option value="user">Pengguna Biasa</option>
+              <option value="super_admin">Super Admin ⭐</option>
+            </select>
+            <button
+              type="button"
+              id="admin-role-submit-btn"
+              class="rounded-xl bg-[#f5c563] text-[#0f0d15] px-4 py-2 text-xs font-semibold shadow-md shadow-[#f5c563]/20 hover:brightness-110 transition-all cursor-pointer whitespace-nowrap"
+            >
+              Simpan Peran
+            </button>
+          </div>
+        </div>
+
+        <!-- Users List -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-surface-400">Daftar Pengguna Terdaftar</h4>
+            <button type="button" id="admin-refresh-users-btn" class="text-xs text-amber-300 hover:underline cursor-pointer">
+              Segarkan
+            </button>
+          </div>
+          <div class="max-h-60 overflow-y-auto rounded-xl border border-white/10 bg-surface-900/60">
+            <div id="admin-users-list" class="divide-y divide-white/5">
+              <div class="p-4 text-center text-xs text-surface-400">Memuat data pengguna...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  )}
+
   <!-- Header -->
   <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
     <div>
@@ -171,12 +335,24 @@ if (user) {
             : `${cards.length} kartu telah dibuat`}
       </p>
     </div>
-    <Button href={isGuest ? "/signin" : "/dashboard/create"} variant="primary" size="md" id="dashboard-create-btn">
-      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-      </svg>
-      {isGuest ? "Masuk untuk Membuat" : "Buat Kartu"}
-    </Button>
+    <div class="flex items-center gap-2.5">
+      {isSuperAdminUser && (
+        <button
+          type="button"
+          id="admin-manage-btn"
+          class="inline-flex items-center gap-2 rounded-xl border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 px-3.5 py-2 text-xs font-semibold shadow-sm transition-all cursor-pointer"
+        >
+          <span>👑</span>
+          <span>Kelola Admin</span>
+        </button>
+      )}
+      <Button href={isGuest ? "/signin" : "/dashboard/create"} variant="primary" size="md" id="dashboard-create-btn">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        {isGuest ? "Masuk untuk Membuat" : "Buat Kartu"}
+      </Button>
+    </div>
   </div>
 
   <!-- ── Master Showcase Card: Raden & Arum ── -->
@@ -353,6 +529,49 @@ if (user) {
         const meta = CATEGORY_META[card.category as keyof typeof CATEGORY_META];
         const cardUrl = `/c/${card.slug}`;
         const isPublished = Boolean(card.is_published);
+        const isUnpaid = card.payment_status === 'unpaid';
+        const isAdminFree = card.payment_status === 'admin_free';
+        const isPaid = card.payment_status === 'paid';
+        const nowMs = Date.now();
+
+        let statusBadge = {
+          label: 'Draf Belum Aktif',
+          color: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+          dot: 'bg-amber-400',
+        };
+
+        if (isAdminFree) {
+          statusBadge = {
+            label: 'VIP Permanen 👑',
+            color: 'bg-amber-500/20 text-amber-200 border-amber-400/40',
+            dot: 'bg-amber-300 animate-pulse',
+          };
+        } else if (isPaid && card.expires_at) {
+          const expiresMs = new Date(card.expires_at).getTime();
+          if (expiresMs > nowMs) {
+            const daysLeft = Math.ceil((expiresMs - nowMs) / (24 * 60 * 60 * 1000));
+            statusBadge = {
+              label: `Aktif • Sisa ${daysLeft} hari`,
+              color: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+              dot: 'bg-emerald-400 animate-pulse',
+            };
+          } else if (card.grace_until && new Date(card.grace_until).getTime() > nowMs) {
+            const graceMs = new Date(card.grace_until).getTime();
+            const hoursLeft = Math.max(1, Math.ceil((graceMs - nowMs) / (60 * 60 * 1000)));
+            statusBadge = {
+              label: `Masa Tenggang • ${hoursLeft}j`,
+              color: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+              dot: 'bg-rose-400 animate-ping',
+            };
+          } else {
+            statusBadge = {
+              label: 'Kedaluwarsa',
+              color: 'bg-surface-800 text-surface-400 border-white/10',
+              dot: 'bg-surface-500',
+            };
+          }
+        }
+
         return (
           <div
             id={`card-item-${card.id}`}
@@ -367,27 +586,18 @@ if (user) {
               <div class="flex items-start justify-between">
                 <span class="text-3xl">{meta?.emoji || '🎉'}</span>
 
-                <!-- Interactive Status Toggle Badge -->
-                <button
-                  type="button"
-                  class:list={[
-                    'status-toggle-btn inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-all hover:scale-105 cursor-pointer border shadow-xs',
-                    isPublished
-                      ? 'bg-success/20 text-emerald-300 border-success/30 hover:bg-success/30'
-                      : 'bg-surface-700/80 text-surface-400 border-white/10 hover:bg-surface-700'
-                  ]}
-                  data-card-id={card.id}
-                  data-published={isPublished ? 'true' : 'false'}
-                  title="Klik untuk mengubah status Diterbitkan / Draf"
-                >
+                <!-- Status Badge -->
+                <div class="flex items-center gap-2">
                   <span
                     class:list={[
-                      'status-dot h-1.5 w-1.5 rounded-full transition-colors',
-                      isPublished ? 'bg-emerald-400 animate-pulse' : 'bg-surface-400'
+                      'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold border shadow-xs select-none',
+                      statusBadge.color
                     ]}
-                  ></span>
-                  <span class="status-text">{isPublished ? 'Diterbitkan' : 'Draf'}</span>
-                </button>
+                  >
+                    <span class:list={['h-1.5 w-1.5 rounded-full', statusBadge.dot]}></span>
+                    <span>{statusBadge.label}</span>
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -404,6 +614,21 @@ if (user) {
 
               <!-- Actions Toolbar -->
               <div class="mt-5 flex flex-wrap items-center gap-1.5 pt-3 border-t border-white/5">
+                <!-- QRIS Activate / Extend Button -->
+                {!isAdminFree && (
+                  <button
+                    type="button"
+                    class="qris-pay-trigger inline-flex items-center gap-1.5 rounded-lg bg-amber-400/15 text-amber-300 border border-amber-400/30 hover:bg-amber-400/25 px-2.5 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
+                    data-card-id={card.id}
+                    data-card-title={card.category === 'wedding' ? card.recipient_name : `Untuk ${card.recipient_name}`}
+                    data-duration-days={card.duration_days || 7}
+                    title="Aktifkan atau perpanjang masa aktif kartu via QRIS"
+                  >
+                    <span>⚡</span>
+                    <span>{isUnpaid ? 'Aktifkan' : 'Perpanjang'}</span>
+                  </button>
+                )}
+
                 <!-- View Button -->
                 <a
                   href={cardUrl}
@@ -411,9 +636,9 @@ if (user) {
                   rel="noopener noreferrer"
                   class:list={[
                     'card-view-link inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors',
-                    isPublished
+                    isPublished && !isUnpaid
                       ? 'bg-surface-700 text-surface-200 hover:bg-surface-600 hover:text-white'
-                      : 'bg-surface-800 text-surface-500 pointer-events-none opacity-50'
+                      : 'bg-surface-800 text-surface-400 hover:bg-surface-700'
                   ]}
                   data-card-id={card.id}
                   title="Lihat"
@@ -434,6 +659,19 @@ if (user) {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                   </svg>
                   Edit
+                </a>
+
+                <!-- Wishes CSV Export Button -->
+                <a
+                  href={`/api/cards/${card.id}/wishes-export`}
+                  download={`ucapan-${card.slug}.csv`}
+                  class="inline-flex items-center gap-1 rounded-lg bg-surface-700 px-2.5 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-surface-600 hover:text-white"
+                  title="Unduh rekapan ucapan dan doa restu (CSV/Excel)"
+                >
+                  <svg class="h-3.5 w-3.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  <span>CSV</span>
                 </a>
 
                 <!-- Copy Link Button -->
@@ -468,7 +706,7 @@ if (user) {
                   type="button"
                   class:list={[
                     'share-card-trigger inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer',
-                    isPublished
+                    isPublished && !isUnpaid
                       ? 'bg-surface-700 text-surface-200 hover:bg-emerald-500/15 hover:text-emerald-400'
                       : 'bg-surface-800 text-surface-500 pointer-events-none opacity-50'
                   ]}
@@ -813,6 +1051,345 @@ if (user) {
       (window as any).showToast({ message: 'Tautan Berhasil Disalin!', type: 'success', duration: 2000 });
     } catch {
       (window as any).showToast({ message: 'Gagal menyalin tautan', type: 'error' });
+    }
+  });
+
+  // ── QRIS Checkout & Modal Flow ─────────────────────────
+  const qrisModal = document.getElementById('qris-modal');
+  const qrisCardTitle = document.getElementById('qris-card-title');
+  const qrisTierBadge = document.getElementById('qris-tier-badge');
+  const qrisOrderId = document.getElementById('qris-order-id');
+  const qrisCountdown = document.getElementById('qris-countdown');
+  const qrisQrContainer = document.getElementById('qris-qr-container');
+  const qrisAmountDisplay = document.getElementById('qris-amount-display');
+  const qrisStatusText = document.getElementById('qris-status-text');
+  const qrisSimulateBtn = document.getElementById('qris-simulate-btn');
+  const qrisSimContainer = document.getElementById('qris-sim-container');
+
+  let activeQrisCardId: string | null = null;
+  let activeQrisTitle = '';
+  let currentOrderId: string | null = null;
+  let qrisPollInterval: any = null;
+  let qrisTimerInterval: any = null;
+
+  async function startQrisCheckout(cardId: string, cardTitle: string, durationDays: number) {
+    activeQrisCardId = cardId;
+    activeQrisTitle = cardTitle;
+
+    if (qrisCardTitle) qrisCardTitle.textContent = cardTitle;
+    if (qrisTierBadge) qrisTierBadge.textContent = `Paket ${durationDays} Hari`;
+    if (qrisQrContainer) {
+      qrisQrContainer.innerHTML = '<div class="animate-pulse text-xs text-slate-500 font-medium py-16">Membuat Kode QRIS...</div>';
+    }
+    if (qrisStatusText) qrisStatusText.textContent = 'Menyiapkan transaksi QRIS...';
+
+    // Highlight selected tier button in modal
+    document.querySelectorAll('.modal-duration-tier-btn').forEach((btn) => {
+      const b = btn as HTMLElement;
+      const days = Number(b.dataset.days);
+      if (days === durationDays) {
+        b.className = 'modal-duration-tier-btn p-2 rounded-xl border text-left transition-all cursor-pointer border-amber-400/60 bg-amber-500/10 ring-1 ring-amber-400/30';
+      } else {
+        b.className = 'modal-duration-tier-btn p-2 rounded-xl border text-left transition-all cursor-pointer border-white/10 bg-surface-800/40 hover:border-white/20';
+      }
+    });
+
+    if (qrisModal) {
+      qrisModal.classList.remove('hidden');
+      qrisModal.classList.add('flex');
+    }
+
+    try {
+      const res = await fetch('/api/payments/create-qris', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cardId, durationDays }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Gagal membuat QRIS' }));
+        throw new Error(err.error || 'Gagal membuat QRIS');
+      }
+
+      const data = await res.json();
+      currentOrderId = data.orderId;
+
+      if (qrisOrderId) qrisOrderId.textContent = data.orderId;
+      if (qrisAmountDisplay) {
+        qrisAmountDisplay.textContent = new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          minimumFractionDigits: 0,
+        }).format(data.amount);
+      }
+      if (qrisTierBadge) qrisTierBadge.textContent = data.tierName || `Paket ${durationDays} Hari`;
+      if (qrisQrContainer && data.qrSvg) {
+        qrisQrContainer.innerHTML = `
+          <div class="w-full flex flex-col items-center select-none text-slate-900">
+            <!-- Header with QRIS Badge and Merchant Name -->
+            <div class="w-full flex items-center justify-between pb-1.5 border-b border-slate-200">
+              <span class="inline-block bg-[#D32F2F] text-white font-black text-[11px] tracking-wider px-2 py-0.5 rounded shadow-xs">
+                QRIS
+              </span>
+              <span class="text-[10px] font-bold text-slate-800 tracking-tight text-right uppercase">
+                ELCELEBRATE DIGITAL
+              </span>
+            </div>
+            <!-- Matrix SVG -->
+            <div class="w-48 h-48 my-1 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+              ${data.qrSvg}
+            </div>
+            <!-- Footer with NMID and Payment Partner Labels -->
+            <div class="w-full pt-1.5 border-t border-dashed border-slate-200 text-center flex flex-col gap-0.5">
+              <div class="font-mono text-[9px] font-bold text-slate-600 tracking-wider">
+                NMID: ID1020021000001
+              </div>
+              <div class="text-[8px] text-slate-500 font-medium leading-tight">
+                SATU QRIS UNTUK SEMUA PEMBAYARAN
+              </div>
+              <div class="text-[8px] text-slate-400 font-normal">
+                BCA • Mandiri • BRI • BNI • GoPay • OVO • DANA • ShopeePay
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      if (qrisStatusText) {
+        qrisStatusText.textContent = 'Menunggu pembayaran via aplikasi perbankan / e-wallet...';
+      }
+
+      if (qrisSimContainer) {
+        if (data.isSimulation) {
+          qrisSimContainer.classList.remove('hidden');
+        } else {
+          qrisSimContainer.classList.add('hidden');
+        }
+      }
+
+      // Start 15-minute countdown
+      clearInterval(qrisTimerInterval);
+      let timeLeft = 15 * 60;
+      qrisTimerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(qrisTimerInterval);
+          if (qrisCountdown) qrisCountdown.textContent = '00:00 (Kedaluwarsa)';
+          if (qrisStatusText) qrisStatusText.textContent = 'Waktu pembayaran berakhir. Silakan pilih paket kembali.';
+          return;
+        }
+        const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const s = String(timeLeft % 60).padStart(2, '0');
+        if (qrisCountdown) qrisCountdown.textContent = `${m}:${s}`;
+      }, 1000);
+
+      // Start polling for payment settlement
+      clearInterval(qrisPollInterval);
+      qrisPollInterval = setInterval(async () => {
+        if (!currentOrderId) return;
+        try {
+          const pollRes = await fetch(`/api/payments/status?order_id=${currentOrderId}`);
+          if (pollRes.ok) {
+            const statusData = await pollRes.json();
+            if (statusData.status === 'settled') {
+              clearInterval(qrisPollInterval);
+              clearInterval(qrisTimerInterval);
+              if (qrisStatusText) qrisStatusText.textContent = '✅ Pembayaran Berhasil! Mengaktifkan kartu...';
+              (window as any).showToast({ message: '🎉 Pembayaran berhasil diverifikasi!', type: 'success' });
+              setTimeout(() => {
+                window.location.href = '/dashboard';
+              }, 1200);
+            }
+          }
+        } catch {
+          // Ignore network poll glitch
+        }
+      }, 3000);
+
+    } catch (err: any) {
+      (window as any).showToast({ message: err.message || 'Gagal memproses QRIS', type: 'error' });
+      if (qrisQrContainer) {
+        qrisQrContainer.innerHTML = '<div class="text-xs text-rose-500 font-medium text-center px-4 py-16 flex flex-col items-center gap-2"><span>⚠️</span><span>Gagal memuat QRIS. Silakan coba kembali.</span></div>';
+      }
+    }
+  }
+
+  // Duration Tier change in modal
+  document.querySelectorAll('.modal-duration-tier-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const days = Number((btn as HTMLElement).dataset.days);
+      if (activeQrisCardId && days) {
+        startQrisCheckout(activeQrisCardId, activeQrisTitle, days);
+      }
+    });
+  });
+
+  // Open QRIS from card actions
+  document.querySelectorAll('.qris-pay-trigger').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cardId = (btn as HTMLElement).dataset.cardId || '';
+      const cardTitle = (btn as HTMLElement).dataset.cardTitle || 'Undangan Anda';
+      const durationDays = Number((btn as HTMLElement).dataset.durationDays) || 7;
+      startQrisCheckout(cardId, cardTitle, durationDays);
+    });
+  });
+
+  // Simulation settlement button (Test mode)
+  qrisSimulateBtn?.addEventListener('click', async () => {
+    if (!currentOrderId) return;
+    qrisSimulateBtn.setAttribute('disabled', 'true');
+    qrisSimulateBtn.textContent = 'Memverifikasi Pembayaran...';
+
+    try {
+      const res = await fetch('/api/payments/webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: currentOrderId, simulated: true }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Gagal simulasi' }));
+        throw new Error(err.error || 'Gagal simulasi pembayaran');
+      }
+
+      clearInterval(qrisPollInterval);
+      clearInterval(qrisTimerInterval);
+      (window as any).showToast({ message: '⚡ Pembayaran simulasi berhasil! Kartu telah aktif.', type: 'success' });
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
+    } catch (err: any) {
+      qrisSimulateBtn.removeAttribute('disabled');
+      qrisSimulateBtn.textContent = '⚡ Simulasikan Pembayaran Berhasil (Test Mode)';
+      (window as any).showToast({ message: err.message || 'Gagal simulasi pembayaran', type: 'error' });
+    }
+  });
+
+  // Check URL query param ?pay=<cardId> on load
+  const urlParams = new URLSearchParams(window.location.search);
+  const payCardId = urlParams.get('pay');
+  if (payCardId) {
+    const cardEl = document.getElementById(`card-item-${payCardId}`);
+    const payTrigger = cardEl?.querySelector('.qris-pay-trigger') as HTMLElement | null;
+    const cardTitle = payTrigger?.dataset.cardTitle || cardEl?.querySelector('h3')?.textContent || 'Undangan Anda';
+    const savedDays = Number(payTrigger?.dataset.durationDays) || 7;
+    startQrisCheckout(payCardId, cardTitle, savedDays);
+  }
+
+  // ── Multi-Admin RBAC Modal Flow ─────────────────────────
+  const adminModal = document.getElementById('admin-roles-modal');
+  const adminManageBtn = document.getElementById('admin-manage-btn');
+  const adminRefreshBtn = document.getElementById('admin-refresh-users-btn');
+  const adminSubmitBtn = document.getElementById('admin-role-submit-btn');
+  const adminEmailInput = document.getElementById('admin-role-email') as HTMLInputElement | null;
+  const adminRoleSelect = document.getElementById('admin-role-select') as HTMLSelectElement | null;
+  const adminUsersList = document.getElementById('admin-users-list');
+
+  async function loadAdminUsers() {
+    if (!adminUsersList) return;
+    adminUsersList.innerHTML = '<div class="p-4 text-center text-xs text-surface-400 animate-pulse">Memuat data pengguna...</div>';
+
+    try {
+      const res = await fetch('/api/admin/roles');
+      if (!res.ok) throw new Error('Gagal memuat pengguna');
+      const data = await res.json();
+      const users: any[] = data.users || [];
+
+      if (adminRoleSelect) {
+        const superAdminOption = adminRoleSelect.querySelector('option[value="super_admin"]') as HTMLOptionElement | null;
+        if (superAdminOption) {
+          superAdminOption.hidden = !data.callerIsRoot;
+          superAdminOption.disabled = !data.callerIsRoot;
+        }
+      }
+
+      if (users.length === 0) {
+        adminUsersList.innerHTML = '<div class="p-4 text-center text-xs text-surface-400">Tidak ada pengguna ditemukan.</div>';
+        return;
+      }
+
+      adminUsersList.innerHTML = users
+        .map((u) => {
+          let badgeClass = 'bg-surface-800 text-surface-400 border border-white/10';
+          let badgeText = 'Pengguna';
+
+          if (u.isRootOwner) {
+            badgeClass = 'bg-amber-400/25 text-amber-200 border border-amber-400/50 font-bold';
+            badgeText = '👑 Pemilik Utama (Terkunci)';
+          } else if (u.role === 'super_admin') {
+            badgeClass = 'bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold';
+            badgeText = '⭐ Super Admin';
+          } else if (u.role === 'admin') {
+            badgeClass = 'bg-amber-400/20 text-amber-300 border border-amber-400/30 font-semibold';
+            badgeText = '👑 Admin Mitra';
+          }
+
+          const isClickable = !u.isRootOwner;
+          return `
+            <div class="p-3 flex items-center justify-between gap-3 text-xs ${isClickable ? 'cursor-pointer hover:bg-white/5 transition-colors' : 'opacity-90'}" ${isClickable ? `onclick="if(document.getElementById('admin-role-email')){document.getElementById('admin-role-email').value='${u.email}'; if(document.getElementById('admin-role-select')){document.getElementById('admin-role-select').value='${u.role}';}}"` : ''}>
+              <div class="min-w-0">
+                <div class="font-medium text-white truncate flex items-center gap-1.5">
+                  <span>${u.full_name || 'Tanpa Nama'}</span>
+                  ${u.isRootOwner ? '<span class="text-[10px] text-amber-400" title="Akun Terkunci">🔒</span>' : ''}
+                </div>
+                <div class="text-[11px] text-surface-400 truncate">${u.email}</div>
+              </div>
+              <div class="shrink-0 flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] ${badgeClass}">
+                  ${badgeText}
+                </span>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    } catch {
+      adminUsersList.innerHTML = '<div class="p-4 text-center text-xs text-rose-400">Gagal memuat data pengguna.</div>';
+    }
+  }
+
+  adminManageBtn?.addEventListener('click', () => {
+    if (adminModal) {
+      adminModal.classList.remove('hidden');
+      adminModal.classList.add('flex');
+      loadAdminUsers();
+    }
+  });
+
+  adminRefreshBtn?.addEventListener('click', () => {
+    loadAdminUsers();
+  });
+
+  adminSubmitBtn?.addEventListener('click', async () => {
+    const email = adminEmailInput?.value?.trim();
+    const role = adminRoleSelect?.value;
+
+    if (!email) {
+      (window as any).showToast({ message: 'Masukkan email pengguna', type: 'error' });
+      return;
+    }
+
+    if (email.toLowerCase() === 'lesynugraha@gmail.com') {
+      (window as any).showToast({ message: 'Role Pemilik Utama (lesynugraha@gmail.com) terkunci permanen.', type: 'error' });
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/roles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, role }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Gagal mengubah peran pengguna');
+      }
+
+      (window as any).showToast({ message: data.message || 'Peran berhasil diperbarui!', type: 'success' });
+      if (adminEmailInput) adminEmailInput.value = '';
+      loadAdminUsers();
+    } catch (err: any) {
+      (window as any).showToast({ message: err.message || 'Gagal mengubah peran', type: 'error' });
     }
   });
 </script>

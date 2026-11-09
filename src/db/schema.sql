@@ -9,6 +9,7 @@ create table if not exists public.profiles (
   id         uuid primary key references auth.users(id) on delete cascade,
   email      text not null,
   full_name  text not null default '',
+  role       text not null default 'user' check (role in ('user', 'admin', 'super_admin')),
   created_at timestamptz not null default now()
 );
 
@@ -56,6 +57,11 @@ create table if not exists public.cards (
   theme_config    jsonb not null default '{}'::jsonb,
   media_urls      text[] default '{}',
   is_published    boolean default true,
+  payment_status  text not null default 'unpaid' check (payment_status in ('unpaid', 'paid', 'admin_free', 'expired')),
+  duration_days   integer,
+  paid_at         timestamptz,
+  expires_at      timestamptz,
+  grace_until     timestamptz,
   created_at      timestamptz not null default now()
 );
 
@@ -91,6 +97,52 @@ create index if not exists idx_cards_slug on public.cards(slug);
 
 -- Index for user card listings
 create index if not exists idx_cards_user_id on public.cards(user_id);
+create index if not exists idx_cards_expiration on public.cards(payment_status, expires_at, grace_until);
+
+
+-- ── Transactions ───────────────────────────────────────────
+create table if not exists public.transactions (
+  id                uuid primary key default gen_random_uuid(),
+  order_id          text unique not null,
+  card_id           uuid references public.cards(id) on delete set null,
+  user_id           uuid not null references auth.users(id) on delete cascade,
+  amount            integer not null,
+  duration_days     integer not null,
+  status            text not null default 'pending' check (status in ('pending', 'settled', 'expired', 'failed')),
+  payment_method    text not null default 'qris',
+  qr_string         text,
+  gateway_provider  text default 'simulation',
+  gateway_reference text,
+  created_at        timestamptz not null default now(),
+  settled_at        timestamptz
+);
+
+alter table public.transactions enable row level security;
+
+-- Users can view their own transactions
+create policy "Users can view own transactions"
+  on public.transactions for select
+  using (auth.uid() = user_id);
+
+-- Users can insert their own transactions
+create policy "Users can insert own transactions"
+  on public.transactions for insert
+  with check (auth.uid() = user_id);
+
+-- Admins and Super Admins can view all transactions
+create policy "Admins can view all transactions"
+  on public.transactions for select
+  using (
+    exists (
+      select 1 from public.profiles
+      where profiles.id = auth.uid()
+      and profiles.role in ('admin', 'super_admin')
+    )
+  );
+
+-- Indexes for transactions
+create index if not exists idx_transactions_order_id on public.transactions(order_id);
+create index if not exists idx_transactions_user_id on public.transactions(user_id);
 
 
 -- ── Wishes (Guestbook) ─────────────────────────────────────

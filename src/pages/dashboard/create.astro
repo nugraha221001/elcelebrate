@@ -1,8 +1,9 @@
 ---
 import DashboardLayout from '../../components/layout/DashboardLayout.astro';
 import Toast from '../../components/ui/Toast.astro';
-import { CATEGORY_META, CATEGORY_UNBOXING_OPTIONS } from '../../lib/types';
+import { CATEGORY_META, CATEGORY_UNBOXING_OPTIONS, ROOT_OWNER_EMAIL, isAdminOrSuperAdmin, type UserRole } from '../../lib/types';
 import { AUDIO_TRACKS } from '../../lib/audio-tracks';
+import { DURATION_TIERS, formatRupiah } from '../../lib/pricing';
 
 export const prerender = false;
 
@@ -11,6 +12,17 @@ const user = Astro.locals.user;
 if (!user) {
   return Astro.redirect('/signin');
 }
+
+// Fetch user role for admin VIP features
+const { data: userProfile } = await Astro.locals.supabase
+  .from('profiles')
+  .select('role')
+  .eq('id', user.id)
+  .single();
+const isRoot = user.email?.trim().toLowerCase() === ROOT_OWNER_EMAIL.toLowerCase();
+const userRole: UserRole = isRoot ? 'super_admin' : (userProfile?.role as UserRole) || 'user';
+const isVip = isAdminOrSuperAdmin(userRole, user.email);
+const isAdmin = isVip;
 
 const editId = Astro.url.searchParams.get('edit');
 const isEdit = Boolean(editId);
@@ -1984,8 +1996,66 @@ const EXTENDED_SWATCHES = [
             </div>
           </div>
 
+          <!-- Duration Selector (For new card creation) -->
+          {!isEdit && (
+            <div class="mt-6 rounded-2xl border border-amber-500/20 bg-surface-900/80 backdrop-blur-md p-5 sm:p-6 shadow-xl">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                <div>
+                  <h3 class="text-base font-bold text-surface-50 flex items-center gap-2">
+                    <span class="text-amber-400">⏳</span>
+                    <span>Pilih Durasi Masa Aktif Kartu</span>
+                  </h3>
+                  <p class="text-xs text-surface-400 mt-0.5">Bebas edit sepuasnya & terima ucapan tanpa batas selama masa aktif.</p>
+                </div>
+                {isAdmin && (
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
+                    👑 Mode Admin VIP Aktif — Gratis & Bebas Pilih Durasi
+                  </span>
+                )}
+              </div>
+
+              <!-- Duration Tiers Grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="duration-tiers-selector">
+                {DURATION_TIERS.map((tier) => (
+                  <label
+                    class={`duration-tier-card relative flex flex-col justify-between p-3.5 rounded-xl border transition-all cursor-pointer select-none ${
+                      tier.days === 7
+                        ? 'border-amber-400/60 bg-amber-500/10 ring-1 ring-amber-400/30'
+                        : 'border-white/10 bg-surface-800/40 hover:border-white/20'
+                    }`}
+                    data-days={tier.days}
+                  >
+                    <input
+                      type="radio"
+                      name="duration_days"
+                      value={tier.days}
+                      checked={tier.days === 7}
+                      class="sr-only duration-radio"
+                    />
+                    <div>
+                      <div class="flex items-center justify-between gap-1 mb-1">
+                        <span class="text-xs font-bold text-surface-200">{tier.days} Hari</span>
+                        {tier.badge && (
+                          <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                            {tier.badge}
+                          </span>
+                        )}
+                      </div>
+                      <div class="text-base font-extrabold text-amber-300">
+                        {isAdmin ? 'Gratis (VIP)' : formatRupiah(tier.price)}
+                      </div>
+                    </div>
+                    <p class="text-[11px] text-surface-400 mt-2 line-clamp-2 leading-tight">
+                      {tier.description}
+                    </p>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div class="mt-6 rounded-2xl border border-white/8 bg-surface-900/60 backdrop-blur-md p-6 w-full max-w-full min-w-0 overflow-x-hidden">
-            <div id="preview-summary" class="space-y-4 w-full max-w-full min-w-0">
+            <div id="preview-summary" class="space-y-4 w-full max-w-full min-w-0" data-user-role={userRole}>
               <!-- Populated by JS -->
             </div>
 
@@ -1998,7 +2068,7 @@ const EXTENDED_SWATCHES = [
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d={isEdit ? "M5 13l4 4L19 7" : "M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"} />
                 </svg>
-                {isEdit ? "Simpan Perubahan" : "Terbitkan Kartu"}
+                {isEdit ? "Simpan Perubahan" : (isVip ? "Terbitkan Kartu (VIP Gratis)" : "Simpan & Lanjut Bayar QRIS")}
               </button>
             </div>
           </div>
@@ -7818,6 +7888,29 @@ const EXTENDED_SWATCHES = [
     const summary = document.getElementById('preview-summary');
     if (!summary) return;
     const isEditMode = new URLSearchParams(window.location.search).has('edit');
+    const userRole = summary.getAttribute('data-user-role') || 'user';
+    const isVip = userRole === 'admin' || userRole === 'super_admin';
+
+    let statusPublicationLabel = '⏳ Menunggu Pembayaran QRIS';
+    let statusPublicationColor = 'text-amber-400';
+    if (isEditMode) {
+      statusPublicationLabel = '✅ Siap Disimpan';
+      statusPublicationColor = 'text-emerald-400';
+    } else if (isVip) {
+      statusPublicationLabel = '👑 VIP Gratis — Siap Diterbitkan';
+      statusPublicationColor = 'text-amber-300';
+    }
+
+    const publishBtn = document.getElementById('publish-btn');
+    if (publishBtn) {
+      const btnIcon = isEditMode
+        ? '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>'
+        : '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>';
+      const btnText = isEditMode
+        ? 'Simpan Perubahan'
+        : (isVip ? 'Terbitkan Kartu (VIP Gratis)' : 'Simpan & Lanjut Bayar QRIS');
+      publishBtn.innerHTML = `${btnIcon} ${btnText}`;
+    }
 
     const categoryEmojis: Record<string, string> = {
       birthday: '🎂 Ulang Tahun',
@@ -7976,7 +8069,7 @@ const EXTENDED_SWATCHES = [
         </div>` : ''}
         <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-1 sm:gap-2 min-w-0">
           <span class="text-sm text-surface-400 shrink-0">Status Publikasi</span>
-          <span class="text-sm font-medium text-emerald-400 break-words break-all [overflow-wrap:anywhere] sm:text-right">✅ ${isEditMode ? 'Siap Disimpan' : 'Siap Diterbitkan'}</span>
+          <span class="text-sm font-medium ${statusPublicationColor} break-words break-all [overflow-wrap:anywhere] sm:text-right">${statusPublicationLabel}</span>
         </div>
         <hr class="border-white/5" />
         <div class="min-w-0 w-full">
@@ -8003,12 +8096,15 @@ const EXTENDED_SWATCHES = [
     const urlParams = new URLSearchParams(window.location.search);
     const editId = urlParams.get('edit');
     const isEditMode = Boolean(editId);
+    const summary = document.getElementById('preview-summary');
+    const userRole = summary?.getAttribute('data-user-role') || 'user';
+    const isVip = userRole === 'admin' || userRole === 'super_admin';
 
     const btn = document.getElementById('publish-btn') as HTMLButtonElement;
     btn.disabled = true;
     btn.innerHTML = isEditMode
       ? '<span class="animate-spin">⏳</span> Menyimpan...'
-      : '<span class="animate-spin">⏳</span> Menerbitkan...';
+      : (isVip ? '<span class="animate-spin">⏳</span> Menerbitkan...' : '<span class="animate-spin">⏳</span> Menyiapkan QRIS...');
 
     try {
       // 1. Upload photos to R2 (if any new files)
@@ -8159,11 +8255,19 @@ const EXTENDED_SWATCHES = [
           window.location.href = '/dashboard';
         }, 1500);
       } else {
-        // Normal POST /api/cards flow
+        // Normal POST /api/cards flow with duration tier
+        const selectedDuration = Number(
+          (document.querySelector('input[name="duration_days"]:checked') as HTMLInputElement)?.value || 7
+        );
+        const postPayload = {
+          ...payload,
+          duration_days: selectedDuration,
+        };
+
         const res = await fetch('/api/cards', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(postPayload),
         });
 
         if (!res.ok) {
@@ -8172,21 +8276,35 @@ const EXTENDED_SWATCHES = [
         }
 
         const card = await res.json();
-        (window as any).showToast({ message: '🎉 Kartu berhasil diterbitkan!', type: 'success' });
 
-        const cardSlug = card?.slug || card?.card?.slug;
-        if (newTab && !newTab.closed) {
-          if (cardSlug) {
-            newTab.location.href = '/c/' + cardSlug;
-          } else {
+        if (card?.requiresPayment) {
+          if (newTab && !newTab.closed) {
             newTab.close();
           }
-        }
+          (window as any).showToast({
+            message: '🎉 Draf kartu berhasil disimpan! Mengalihkan ke pembayaran QRIS...',
+            type: 'success',
+          });
+          setTimeout(() => {
+            window.location.href = `/dashboard?pay=${card.id}`;
+          }, 800);
+        } else {
+          (window as any).showToast({ message: '🎉 Kartu berhasil diterbitkan!', type: 'success' });
 
-        // Return current tab to dashboard
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 1500);
+          const cardSlug = card?.slug || card?.card?.slug;
+          if (newTab && !newTab.closed) {
+            if (cardSlug) {
+              newTab.location.href = '/c/' + cardSlug;
+            } else {
+              newTab.close();
+            }
+          }
+
+          // Return current tab to dashboard
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 1500);
+        }
       }
     } catch (err: any) {
       if (newTab && !newTab.closed) {
@@ -8194,10 +8312,29 @@ const EXTENDED_SWATCHES = [
       }
       (window as any).showToast({ message: err.message || (isEditMode ? 'Gagal menyimpan perubahan' : 'Gagal menerbitkan kartu'), type: 'error' });
       btn.disabled = false;
+      const resetLabel = isEditMode
+        ? 'Simpan Perubahan'
+        : (isVip ? 'Terbitkan Kartu (VIP Gratis)' : 'Simpan & Lanjut Bayar QRIS');
       btn.innerHTML = isEditMode
-        ? '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Simpan Perubahan'
-        : '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg> Terbitkan Kartu';
+        ? `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> ${resetLabel}`
+        : `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg> ${resetLabel}`;
     }
+  });
+
+  // Duration Tier Selection Interactions
+  document.querySelectorAll('.duration-tier-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const radio = card.querySelector('input[type="radio"]') as HTMLInputElement;
+      if (radio) {
+        radio.checked = true;
+      }
+      document.querySelectorAll('.duration-tier-card').forEach((c) => {
+        c.classList.remove('border-amber-400/60', 'bg-amber-500/10', 'ring-1', 'ring-amber-400/30');
+        c.classList.add('border-white/10', 'bg-surface-800/40');
+      });
+      card.classList.remove('border-white/10', 'bg-surface-800/40');
+      card.classList.add('border-amber-400/60', 'bg-amber-500/10', 'ring-1', 'ring-amber-400/30');
+    });
   });
 
   // ═══════════════════════════════════════════════════════

@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { generateSlug } from '../../../lib/slug';
 import { resolveMediaUrl } from '../../../lib/r2';
+import { isAdminOrSuperAdmin } from '../../../lib/types';
 
 export const prerender = false;
 
@@ -59,6 +60,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
     event_date = null,
     theme_config = {},
     media_urls = [],
+    duration_days = 7,
   } = body || {};
 
   // Validation
@@ -104,6 +106,20 @@ export const POST: APIRoute = async ({ locals, request }) => {
     ? media_urls.map(resolveMediaUrl)
     : [];
 
+  // Check user role for Admin VIP bypass
+  const { data: profile } = await locals.supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', locals.user.id)
+    .single();
+
+  const isVip = isAdminOrSuperAdmin(profile?.role, locals.user.email);
+  const durationNum = [3, 7, 14, 30, 45, 60].includes(Number(duration_days)) ? Number(duration_days) : 7;
+
+  const paymentStatus = isVip ? 'admin_free' : 'unpaid';
+  const isPublished = isVip; // Admin/SuperAdmin VIP cards are published immediately, user cards require QRIS activation
+  const paidAt = isVip ? new Date().toISOString() : null;
+
   const { data, error } = await locals.supabase
     .from('cards')
     .insert({
@@ -116,7 +132,12 @@ export const POST: APIRoute = async ({ locals, request }) => {
       event_date,
       theme_config,
       media_urls: sanitizedMediaUrls,
-      is_published: true,
+      is_published: isPublished,
+      payment_status: paymentStatus,
+      duration_days: durationNum,
+      paid_at: paidAt,
+      expires_at: null,
+      grace_until: null,
     })
     .select()
     .single();
@@ -132,8 +153,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
     data.media_urls = data.media_urls.map(resolveMediaUrl);
   }
 
-  return new Response(JSON.stringify(data), {
-    status: 201,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return new Response(
+    JSON.stringify({
+      ...data,
+      requiresPayment: !isVip,
+    }),
+    {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
 };

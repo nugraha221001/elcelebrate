@@ -1,5 +1,7 @@
 import type { APIRoute } from 'astro';
 import { resolveMediaUrl, extractR2Key, deleteR2Object } from '../../../lib/r2';
+import { createSupabaseAdminClient } from '../../../lib/supabase';
+import { isAdminOrSuperAdmin } from '../../../lib/types';
 
 export const prerender = false;
 
@@ -61,6 +63,55 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
     'media_urls',
   ];
 
+  // Fetch existing card for permission and expiration checks
+  const { data: existingCardInfo } = await locals.supabase
+    .from('cards')
+    .select('id, user_id, category, payment_status, expires_at, grace_until, media_urls, theme_config')
+    .eq('id', id)
+    .single();
+
+  if (!existingCardInfo) {
+    return new Response(JSON.stringify({ error: 'Card not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Check admin role
+  let isCallerAdmin = false;
+  const { data: profile } = await locals.supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', locals.user.id)
+    .single();
+
+  isCallerAdmin = isAdminOrSuperAdmin(profile?.role, locals.user.email);
+
+  if (existingCardInfo.user_id !== locals.user.id && !isCallerAdmin) {
+    return new Response(JSON.stringify({ error: 'Not authorized to edit this card' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Grace period enforcement: disallow edits if grace period has expired
+  if (
+    !isCallerAdmin &&
+    existingCardInfo.payment_status !== 'admin_free' &&
+    existingCardInfo.grace_until &&
+    new Date(existingCardInfo.grace_until).getTime() < Date.now()
+  ) {
+    return new Response(
+      JSON.stringify({
+        error: 'Masa tenggang kartu ini telah berakhir. Silakan perpanjang masa aktif kartu di dashboard untuk mengedit.',
+      }),
+      {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+
   const updatePayload: Record<string, any> = {};
   for (const key of allowedKeys) {
     if (key in body) {
@@ -85,14 +136,7 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
       });
     }
 
-    const { data: existingCardInfo } = await locals.supabase
-      .from('cards')
-      .select('category')
-      .eq('id', id)
-      .eq('user_id', locals.user.id)
-      .single();
-
-    const maxPhotos = existingCardInfo?.category === 'wedding' ? 11 : 4;
+    const maxPhotos = existingCardInfo.category === 'wedding' ? 11 : 4;
     if (updatePayload.media_urls.length > maxPhotos) {
       return new Response(JSON.stringify({ error: `Maximum ${maxPhotos} photos allowed` }), {
         status: 400,
@@ -108,12 +152,7 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
   const needAudioCheck = updatePayload.theme_config && 'customAudioUrl' in updatePayload.theme_config;
 
   if (needMediaCheck || needAudioCheck) {
-    const { data: existingCard } = await locals.supabase
-      .from('cards')
-      .select('media_urls, theme_config')
-      .eq('id', id)
-      .eq('user_id', locals.user.id)
-      .single();
+    const existingCard = existingCardInfo;
 
     if (existingCard) {
       const keysToDelete: string[] = [];
@@ -151,13 +190,17 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
     }
   }
 
-  const { data, error } = await locals.supabase
+  const clientToUse = isCallerAdmin ? createSupabaseAdminClient() : locals.supabase;
+  const updateQuery = clientToUse
     .from('cards')
     .update(updatePayload)
-    .eq('id', id)
-    .eq('user_id', locals.user.id)
-    .select()
-    .single();
+    .eq('id', id);
+
+  if (!isCallerAdmin) {
+    updateQuery.eq('user_id', locals.user.id);
+  }
+
+  const { data, error } = await updateQuery.select().single();
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
@@ -194,13 +237,25 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
 
   const { id } = params;
 
+  const { data: profile } = await locals.supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', locals.user.id)
+    .single();
+  const isCallerAdmin = isAdminOrSuperAdmin(profile?.role, locals.user.email);
+  const adminClient = createSupabaseAdminClient();
+
   // 1. Fetch card first to retrieve media_urls and theme_config for asset cleanup
-  const { data: card, error: fetchError } = await locals.supabase
+  let cardQuery = adminClient
     .from('cards')
     .select('id, user_id, media_urls, theme_config')
-    .eq('id', id)
-    .eq('user_id', locals.user.id)
-    .single();
+    .eq('id', id);
+
+  if (!isCallerAdmin) {
+    cardQuery = cardQuery.eq('user_id', locals.user.id);
+  }
+
+  const { data: card, error: fetchError } = await cardQuery.single();
 
   if (fetchError || !card) {
     return new Response(JSON.stringify({ error: 'Card not found or not authorized' }), {
@@ -234,11 +289,12 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
   }
 
   // 3. Delete card from Supabase (cascades to wishes table)
-  const { error: deleteError } = await locals.supabase
-    .from('cards')
-    .delete()
-    .eq('id', id)
-    .eq('user_id', locals.user.id);
+  let deleteQuery = adminClient.from('cards').delete().eq('id', id);
+  if (!isCallerAdmin) {
+    deleteQuery = deleteQuery.eq('user_id', locals.user.id);
+  }
+
+  const { error: deleteError } = await deleteQuery;
 
   if (deleteError) {
     return new Response(JSON.stringify({ error: deleteError.message }), {

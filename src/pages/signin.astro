@@ -99,34 +99,6 @@ if (user) {
             </svg>
           </Button>
         </form>
-
-        <!-- Divider -->
-        <div class="mt-6 flex items-center gap-3">
-          <div class="h-px flex-1 bg-white/10"></div>
-          <span class="text-xs text-surface-500">atau</span>
-          <div class="h-px flex-1 bg-white/10"></div>
-        </div>
-
-        <!-- Magic Link Section -->
-        <form id="magic-link-form" class="mt-6 flex flex-col gap-4">
-          <Input
-            label="Tautan Masuk Langsung (Magic Link)"
-            name="magic_email"
-            type="email"
-            placeholder="Kirim tautan masuk ke email Anda"
-            required={true}
-          />
-          <Button type="submit" variant="secondary" size="md" fullWidth={true} id="magic-link-btn">
-            <svg id="magic-envelope-icon" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-            </svg>
-            <span id="magic-btn-text">Kirim Magic Link</span>
-            <svg id="magic-spinner" class="hidden h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </Button>
-        </form>
       </div>
 
       <p class="mt-6 text-center text-sm text-surface-400">
@@ -243,44 +215,6 @@ if (user) {
       btn.disabled = false;
       if (btnText) btnText.textContent = 'Masuk';
       spinner?.classList.add('hidden');
-    }
-  });
-
-  // ── Magic Link Form Submission ────────────────────────────────
-  document.getElementById('magic-link-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const btn = document.getElementById('magic-link-btn') as HTMLButtonElement;
-    const btnText = document.getElementById('magic-btn-text');
-    const spinner = document.getElementById('magic-spinner');
-    const envelopeIcon = document.getElementById('magic-envelope-icon');
-
-    btn.disabled = true;
-    if (btnText) btnText.textContent = 'Mengirim tautan...';
-    spinner?.classList.remove('hidden');
-    envelopeIcon?.classList.add('hidden');
-
-    try {
-      const res = await fetch('/api/auth/magic-link', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.get('magic_email') }),
-      });
-
-      if (res.ok) {
-        (window as any).showToast({ message: 'Tautan masuk terkirim! Periksa email Anda.', type: 'success' });
-      } else {
-        const data = await res.json();
-        (window as any).showToast({ message: data.error || 'Gagal mengirim tautan. Silakan coba lagi.', type: 'error' });
-      }
-    } catch {
-      (window as any).showToast({ message: 'Kesalahan jaringan. Silakan coba lagi.', type: 'error' });
-    } finally {
-      btn.disabled = false;
-      if (btnText) btnText.textContent = 'Kirim Magic Link';
-      spinner?.classList.add('hidden');
-      envelopeIcon?.classList.remove('hidden');
     }
   });
 
