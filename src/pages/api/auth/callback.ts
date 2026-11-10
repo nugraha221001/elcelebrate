@@ -15,6 +15,21 @@ export const GET: APIRoute = async ({ locals, url, cookies, redirect }) => {
       ? nextParam
       : (type === 'recovery' ? '/reset-password' : '/dashboard');
 
+  const isRecovery =
+    type === 'recovery' ||
+    safeNext.includes('/reset-password') ||
+    (nextParam && nextParam.includes('/reset-password'));
+
+  // 1. If recovery link has token_hash: forward directly to /reset-password WITHOUT consuming it on GET!
+  // This prevents email link scanners / antivirus prefetchers from invalidating the single-use OTP.
+  if (isRecovery && token_hash) {
+    const resetUrl = new URL('/reset-password', url.origin);
+    url.searchParams.forEach((val, key) => {
+      if (key !== 'next') resetUrl.searchParams.set(key, val);
+    });
+    return redirect(resetUrl.pathname + resetUrl.search);
+  }
+
   let session = null;
 
   if (code) {
@@ -22,7 +37,7 @@ export const GET: APIRoute = async ({ locals, url, cookies, redirect }) => {
     if (!error && data?.session) {
       session = data.session;
     }
-  } else if (token_hash && type) {
+  } else if (token_hash && type && !isRecovery) {
     const { data, error } = await locals.supabase.auth.verifyOtp({
       token_hash,
       type,
@@ -32,9 +47,15 @@ export const GET: APIRoute = async ({ locals, url, cookies, redirect }) => {
     }
   }
 
-  // If email verification from signup or redirected to /signin:
-  // Clear session cookies so the user signs in with their credentials cleanly
-  const isSignupVerification = type === 'signup' || safeNext.includes('/signin') || (nextParam && nextParam.includes('/signin'));
+  // If email verification from signup (NOT recovery) or next contains /signin:
+  // Clear session cookies so the user signs in with their credentials cleanly.
+  // CRITICAL: NEVER clear cookies when next is /reset-password!
+  const isSignupVerification =
+    !isRecovery &&
+    (type === 'signup' ||
+      safeNext.includes('/signin') ||
+      (nextParam && nextParam.includes('/signin')));
+
   if (isSignupVerification) {
     cookies.delete('sb-access-token', { path: '/' });
     cookies.delete('sb-refresh-token', { path: '/' });
@@ -46,6 +67,8 @@ export const GET: APIRoute = async ({ locals, url, cookies, redirect }) => {
     return redirect('/signin?verified=1');
   }
 
+  // If a session was established (e.g. code exchange for recovery or dashboard login):
+  // Set the sb-access-token and sb-refresh-token cookies and redirect to safeNext
   if (session) {
     const isProd = import.meta.env.PROD;
     cookies.set('sb-access-token', session.access_token, {
@@ -65,8 +88,8 @@ export const GET: APIRoute = async ({ locals, url, cookies, redirect }) => {
     return redirect(safeNext);
   }
 
-  // Recovery fallback if session exchange handled on client
-  if (type === 'recovery' || safeNext.includes('/reset-password')) {
+  // Recovery fallback: forward query parameters to /reset-password
+  if (isRecovery) {
     const resetUrl = new URL('/reset-password', url.origin);
     url.searchParams.forEach((val, key) => {
       if (key !== 'next') resetUrl.searchParams.set(key, val);

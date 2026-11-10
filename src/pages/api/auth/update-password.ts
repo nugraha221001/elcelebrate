@@ -8,9 +8,12 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
     const body = await request.json();
     const newPassword = (body.password || body.new_password || '').trim();
     const confirmPassword = (body.confirm_password || body.confirmPassword || '').trim();
+    const token_hash = (body.token_hash || '').trim();
+    const code = (body.code || '').trim();
     const authHeader = request.headers.get('authorization') || '';
     const tokenFromHeader = authHeader.startsWith('Bearer ') ? authHeader.substring(7).trim() : '';
     const accessToken = (body.access_token || tokenFromHeader || '').trim();
+    const refreshToken = (body.refresh_token || '').trim();
 
     if (!newPassword || !confirmPassword) {
       return new Response(
@@ -33,48 +36,97 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
       );
     }
 
-    let updateError: any = null;
+    const authClient = locals.supabase;
+    let authError: string | null = null;
+    let authenticatedUserId: string | null = null;
 
-    // Case 1: Active server session exists
-    if (locals.user) {
-      const { error } = await locals.supabase.auth.updateUser({
-        password: newPassword,
+    // Execute recovery verification in strict priority order:
+    // 1) If token_hash is provided: verifyOtp({ token_hash, type: 'recovery' })
+    // Works across any browser or mobile WebView without requiring PKCE localStorage!
+    if (token_hash) {
+      const { data, error } = await authClient.auth.verifyOtp({
+        token_hash,
+        type: 'recovery',
       });
-      updateError = error;
+      if (error || !data?.user) {
+        authError = error?.message || 'Tautan pemulihan tidak valid atau telah kedaluwarsa.';
+      } else {
+        authenticatedUserId = data.user.id;
+      }
     }
-    // Case 2: Client passed accessToken from recovery hash
+    // 2) Else if code is provided: exchangeCodeForSession(code)
+    else if (code) {
+      const { data, error } = await authClient.auth.exchangeCodeForSession(code);
+      if (error || !data?.user) {
+        authError = error?.message || 'Kode pemulihan tidak valid atau telah kedaluwarsa.';
+      } else {
+        authenticatedUserId = data.user.id;
+      }
+    }
+    // 3) Else if access_token & refresh_token are provided (from URL hash)
     else if (accessToken) {
-      const { data: userData, error: getUserError } = await locals.supabase.auth.getUser(accessToken);
-      if (getUserError || !userData?.user) {
-        return new Response(
-          JSON.stringify({ error: 'Sesi pemulihan tidak valid atau telah kedaluwarsa. Silakan minta tautan baru.' }),
-          { status: 401, headers: { 'Content-Type': 'application/json' } }
-        );
+      const { data, error } = await authClient.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken || '',
+      });
+      if (error || !data?.user) {
+        const { data: userData, error: userErr } = await authClient.auth.getUser(accessToken);
+        if (userErr || !userData?.user) {
+          authError = error?.message || userErr?.message || 'Sesi pemulihan tidak valid atau telah kedaluwarsa.';
+        } else {
+          authenticatedUserId = userData.user.id;
+        }
+      } else {
+        authenticatedUserId = data.user.id;
       }
-
-      try {
-        const supabaseAdmin = createSupabaseAdminClient();
-        const { error: adminError } = await supabaseAdmin.auth.admin.updateUserById(
-          userData.user.id,
-          { password: newPassword }
-        );
-        updateError = adminError;
-      } catch {
-        // Fallback: setSession and updateUser
-        await locals.supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: body.refresh_token || '',
-        });
-        const { error: fallbackError } = await locals.supabase.auth.updateUser({
-          password: newPassword,
-        });
-        updateError = fallbackError;
-      }
+    }
+    // 4) Else: fallback to existing sb-access-token / sb-refresh-token cookies
+    else if (locals.user) {
+      authenticatedUserId = locals.user.id;
     } else {
       return new Response(
         JSON.stringify({ error: 'Sesi pemulihan tidak ditemukan. Silakan minta tautan pemulihan baru.' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
+    }
+
+    if (authError) {
+      let localizedAuthError = authError;
+      if (
+        authError.includes('expired') ||
+        authError.includes('invalid') ||
+        authError.includes('Token has expired') ||
+        authError.includes('otp_expired')
+      ) {
+        localizedAuthError = 'Tautan pemulihan kata sandi tidak valid atau telah kedaluwarsa. Silakan minta tautan baru.';
+      }
+      return new Response(
+        JSON.stringify({ error: localizedAuthError }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Once the session is established from steps 1-4, immediately call updateUser({ password })
+    let updateError: any = null;
+    const { error: updErr } = await authClient.auth.updateUser({
+      password: newPassword,
+    });
+    updateError = updErr;
+
+    // Resilient fallback: If updateUser returned session missing but we have authenticatedUserId
+    if (updateError && authenticatedUserId) {
+      try {
+        const supabaseAdmin = createSupabaseAdminClient();
+        const { error: adminErr } = await supabaseAdmin.auth.admin.updateUserById(
+          authenticatedUserId,
+          { password: newPassword }
+        );
+        if (!adminErr) {
+          updateError = null;
+        }
+      } catch {
+        // preserve original updateError
+      }
     }
 
     if (updateError) {
@@ -90,11 +142,12 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
       );
     }
 
-    // Sign out recovery session and clear cookies so user logs in cleanly
+    // After successful password update:
+    // Call signOut, clear sb-access-token and sb-refresh-token cookies, and return { success: true }
     cookies.delete('sb-access-token', { path: '/' });
     cookies.delete('sb-refresh-token', { path: '/' });
     try {
-      await locals.supabase.auth.signOut();
+      await authClient.auth.signOut();
     } catch {
       // ignore
     }
@@ -113,4 +166,3 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
     );
   }
 };
-
