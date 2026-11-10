@@ -1117,5 +1117,141 @@ input[type="datetime-local"] {
   perspective: 1200px;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   Polaroid Stack Animated Miniature Preview
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes polaroidShuffle {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(2deg);
+  }
+  33% {
+    transform: translate3d(3px, -2px, 0) rotate(4deg);
+  }
+  66% {
+    transform: translate3d(-1px, -1px, 0) rotate(1deg);
+  }
+}
+
+@keyframes polaroidShimmer {
+  0% {
+    opacity: 0;
+    transform: translateX(-140%) rotate(25deg);
+  }
+  35% {
+    opacity: 0.85;
+  }
+  70%, 100% {
+    opacity: 0;
+    transform: translateX(240%) rotate(25deg);
+  }
+}
+
+.polaroid-stack-container {
+  perspective: 600px;
+  transform-style: preserve-3d;
+}
+
+.polaroid-card-top {
+  animation: polaroidShuffle 4s ease-in-out infinite;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+  will-change: transform;
+}
+
+.group:hover .polaroid-card-top,
+.group\/polaroid:hover .polaroid-card-top,
+.polaroid-stack-container:hover .polaroid-card-top {
+  transform: translate3d(14px, -6px, 0) rotate(10deg) !important;
+  box-shadow: 0 16px 28px -4px rgba(0, 0, 0, 0.6), 0 0 18px rgba(245, 197, 99, 0.35);
+}
+
+.polaroid-card-mid {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+  will-change: transform;
+}
+
+.group:hover .polaroid-card-mid,
+.group\/polaroid:hover .polaroid-card-mid,
+.polaroid-stack-container:hover .polaroid-card-mid {
+  transform: rotate(-8deg) !important;
+  box-shadow: 0 10px 20px -2px rgba(0, 0, 0, 0.5);
+}
+
+.polaroid-card-back {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+  will-change: transform;
+}
+
+.group:hover .polaroid-card-back,
+.group\/polaroid:hover .polaroid-card-back,
+.polaroid-stack-container:hover .polaroid-card-back {
+  transform: translate3d(-12px, 4px, 0) rotate(-14deg) !important;
+  box-shadow: 0 8px 16px -2px rgba(0, 0, 0, 0.45);
+}
+
+.polaroid-shimmer-sweep {
+  animation: polaroidShimmer 3.2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GPU-Accelerated Scroll Reveal Choreography
+   ══════════════════════════════════════════════════════════════ */
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Staggered Delay Utilities */
+.reveal-on-scroll[data-delay="50"] {
+  transition-delay: 50ms;
+}
+.reveal-on-scroll[data-delay="100"] {
+  transition-delay: 100ms;
+}
+.reveal-on-scroll[data-delay="150"] {
+  transition-delay: 150ms;
+}
+.reveal-on-scroll[data-delay="200"] {
+  transition-delay: 200ms;
+}
+.reveal-on-scroll[data-delay="250"] {
+  transition-delay: 250ms;
+}
+.reveal-on-scroll[data-delay="300"] {
+  transition-delay: 300ms;
+}
+.reveal-on-scroll[data-delay="350"] {
+  transition-delay: 350ms;
+}
+.reveal-on-scroll[data-delay="400"] {
+  transition-delay: 400ms;
+}
+.reveal-on-scroll[data-delay="500"] {
+  transition-delay: 500ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .polaroid-card-top {
+    animation: none !important;
+  }
+  .polaroid-shimmer-sweep {
+    animation: none !important;
+  }
+}
+
+
 
 
