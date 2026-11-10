@@ -19,7 +19,7 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
     password,
     options: {
       data: { full_name: full_name || '' },
-      emailRedirectTo: `${origin}/api/auth/callback`,
+      emailRedirectTo: `${origin}/api/auth/callback?next=/signin?verified=1`,
     },
   });
 

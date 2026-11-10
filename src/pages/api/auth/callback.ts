@@ -32,6 +32,20 @@ export const GET: APIRoute = async ({ locals, url, cookies, redirect }) => {
     }
   }
 
+  // If email verification from signup or redirected to /signin:
+  // Clear session cookies so the user signs in with their credentials cleanly
+  const isSignupVerification = type === 'signup' || safeNext.includes('/signin') || (nextParam && nextParam.includes('/signin'));
+  if (isSignupVerification) {
+    cookies.delete('sb-access-token', { path: '/' });
+    cookies.delete('sb-refresh-token', { path: '/' });
+    try {
+      await locals.supabase.auth.signOut();
+    } catch {
+      // Ignore signOut errors
+    }
+    return redirect('/signin?verified=1');
+  }
+
   if (session) {
     const isProd = import.meta.env.PROD;
     cookies.set('sb-access-token', session.access_token, {
@@ -49,6 +63,15 @@ export const GET: APIRoute = async ({ locals, url, cookies, redirect }) => {
       maxAge: 60 * 60 * 24 * 7,
     });
     return redirect(safeNext);
+  }
+
+  // Recovery fallback if session exchange handled on client
+  if (type === 'recovery' || safeNext.includes('/reset-password')) {
+    const resetUrl = new URL('/reset-password', url.origin);
+    url.searchParams.forEach((val, key) => {
+      if (key !== 'next') resetUrl.searchParams.set(key, val);
+    });
+    return redirect(resetUrl.pathname + resetUrl.search);
   }
 
   return redirect('/signin');
