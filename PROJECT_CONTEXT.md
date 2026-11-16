@@ -1229,3 +1229,55 @@ flowchart TD
 1. **Never Bypass RLS on User Endpoints**: Standard user API routes (`cards`, `wishes`, `profile`) must always use `createServerSupabaseClient(request)`. The `createAdminSupabaseClient()` is strictly reserved for administrative tasks (cleanup, role management, webhooks).
 2. **Immortal Super Admin Protection**: The email `lesynugraha@gmail.com` must never be demoted, modified, or deleted by any API route or database migration.
 3. **Stateless Password Reset**: The OTP `token_hash` must never be consumed on `GET` requests to prevent automated email security scanners from invalidating single-use links.
+
+
+---
+
+## 10. Codebase Audit Changelog (November 2026)
+
+This section records the fixes applied during the full `src/` audit. No database columns, `theme_config` JSONB keys, form `name`/`id` attributes, or API route paths were renamed.
+
+### 10.1 Diagnostics & Typing
+- **`src/lib/supabase.ts`**: `createSupabaseServerClient()` now builds a `CookieMethodsServer`-typed object (`getAll` / `setAll`) and passes it as `{ cookies: cookieMethods }`. Cookie behaviour is unchanged (same cookie merge of `Cookie` header and `AstroCookies`, same `httpOnly` / `sameSite: 'lax'` / `secure` flags). The explicit `CookieOptions` annotation was removed in favour of contextual typing.
+- **`npx astro check`**: `0 errors, 0 warnings`, with 1 informational hint (`ts(6387)`: `createServerClient` overload deprecation). The `@supabase/ssr` typings declare a deprecated `get/set/remove` overload ahead of the current `getAll/setAll` one, so the hint is produced by library overload ordering and not by project code.
+- **`npm run build`**: Cloudflare SSR bundle compiles with exit code 0.
+
+### 10.2 Tailwind CSS v4 Discipline
+- Replaced the 4 remaining legacy `bg-gradient-to-*` utilities in `src/pages/dashboard/create.astro` with `bg-linear-to-t`, `bg-linear-to-b`, `bg-linear-to-t`, `bg-linear-to-r`. A repo-wide scan now finds **0** occurrences of `bg-gradient-to-*`.
+- Replaced `flex-shrink-0` with `shrink-0` in `src/components/ui/Toast.astro`.
+- A scan for `border-*` combined with `divide-*` on the same element found **0** conflicts.
+- No `console.log` / `console.debug` calls exist in `src/`. Only `console.error` remains inside error handlers.
+
+### 10.3 Zero Native Emoji Policy
+- `src/pages/index.astro` was already emoji-free (verified by scan).
+- `src/pages/dashboard/index.astro` UI emoji replaced with `lucide-astro` vectors or removed from labels:
+  - `Zap` replaces the lightning glyph on the QRIS "Aktifkan / Perpanjang" button and the "Simulasikan Pembayaran Berhasil (Test Mode)" button.
+  - `Crown` replaces the crown glyph on the "Kelola Admin" button.
+  - The card thumbnail now renders a per-category icon via `CATEGORY_ICONS` (`wedding: Gem`, `birthday: Cake`, `anniversary: Heart`, `graduation: GraduationCap`, `invitation: Ticket`, `love: MailOpen`, `greetings: Sparkles`) instead of `CATEGORY_META[...].emoji`.
+  - Role `<option>` labels, role badges (`Pemilik Utama (Terkunci)`, `Super Admin`, `Admin Mitra`), the `VIP Permanen` status label, toast messages, the share-copy label (`Tersalin!`), and QRIS status text no longer contain emoji.
+  - The root-owner lock marker and the QRIS error state use inline SVG icons.
+  - **Intentionally retained:** the WhatsApp share message templates in the share modal (birthday, anniversary, graduation, love). They are outbound message text that recipients see in WhatsApp, not application UI icons.
+- `CATEGORY_META[*].emoji` in `src/lib/types.ts` is retained because `create.astro` and the public card viewer still consume it. These pages are outside the emoji policy scope.
+
+### 10.4 Defensive Data Access
+- **`src/pages/c/[slug].astro`**:
+  - `theme` is normalized from `typedCard.theme_config || {}` with fallbacks for `primaryColor`, `secondaryColor`, and `backgroundColor` taken from `DEFAULT_THEME_CONFIG`. Other defaults such as `cornerOrnament` are deliberately not injected, so the existing `|| (isWedding ? 'botanical' : 'none')` fallback logic is unchanged.
+  - `weddingData` is normalized so `bride`, `groom`, `akadEvent`, `receptionEvent`, and `digitalEnvelope` always exist, which prevents template crashes on legacy or partial cards. Optional blocks (`unduhMantu`, `sacredQuote`, `dresscode`, `loveStoryTimeline`, `turutMengundang`) remain guarded by their existing `?.` checks.
+  - `typedCard.media_urls` is coerced to an array.
+- **`src/pages/dashboard/create.astro`** (`checkAndLoadEditMode`): when a saved card is loaded for editing, `interactiveConfession` is merged over the studio defaults, `occasion` and `passcode` receive fallbacks, and `weddingData` is deep-merged over `emptyWeddingData()` so `bride`, `groom`, `akadEvent`, `receptionEvent`, `unduhMantu`, `digitalEnvelope`, `sacredQuote`, `dresscode`, and `loveStoryTimeline` can never be `null` in studio state.
+- **`src/pages/dashboard/index.astro`**: card header gradient reads `card.theme_config?.primaryColor` / `secondaryColor`.
+
+### 10.5 Listener, Timer & Observer Lifecycle
+- **`src/pages/c/[slug].astro`**:
+  - The countdown `setInterval` is now stored and cleared on `pagehide`.
+  - `romanticObserver` (non-wedding photo reveal) is now disconnected on `pagehide`, matching `weddingObserver` and `revealObserver`.
+- Verified already correct: `AmbientEffect.astro` cancels its animation frame and resize timer on `visibilitychange` / `pagehide` / `beforeunload`. `create.astro` clears its per-screen countdown interval and cancels its preview ambient animation frame. `src/pages/index.astro` unobserves each reveal target and uses a one-shot `IntersectionObserver`. `dashboard/index.astro` clears the QRIS poll and timer intervals on settlement.
+
+### 10.6 Copywriting Consistency ("Gratis Desain & Pratinjau, Publikasi Mulai Rp5.000")
+- `src/components/layout/BaseLayout.astro`: default meta description changed from English ("Free, fast, and delightful") to Indonesian pricing-accurate copy.
+- `src/pages/terms.astro` section 6: removed the outdated "premium features if available in the future" wording and replaced it with the actual model: studio design and Live Preview are free, and publishing uses 3/7/14/30/45/60-day packages from Rp5.000 via QRIS.
+- `src/pages/dashboard/index.astro`: guest CTA "Daftar Gratis" changed to "Daftar Sekarang".
+- Selective English industry terms (Dashboard, Live Preview, RSVP, Dresscode, VIP Pass, Polaroid Stack, Wax Seal, Gate Split, Aurora Mist, Google Calendar, Google Maps) are retained.
+
+### 10.7 Verified-Preserved Behaviour
+Auth flows (`/signin` without Magic Link, `/signup` to `/signin?verified=1`, `/reset-password` recovery), 3-tier RBAC with the immortal root owner, the 6-tier pricing engine (`src/lib/pricing.ts`), QRIS flow and scrollable modal, 48-hour grace period, CSV wishes export, the 7 category flows, `demo-wedding` showcase, client-side WebP compression, custom audio upload, and R2 garbage collection were not modified.

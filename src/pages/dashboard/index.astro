@@ -5,7 +5,18 @@ import Modal from '../../components/ui/Modal.astro';
 import Toast from '../../components/ui/Toast.astro';
 import { CATEGORY_META, ROOT_OWNER_EMAIL, isSuperAdmin, type UserRole } from '../../lib/types';
 import type { Card } from '../../lib/types';
-import { Cake, Sparkles, Gift, Eye, Share2, Plus, Sparkle, ArrowRight, ShieldCheck } from 'lucide-astro';
+import { Cake, Sparkles, Gift, Eye, Share2, Plus, Sparkle, ArrowRight, ShieldCheck, Zap, Crown, Gem, GraduationCap, Heart, MailOpen, Ticket } from 'lucide-astro';
+
+// Vector icon per card category (Zero Native Emoji policy)
+const CATEGORY_ICONS: Record<string, any> = {
+  wedding: Gem,
+  birthday: Cake,
+  anniversary: Heart,
+  graduation: GraduationCap,
+  invitation: Ticket,
+  love: MailOpen,
+  greetings: Sparkles,
+};
 import { SHOWCASE_WEDDING_CARD } from '../../lib/showcase-wedding';
 import { cleanupExpiredCards } from '../../lib/cleanup-expired';
 import { createSupabaseAdminClient } from '../../lib/supabase';
@@ -83,7 +94,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
           href="/signup"
           class="rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white px-3.5 py-2 text-xs font-medium transition-all"
         >
-          Daftar Gratis
+          Daftar Sekarang
         </a>
       </div>
     </div>
@@ -266,7 +277,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
           id="qris-simulate-btn"
           class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-xs bg-amber-400/20 text-amber-300 border border-amber-400/40 hover:bg-amber-400/30 hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer shadow-sm"
         >
-          <span>⚡</span>
+          <Zap class="h-3.5 w-3.5" stroke-width="2" />
           <span>Simulasikan Pembayaran Berhasil (Test Mode)</span>
         </button>
       </div>
@@ -291,9 +302,9 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
               id="admin-role-select"
               class="rounded-xl bg-surface-800 border border-white/10 px-3 py-2 text-xs text-white focus-ring cursor-pointer"
             >
-              <option value="admin">Admin Mitra 👑</option>
+              <option value="admin">Admin Mitra</option>
               <option value="user">Pengguna Biasa</option>
-              <option value="super_admin">Super Admin ⭐</option>
+              <option value="super_admin">Super Admin</option>
             </select>
             <button
               type="button"
@@ -342,7 +353,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
           id="admin-manage-btn"
           class="inline-flex items-center gap-2 rounded-xl border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 px-3.5 py-2 text-xs font-semibold shadow-sm transition-all cursor-pointer"
         >
-          <span>👑</span>
+          <Crown class="h-4 w-4" stroke-width="2" />
           <span>Kelola Admin</span>
         </button>
       )}
@@ -542,7 +553,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
 
         if (isAdminFree) {
           statusBadge = {
-            label: 'VIP Permanen 👑',
+            label: 'VIP Permanen',
             color: 'bg-amber-500/20 text-amber-200 border-amber-400/40',
             dot: 'bg-amber-300 animate-pulse',
           };
@@ -581,10 +592,15 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
             <!-- Card header with gradient -->
             <div
               class="h-28 bg-linear-to-br p-4 relative"
-              style={`background: linear-gradient(135deg, ${card.theme_config.primaryColor || '#c084fc'}40, ${card.theme_config.secondaryColor || '#f472b6'}30);`}
+              style={`background: linear-gradient(135deg, ${card.theme_config?.primaryColor || '#c084fc'}40, ${card.theme_config?.secondaryColor || '#f472b6'}30);`}
             >
               <div class="flex items-start justify-between">
-                <span class="text-3xl">{meta?.emoji || '🎉'}</span>
+                <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 border border-white/15 text-white">
+                  {(() => {
+                    const CategoryIcon = CATEGORY_ICONS[card.category] || Sparkles;
+                    return <CategoryIcon class="h-6 w-6" stroke-width="1.5" />;
+                  })()}
+                </span>
 
                 <!-- Status Badge -->
                 <div class="flex items-center gap-2">
@@ -624,7 +640,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
                     data-duration-days={card.duration_days || 7}
                     title="Aktifkan atau perpanjang masa aktif kartu via QRIS"
                   >
-                    <span>⚡</span>
+                    <Zap class="h-3.5 w-3.5" stroke-width="2" />
                     <span>{isUnpaid ? 'Aktifkan' : 'Perpanjang'}</span>
                   </button>
                 )}
@@ -764,7 +780,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
           throw new Error(errData.error || 'Failed to update status');
         }
 
-        const msg = newPublished ? '🎉 Kartu berhasil diterbitkan! Siapa pun yang memiliki tautan dapat melihat.' : 'Kartu disimpan sebagai draf.';
+        const msg = newPublished ? 'Kartu berhasil diterbitkan! Siapa pun yang memiliki tautan dapat melihat.' : 'Kartu disimpan sebagai draf.';
         (window as any).showToast({ message: msg, type: newPublished ? 'success' : 'info', duration: 2500 });
       } catch (err: any) {
         // Revert on error
@@ -881,7 +897,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
       }
 
       (window as any).showToast({
-        message: '🗑️ Kartu dan semua foto berhasil dihapus permanen.',
+        message: 'Kartu dan semua foto berhasil dihapus permanen.',
         type: 'success',
         duration: 3000,
       });
@@ -1045,7 +1061,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
     try {
       await navigator.clipboard.writeText(url);
       if (shareCopyText) {
-        shareCopyText.textContent = 'Tersalin! ✅';
+        shareCopyText.textContent = 'Tersalin!';
         setTimeout(() => { if (shareCopyText) shareCopyText.textContent = 'Salin Tautan'; }, 2000);
       }
       (window as any).showToast({ message: 'Tautan Berhasil Disalin!', type: 'success', duration: 2000 });
@@ -1193,8 +1209,8 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
             if (statusData.status === 'settled') {
               clearInterval(qrisPollInterval);
               clearInterval(qrisTimerInterval);
-              if (qrisStatusText) qrisStatusText.textContent = '✅ Pembayaran Berhasil! Mengaktifkan kartu...';
-              (window as any).showToast({ message: '🎉 Pembayaran berhasil diverifikasi!', type: 'success' });
+              if (qrisStatusText) qrisStatusText.textContent = 'Pembayaran Berhasil! Mengaktifkan kartu...';
+              (window as any).showToast({ message: 'Pembayaran berhasil diverifikasi!', type: 'success' });
               setTimeout(() => {
                 window.location.href = '/dashboard';
               }, 1200);
@@ -1208,7 +1224,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
     } catch (err: any) {
       (window as any).showToast({ message: err.message || 'Gagal memproses QRIS', type: 'error' });
       if (qrisQrContainer) {
-        qrisQrContainer.innerHTML = '<div class="text-xs text-rose-500 font-medium text-center px-4 py-16 flex flex-col items-center gap-2"><span>⚠️</span><span>Gagal memuat QRIS. Silakan coba kembali.</span></div>';
+        qrisQrContainer.innerHTML = '<div class="text-xs text-rose-500 font-medium text-center px-4 py-16 flex flex-col items-center gap-2"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg><span>Gagal memuat QRIS. Silakan coba kembali.</span></div>';
       }
     }
   }
@@ -1253,13 +1269,13 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
 
       clearInterval(qrisPollInterval);
       clearInterval(qrisTimerInterval);
-      (window as any).showToast({ message: '⚡ Pembayaran simulasi berhasil! Kartu telah aktif.', type: 'success' });
+      (window as any).showToast({ message: 'Pembayaran simulasi berhasil! Kartu telah aktif.', type: 'success' });
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 1000);
     } catch (err: any) {
       qrisSimulateBtn.removeAttribute('disabled');
-      qrisSimulateBtn.textContent = '⚡ Simulasikan Pembayaran Berhasil (Test Mode)';
+      qrisSimulateBtn.textContent = 'Simulasikan Pembayaran Berhasil (Test Mode)';
       (window as any).showToast({ message: err.message || 'Gagal simulasi pembayaran', type: 'error' });
     }
   });
@@ -1314,13 +1330,13 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
 
           if (u.isRootOwner) {
             badgeClass = 'bg-amber-400/25 text-amber-200 border border-amber-400/50 font-bold';
-            badgeText = '👑 Pemilik Utama (Terkunci)';
+            badgeText = 'Pemilik Utama (Terkunci)';
           } else if (u.role === 'super_admin') {
             badgeClass = 'bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold';
-            badgeText = '⭐ Super Admin';
+            badgeText = 'Super Admin';
           } else if (u.role === 'admin') {
             badgeClass = 'bg-amber-400/20 text-amber-300 border border-amber-400/30 font-semibold';
-            badgeText = '👑 Admin Mitra';
+            badgeText = 'Admin Mitra';
           }
 
           const isClickable = !u.isRootOwner;
@@ -1329,7 +1345,7 @@ const isSuperAdminUser = isSuperAdmin(userRole, user?.email);
               <div class="min-w-0">
                 <div class="font-medium text-white truncate flex items-center gap-1.5">
                   <span>${u.full_name || 'Tanpa Nama'}</span>
-                  ${u.isRootOwner ? '<span class="text-[10px] text-amber-400" title="Akun Terkunci">🔒</span>' : ''}
+                  ${u.isRootOwner ? '<span class="text-amber-400 inline-flex" title="Akun Terkunci"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg></span>' : ''}
                 </div>
                 <div class="text-[11px] text-surface-400 truncate">${u.email}</div>
               </div>

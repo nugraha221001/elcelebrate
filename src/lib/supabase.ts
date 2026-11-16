@@ -1,4 +1,4 @@
-import { createServerClient, parseCookieHeader, type CookieOptions } from '@supabase/ssr';
+import { createServerClient, parseCookieHeader, type CookieMethodsServer } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import type { AstroCookies } from 'astro';
 
@@ -9,45 +9,46 @@ import type { AstroCookies } from 'astro';
 export function createSupabaseServerClient(cookies: AstroCookies, request?: Request) {
   const cookieHeader = request?.headers.get('cookie') ?? '';
 
+  // Typed as CookieMethodsServer so the non-deprecated getAll/setAll overload is selected.
+  const cookieMethods: CookieMethodsServer = {
+    getAll() {
+      const parsed = parseCookieHeader(cookieHeader);
+      const cookieMap = new Map<string, string>();
+      for (const c of parsed) {
+        if (c.name && c.value !== undefined && c.value !== null) {
+          cookieMap.set(c.name, c.value);
+        }
+      }
+      // Also include tokens from AstroCookies if present
+      const sbAccess = cookies.get('sb-access-token')?.value;
+      if (sbAccess && !cookieMap.has('sb-access-token')) {
+        cookieMap.set('sb-access-token', sbAccess);
+      }
+      const sbRefresh = cookies.get('sb-refresh-token')?.value;
+      if (sbRefresh && !cookieMap.has('sb-refresh-token')) {
+        cookieMap.set('sb-refresh-token', sbRefresh);
+      }
+      return Array.from(cookieMap.entries()).map(([name, value]) => ({ name, value }));
+    },
+    setAll(cookiesToSet) {
+      const isProd = import.meta.env.PROD;
+      cookiesToSet.forEach(({ name, value, options }) => {
+        cookies.set(name, value, {
+          path: '/',
+          httpOnly: true,
+          sameSite: 'lax',
+          secure: isProd ? true : false,
+          ...(options as any),
+          ...(isProd ? {} : { secure: false }),
+        });
+      });
+    },
+  };
+
   return createServerClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
     import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          const parsed = parseCookieHeader(cookieHeader);
-          const cookieMap = new Map<string, string>();
-          for (const c of parsed) {
-            if (c.name && c.value !== undefined && c.value !== null) {
-              cookieMap.set(c.name, c.value);
-            }
-          }
-          // Also include tokens from AstroCookies if present
-          const sbAccess = cookies.get('sb-access-token')?.value;
-          if (sbAccess && !cookieMap.has('sb-access-token')) {
-            cookieMap.set('sb-access-token', sbAccess);
-          }
-          const sbRefresh = cookies.get('sb-refresh-token')?.value;
-          if (sbRefresh && !cookieMap.has('sb-refresh-token')) {
-            cookieMap.set('sb-refresh-token', sbRefresh);
-          }
-          return Array.from(cookieMap.entries()).map(([name, value]) => ({ name, value }));
-        },
-        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          const isProd = import.meta.env.PROD;
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookies.set(name, value, {
-              path: '/',
-              httpOnly: true,
-              sameSite: 'lax',
-              secure: isProd ? true : false,
-              ...(options as any),
-              ...(isProd ? {} : { secure: false }),
-            });
-          });
-        },
-      },
-    }
+    { cookies: cookieMethods }
   );
 }
 

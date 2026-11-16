@@ -5535,7 +5535,7 @@ const EXTENDED_SWATCHES = [
     const photoOrRings = coverPhotoUrl
       ? `<div class="relative mx-auto mb-3 h-28 w-22 sm:h-32 sm:w-26 overflow-hidden rounded-t-full border border-amber-300/40 shadow-xl bg-black/20">
            <img src="${coverPhotoUrl}" alt="Mempelai" class="h-full w-full object-cover" />
-           <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+           <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
          </div>`
       : `<div class="text-4xl mb-3 animate-bounce" style="animation-duration: 3s;">💍</div>`;
 
@@ -5582,7 +5582,7 @@ const EXTENDED_SWATCHES = [
       return `
         <div class="preview-cover-gate preview-gate-left absolute inset-y-0 left-0 w-1/2 overflow-hidden pointer-events-none border-r border-[#f5c563]/40 z-20" style="background: linear-gradient(135deg, #181522, ${primaryColor}25, #181522);"></div>
         <div class="preview-cover-gate preview-gate-right absolute inset-y-0 right-0 w-1/2 overflow-hidden pointer-events-none border-l border-[#f5c563]/40 z-20" style="background: linear-gradient(225deg, #181522, ${secondaryColor}25, #181522);"></div>
-        <div class="preview-seam-glow pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 z-22 w-0.5 bg-gradient-to-b from-transparent via-[#f5c563]/60 to-transparent"></div>
+        <div class="preview-seam-glow pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 z-22 w-0.5 bg-linear-to-b from-transparent via-[#f5c563]/60 to-transparent"></div>
         ${commonCenter}
       `;
     }
@@ -5940,7 +5940,7 @@ const EXTENDED_SWATCHES = [
           <div class="aspect-4/5 w-full overflow-hidden">
             <img src="${coverPhotoUrl}" alt="Mempelai" class="hero-couple-photo ken-burns-active w-full h-full object-cover will-change-transform" />
           </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none"></div>
+          <div class="absolute inset-0 bg-linear-to-t from-black/75 via-black/20 to-transparent pointer-events-none"></div>
           <div class="absolute bottom-2.5 inset-x-0 text-center px-2 pointer-events-none">
             <p class="text-[9px] uppercase tracking-[0.25em] text-amber-200/90 font-medium mb-0.5">${headerTitle}</p>
             <h3 class="text-base font-serif font-bold text-white tracking-wide truncate">${brideName} & ${groomName}</h3>
@@ -6353,7 +6353,7 @@ const EXTENDED_SWATCHES = [
           ></textarea>
           <button
             type="submit"
-            class="w-full py-2 rounded-lg text-xs font-semibold text-[#0f0d15] bg-gradient-to-r from-[#f5c563] to-[#e07a93] shadow-md shadow-black/20 cursor-pointer transition-transform active:scale-[0.99] flex items-center justify-center gap-1.5"
+            class="w-full py-2 rounded-lg text-xs font-semibold text-[#0f0d15] bg-linear-to-r from-[#f5c563] to-[#e07a93] shadow-md shadow-black/20 cursor-pointer transition-transform active:scale-[0.99] flex items-center justify-center gap-1.5"
           >
             <span>Kirim Doa & Restu</span>
             <span>✨</span>
@@ -8357,11 +8357,34 @@ const EXTENDED_SWATCHES = [
       state.eventDate = card.event_date ? card.event_date.split('T')[0] : '';
 
       if (card.theme_config) {
+        const baseTheme = state.themeConfig;
         state.themeConfig = {
           ...state.themeConfig,
           ...card.theme_config,
         };
         state.themeConfig.unboxingStyle = resolveUnboxingStyle(card.category, (card.theme_config as any).unboxingStyle, (card.theme_config as any).unboxStyle);
+        // Defensive normalization: legacy / partial theme_config must never leave nested state null
+        const savedTheme: any = card.theme_config;
+        state.themeConfig.interactiveConfession = { ...baseTheme.interactiveConfession, ...(savedTheme.interactiveConfession || {}) };
+        state.themeConfig.occasion = savedTheme.occasion || baseTheme.occasion;
+        state.themeConfig.passcode = savedTheme.passcode || '';
+        if (savedTheme.weddingData) {
+          const wd: any = savedTheme.weddingData;
+          const base: any = emptyWeddingData();
+          state.themeConfig.weddingData = {
+            ...base,
+            ...wd,
+            bride: { ...base.bride, ...(wd.bride || {}) },
+            groom: { ...base.groom, ...(wd.groom || {}) },
+            akadEvent: { ...base.akadEvent, ...(wd.akadEvent || {}) },
+            receptionEvent: { ...base.receptionEvent, ...(wd.receptionEvent || {}) },
+            unduhMantu: { ...base.unduhMantu, ...(wd.unduhMantu || {}) },
+            digitalEnvelope: { ...base.digitalEnvelope, ...(wd.digitalEnvelope || {}) },
+            sacredQuote: { ...base.sacredQuote, ...(wd.sacredQuote || {}) },
+            dresscode: { ...base.dresscode, ...(wd.dresscode || {}) },
+            loveStoryTimeline: Array.isArray(wd.loveStoryTimeline) && wd.loveStoryTimeline.length > 0 ? wd.loveStoryTimeline : base.loveStoryTimeline,
+          };
+        }
         if (state.themeConfig.audioTrackId && LEGACY_TRACK_MAP[state.themeConfig.audioTrackId]) {
           state.themeConfig.audioTrackId = LEGACY_TRACK_MAP[state.themeConfig.audioTrackId];
         }

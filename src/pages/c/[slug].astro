@@ -2,8 +2,8 @@
 import BaseLayout from '../../components/layout/BaseLayout.astro';
 import AmbientEffect from '../../components/ui/AmbientEffect.astro';
 import CornerOrnaments from '../../components/ui/CornerOrnaments.astro';
-import type { Card, Wish, ThemeConfig } from '../../lib/types';
-import { CATEGORY_META, resolveUnboxingStyle } from '../../lib/types';
+import type { Card, Wish, ThemeConfig, WeddingData } from '../../lib/types';
+import { CATEGORY_META, DEFAULT_THEME_CONFIG, resolveUnboxingStyle } from '../../lib/types';
 import { getTrackById, getTrackUrl } from '../../lib/audio-tracks';
 import { resolveMediaUrl } from '../../lib/r2';
 
@@ -55,8 +55,16 @@ const isExpired = !isDemoWedding && !isAdminFree && (
 const isCardInactive = isUnpaid || isExpired;
 
 const typedCard = card as Card;
+typedCard.media_urls = Array.isArray(typedCard.media_urls) ? typedCard.media_urls : [];
 const typedWishes = (wishes || []) as Wish[];
-const theme = typedCard.theme_config as ThemeConfig;
+// Defensive theme normalization: tolerate null / partial theme_config JSONB
+const rawTheme = (typedCard.theme_config || {}) as Partial<ThemeConfig>;
+const theme = {
+  ...rawTheme,
+  primaryColor: rawTheme.primaryColor || DEFAULT_THEME_CONFIG.primaryColor,
+  secondaryColor: rawTheme.secondaryColor || DEFAULT_THEME_CONFIG.secondaryColor,
+  backgroundColor: rawTheme.backgroundColor || DEFAULT_THEME_CONFIG.backgroundColor,
+} as ThemeConfig;
 const meta = CATEGORY_META[typedCard.category as keyof typeof CATEGORY_META];
 const customAudioUrl = theme.customAudioUrl ? resolveMediaUrl(theme.customAudioUrl) : null;
 const audioTrack = theme.audioTrackId ? getTrackById(theme.audioTrackId) : null;
@@ -77,7 +85,23 @@ const fontFamily = fontMap[theme.fontFamily] || fontMap.sans;
 
 // Wedding-specific data
 const isWedding = typedCard.category === 'wedding';
-const weddingData = theme.weddingData || null;
+const rawWeddingData = theme.weddingData || null;
+const emptyEvent = { date: '', timeStart: '', timeEnd: '', venue: '', address: '', mapsUrl: '' };
+const emptyPerson = { fullName: '', nickname: '', parents: '' };
+const emptyEnvelope = { bankName: '', accountNumber: '', accountHolder: '' };
+// Guarantee every required nested object exists so template property accesses never throw
+const weddingData: WeddingData | null = rawWeddingData
+  ? {
+      ...rawWeddingData,
+      bride: { ...emptyPerson, ...(rawWeddingData.bride || {}) },
+      groom: { ...emptyPerson, ...(rawWeddingData.groom || {}) },
+      akadEvent: { ...emptyEvent, ...(rawWeddingData.akadEvent || {}) },
+      receptionEvent: { ...emptyEvent, ...(rawWeddingData.receptionEvent || {}) },
+      digitalEnvelope: { ...emptyEnvelope, ...(rawWeddingData.digitalEnvelope || {}) },
+      loveStory: rawWeddingData.loveStory || '',
+      openingGreeting: rawWeddingData.openingGreeting || '',
+    }
+  : null;
 
 // Evergreen future target date for demo wedding (30 days from today)
 const evergreenTargetMs = Date.now() + 30 * 24 * 60 * 60 * 1000;
@@ -3839,7 +3863,8 @@ const hasBirthdayAge = birthdayAge.length > 0;
       }
 
       updateCountdown();
-      setInterval(updateCountdown, 1000);
+      const countdownTimerId = window.setInterval(updateCountdown, 1000);
+      window.addEventListener('pagehide', () => clearInterval(countdownTimerId), { once: true });
     }
   }
 
@@ -4057,6 +4082,7 @@ const hasBirthdayAge = birthdayAge.length > 0;
     document.querySelectorAll('.romantic-photo-wrapper').forEach((el) => {
       romanticObserver.observe(el);
     });
+    window.addEventListener('pagehide', () => romanticObserver.disconnect(), { once: true });
   }
   observeRevealElements();
 
